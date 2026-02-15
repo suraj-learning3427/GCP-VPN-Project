@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenkins VPN Infrastructure - Complete Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar h1 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .sidebar .status {
+            background: #27ae60;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .nav-section {
+            margin-bottom: 25px;
+        }
+        
+        .nav-section h3 {
+            font-size: 0.9em;
+            color: #95a5a6;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .nav-section ul {
+            list-style: none;
+        }
+        
+        .nav-section li {
+            margin-bottom: 8px;
+        }
+        
+        .nav-section a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        
+        .nav-section a:hover {
+            background: #34495e;
+            color: #3498db;
+            padding-left: 16px;
+        }
+        
+        .nav-section a.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+        }
+        
+        .content-section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .content-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .content-section h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .content-section h4 {
+            color: #7f8c8d;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Code Blocks */
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        
+        code {
+            background: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: #ecf0f1;
+        }
+        
+        /* Lists */
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        /* Alert Boxes */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        /* Diagrams */
+        .diagram {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+        }
+        
+        /* Quick Links */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .quick-link-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+        
+        .quick-link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .quick-link-card h3 {
+            color: white;
+            margin: 0 0 10px 0;
+        }
+        
+        .quick-link-card p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .content-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h1>🚀 Jenkins VPN Infrastructure</h1>
+            <div class="status">✅ Production Ready</div>
+            
+            <div class="nav-section">
+                <h3>Quick Start</h3>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#quick-access">Quick Access Guide</a></li>
+                    <li><a href="#status">Current Status</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Infrastructure</h3>
+                <ul>
+                    <li><a href="#architecture">Architecture</a></li>
+                    <li><a href="#components">Components</a></li>
+                    <li><a href="#network">Network Details</a></li>
+                    <li><a href="#security">Security Layers</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>PKI & Certificates</h3>
+                <ul>
+                    <li><a href="#pki-overview">PKI Overview</a></li>
+                    <li><a href="#certificates">Certificate Details</a></li>
+                    <li><a href="#pki-setup">PKI Setup Guide</a></li>
+                    <li><a href="#cert-renewal">Certificate Renewal</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Access & Configuration</h3>
+                <ul>
+                    <li><a href="#https-access">HTTPS Access</a></li>
+                    <li><a href="#firezone-setup">Firezone Setup</a></li>
+                    <li><a href="#client-setup">Client Setup</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Operations</h3>
+                <ul>
+                    <li><a href="#verification">Verification Tests</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#maintenance">Maintenance</a></li>
+                    <li><a href="#costs">Cost Analysis</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Reference</h3>
+                <ul>
+                    <li><a href="#commands">Quick Commands</a></li>
+                    <li><a href="#files">File Locations</a></li>
+                    <li><a href="#diagrams">Architecture Diagrams</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section">
+                <h2>📋 Project Overview</h2>
+                
+                <div class="alert alert-success">
+                    <strong>✅ Status: Production Ready</strong><br>
+                    Your secure Jenkins infrastructure is fully operational with complete PKI, HTTPS, and 5-layer security architecture.
+                </div>
+                
+                <h3>What You Have</h3>
+                <p>A production-ready, enterprise-grade Jenkins CI/CD infrastructure with:</p>
+                <ul>
+                    <li><strong>Zero Internet Exposure:</strong> Air-gapped Jenkins VM with no public IP</li>
+                    <li><strong>VPN-Only Access:</strong> Firezone WireGuard VPN authentication required</li>
+                    <li><strong>Complete PKI:</strong> 3-tier certificate chain (Root → Intermediate → Server)</li>
+                    <li><strong>HTTPS Encryption:</strong> Full TLS with certificate validation</li>
+                    <li><strong>5-Layer Security:</strong> Network isolation, VPN auth, firewall, VPN encryption, TLS encryption</li>
+                    <li><strong>Cost Optimized:</strong> $58.87/month (52% cheaper than Cloud NAT approach)</li>
+                </ul>
+                
+                <h3>Access URLs</h3>
+                <div class="quick-links">
+                    <div class="quick-link-card">
+                        <h3>🔒 Primary HTTPS</h3>
+                        <p><code>https://jenkins.np.learningmyway.space</code></p>
+                        <p>Recommended - Full certificate validation</p>
+                    </div>
+                    <div class="quick-link-card">
+                        <h3>🔒 Alternative HTTPS</h3>
+                        <p><code>https://10.10.10.100</code></p>
+                        <p>Direct IP access via HTTPS</p>
+                    </div>
+                </div>
+                
+                <h3>Key Metrics</h3>
+                <table>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Infrastructure Health</td>
+                        <td>100%</td>
+                        <td><span class="badge badge-success">✅ Operational</span></td>
+                    </tr>
+                    <tr>
+                        <td>Security Rating</td>
+                        <td>5/5 Layers</td>
+                        <td><span class="badge badge-success">⭐⭐⭐⭐⭐</span></td>
+                    </tr>
+                    <tr>
+                        <td>Monthly Cost</td>
+                        <td>$58.87</td>
+                        <td><span class="badge badge-success">✅ Optimized</span></td>
+                    </tr>
+                    <tr>
+                        <td>Certificate Validity</td>
+                        <td>365 days</td>
+                        <td><span class="badge badge-success">✅ Valid</span></td>
+                    </tr>
+                </table>
+            </section>
+            
+            <!-- Quick Access Section -->
+            <section id="quick-access" class="content-section">
+                <h2>🚀 Quick Access Guide (5 Minutes)</h2>
+                
+                <h3>Step 1: Install Root CA Certificate (2 minutes)</h3>
+                <p>Open PowerShell as Administrator and run:</p>
+                <pre><code># Install Root CA certificate
+Import-Certificate -FilePath "LearningMyWay-Root-CA.crt" -CertStoreLocation Cert:\LocalMachine\Root</code></pre>
+                
+                <h3>Step 2: Add Hosts File Entry (1 minute)</h3>
+                <pre><code># Add DNS entry to hosts file
+Add-Content C:\Windows\System32\drivers\etc\hosts "`n10.10.10.100 jenkins.np.learningmyway.space"</code></pre>
+                
+                <h3>Step 3: Configure Firezone Resource (2 minutes)</h3>
+                <ol>
+                    <li>Login to <code>https://app.firezone.dev</code></li>
+                    <li>Go to <strong>Resources</strong> → <strong>Add Resource</strong></li>
+                    <li>Name: <code>Jenkins Infrastructure</code></li>
+                    <li>Address: <code>10.10.10.0/24</code> or <code>10.10.10.100/32</code></li>
+                    <li>Assign to your user/group</li>
+                    <li>Reconnect VPN</li>
+                </ol>
+                
+                <h3>Step 4: Access Jenkins</h3>
+                <ol>
+                    <li>Connect to Firezone VPN</li>
+                    <li>Open browser</li>
+                    <li>Go to: <code>https://jenkins.np.learningmyway.space</code></li>
+                    <li>Browser shows "Secure" 🔒 with no warnings</li>
+                </ol>
+                
+                <div class="alert alert-success">
+                    <strong>✅ Success!</strong> You should now see Jenkins login page with a secure connection.
+                </div>
+            </section>
+            
+            <!-- Current Status Section -->
+            <section id="status" class="content-section">
+                <h2>📊 Current Infrastructure Status</h2>
+                
+                <h3>Network Infrastructure</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td>VPC Networks</td>
+                        <td><span class="badge badge-success">✅ Running</span></td>
+                        <td>Both VPCs operational</td>
+                    </tr>
+                    <tr>
+                        <td>VPC Peering</td>
+                        <td><span class="badge badge-success">✅ Active</span></td>
+                        <td>Bidirectional peering working</td>
+                    </tr>
+                    <tr>
+                        <td>Subnets</td>
+                        <td><span class="badge badge-success">✅ Configured</span></td>
+                        <td>All subnets properly configured</td>
+                    </tr>
+                    <tr>
+                        <td>Firewall Rules</td>
+                        <td><span class="badge badge-success">✅ Active</span></td>
+                        <td>All 4 rules enforced</td>
+                    </tr>
+                </table>
+                
+                <h3>Compute Resources</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td>Jenkins VM</td>
+                        <td><span class="badge badge-success">✅ Running</span></td>
+                        <td>HTTP on 8080, healthy</td>
+                    </tr>
+                    <tr>
+                        <td>Firezone Gateway</td>
+                        <td><span class="badge badge-success">✅ Running</span></td>
+                        <td>VPN operational</td>
+                    </tr>
+                    <tr>
+                        <td>Nginx Proxy</td>
+                        <td><span class="badge badge-success">✅ Running</span></td>
+                        <td>HTTPS on 443, healthy</td>
+                    </tr>
+                </table>
+                
+                <h3>Security & Certificates</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Status</th>
+                        <th>Expiry</th>
+                    </tr>
+                    <tr>
+                        <td>Root CA</td>
+                        <td><span class="badge badge-success">✅ Valid</span></td>
+                        <td>Feb 13, 2036 (10 years)</td>
+                    </tr>
+                    <tr>
+                        <td>Intermediate CA</td>
+                        <td><span class="badge badge-success">✅ Valid</span></td>
+                        <td>Feb 12, 2031 (5 years)</td>
+                    </tr>
+                    <tr>
+                        <td>Server Certificate</td>
+                        <td><span class="badge badge-success">✅ Valid</span></td>
+                        <td>Feb 13, 2027 (1 year)</td>
+                    </tr>
+                    <tr>
+                        <td>HTTPS Configuration</td>
+                        <td><span class="badge badge-success">✅ Active</span></td>
+                        <td>TLS 1.2/1.3 enabled</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Architecture Section -->
+            <section id="architecture" class="content-section">
+                <h2>🏗️ Architecture Overview</h2>
+                
+                <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         GCP PROJECT 1                                    │
+│                    test-project1-485105                                  │
+│                      (VPN Gateway)                                       │
+│                                                                          │
+│  ┌────────────────────────────────────────────────────────────────┐    │
+│  │  VPC Network: vpn-vpc (20.20.20.0/16)                          │    │
+│  │                                                                  │    │
+│  │  ┌──────────────────────────────────────────────────────────┐  │    │
+│  │  │  Subnet: vpn-subnet (20.20.20.0/24)                      │  │    │
+│  │  │                                                            │  │    │
+│  │  │  ┌──────────────────────────────────────────────────┐    │  │    │
+│  │  │  │  Firezone VPN Gateway                            │    │  │    │
+│  │  │  │  - VM: e2-small                                  │    │  │    │
+│  │  │  │  - IP: 20.20.20.10                               │    │  │    │
+│  │  │  │  - Public IP: Yes (for VPN clients)              │    │  │    │
+│  │  │  │  - WireGuard VPN                                 │    │  │    │
+│  │  │  └──────────────────────────────────────────────────┘    │  │    │
+│  │  └──────────────────────────────────────────────────────────┘  │    │
+│  └────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ VPC Peering
+                                    │ (Bidirectional)
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         GCP PROJECT 2                                    │
+│                    test-project2-485105                                  │
+│                    (Jenkins Application)                                 │
+│                                                                          │
+│  ┌────────────────────────────────────────────────────────────────┐    │
+│  │  VPC Network: jenkins-vpc (10.10.10.0/16)                      │    │
+│  │                                                                  │    │
+│  │  ┌──────────────────────────────────────────────────────────┐  │    │
+│  │  │  Subnet: jenkins-subnet (10.10.10.0/24)                  │  │    │
+│  │  │                                                            │  │    │
+│  │  │  ┌──────────────────────────────────────────────────┐    │  │    │
+│  │  │  │  Internal Load Balancer                          │    │  │    │
+│  │  │  │  - IP: 10.10.10.100                              │    │  │    │
+│  │  │  │  - Ports: 8080, 443                              │    │  │    │
+│  │  │  │  - Health Checks: Enabled                        │    │  │    │
+│  │  │  └──────────────────────────────────────────────────┘    │  │    │
+│  │  │                        │                                   │  │    │
+│  │  │                        ▼                                   │  │    │
+│  │  │  ┌──────────────────────────────────────────────────┐    │  │    │
+│  │  │  │  Jenkins VM                                      │    │  │    │
+│  │  │  │  - VM: e2-medium (2 vCPU, 4GB RAM)              │    │  │    │
+│  │  │  │  - IP: 10.10.10.10                               │    │  │    │
+│  │  │  │  - Public IP: None (Air-gapped)                  │    │  │    │
+│  │  │  │  - OS: Rocky Linux 8                             │    │  │    │
+│  │  │  │  - Jenkins: Port 8080                            │    │  │    │
+│  │  │  │  - Nginx: Port 443 (HTTPS)                       │    │  │    │
+│  │  │  └──────────────────────────────────────────────────┘    │  │    │
+│  │  └──────────────────────────────────────────────────────────┘  │    │
+│  └────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+                        Traffic Flow:
+        User → VPN → Project 1 → VPC Peering → Project 2 → Jenkins
+                </div>
+                
+                <h3>Key Design Principles</h3>
+                <ul>
+                    <li><strong>Zero Trust Architecture:</strong> No public access to Jenkins</li>
+                    <li><strong>Defense in Depth:</strong> 5 layers of security</li>
+                    <li><strong>Network Segmentation:</strong> Separate VPN and application networks</li>
+                    <li><strong>Encryption Everywhere:</strong> VPN + TLS double encryption</li>
+                    <li><strong>Infrastructure as Code:</strong> Fully automated with Terraform</li>
+                </ul>
+            </section>
+            
+            <!-- Components Section -->
+            <section id="components" class="content-section">
+                <h2>🔧 Infrastructure Components</h2>
+                
+                <h3>GCP Project 1: VPN Gateway (test-project1-485105)</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Specification</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>VPC Network</td>
+                        <td>20.20.20.0/16</td>
+                        <td>VPN gateway network</td>
+                    </tr>
+                    <tr>
+                        <td>Subnet</td>
+                        <td>20.20.20.0/24</td>
+                        <td>VPN gateway subnet</td>
+                    </tr>
+                    <tr>
+                        <td>Firezone VM</td>
+                        <td>e2-small (2 vCPU, 2GB RAM)</td>
+                        <td>WireGuard VPN gateway</td>
+                    </tr>
+                    <tr>
+                        <td>Public IP</td>
+                        <td>Static external IP</td>
+                        <td>VPN client connectivity</td>
+                    </tr>
+                </table>
+                
+                <h3>GCP Project 2: Jenkins Application (test-project2-485105)</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Specification</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>VPC Network</td>
+                        <td>10.10.10.0/16</td>
+                        <td>Application network</td>
+                    </tr>
+                    <tr>
+                        <td>Subnet</td>
+                        <td>10.10.10.0/24</td>
+                        <td>Jenkins subnet</td>
+                    </tr>
+                    <tr>
+                        <td>Jenkins VM</td>
+                        <td>e2-medium (2 vCPU, 4GB RAM)</td>
+                        <td>Jenkins CI/CD server</td>
+                    </tr>
+                    <tr>
+                        <td>Boot Disk</td>
+                        <td>50GB SSD</td>
+                        <td>OS and applications</td>
+                    </tr>
+                    <tr>
+                        <td>Data Disk</td>
+                        <td>100GB SSD</td>
+                        <td>Jenkins data persistence</td>
+                    </tr>
+                    <tr>
+                        <td>Internal LB</td>
+                        <td>10.10.10.100</td>
+                        <td>Load balancing and health checks</td>
+                    </tr>
+                    <tr>
+                        <td>Nginx</td>
+                        <td>Latest stable</td>
+                        <td>HTTPS termination and reverse proxy</td>
+                    </tr>
+                </table>
+            </section>
+            
+            <!-- Network Details Section -->
+            <section id="network" class="content-section">
+                <h2>🌐 Network Configuration</h2>
+                
+                <h3>IP Address Allocation</h3>
+                <table>
+                    <tr>
+                        <th>Resource</th>
+                        <th>IP Address</th>
+                        <th>Type</th>
+                    </tr>
+                    <tr>
+                        <td>Firezone Gateway</td>
+                        <td>20.20.20.10</td>
+                        <td>Private (+ Public IP)</td>
+                    </tr>
+                    <tr>
+                        <td>Jenkins VM</td>
+                        <td>10.10.10.10</td>
+                        <td>Private only</td>
+                    </tr>
+                    <tr>
+                        <td>Internal Load Balancer</td>
+                        <td>10.10.10.100</td>
+                        <td>Private only</td>
+                    </tr>
+                </table>
+                
+                <h3>Firewall Rules</h3>
+                <table>
+                    <tr>
+                        <th>Rule Name</th>
+                        <th>Direction</th>
+                        <th>Ports</th>
+                        <th>Source</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>allow-vpn-to-jenkins</td>
+                        <td>Ingress</td>
+                        <td>8080, 443</td>
+                        <td>20.20.20.0/24</td>
+                        <td>VPN access to Jenkins</td>
+                    </tr>
+                    <tr>
+                        <td>allow-health-checks</td>
+                        <td>Ingress</td>
+                        <td>8080, 443</td>
+                        <td>35.191.0.0/16, 130.211.0.0/22</td>
+                        <td>GCP health checks</td>
+                    </tr>
+                    <tr>
+                        <td>allow-iap-ssh</td>
+                        <td>Ingress</td>
+                        <td>22</td>
+                        <td>35.235.240.0/20</td>
+                        <td>IAP SSH access</td>
+                    </tr>
+                    <tr>
+                        <td>allow-wireguard</td>
+                        <td>Ingress</td>
+                        <td>51820/UDP</td>
+                        <td>0.0.0.0/0</td>
+                        <td>VPN client connections</td>
+                    </tr>
+                </table>
+                
+                <h3>DNS Configuration</h3>
+                <ul>
+                    <li><strong>Private DNS Zone:</strong> learningmyway.space</li>
+                    <li><strong>A Record:</strong> jenkins.np.learningmyway.space → 10.10.10.100</li>
+                    <li><strong>Client Resolution:</strong> Via hosts file entry</li>
+                </ul>
+            </section>
+            
+            <!-- Security Section -->
+            <section id="security" class="content-section">
+                <h2>🔒 Security Architecture (5 Layers)</h2>
+                
+                <div class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                    LAYER 5: TLS Encryption                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  • HTTPS with full certificate chain                      │  │
+│  │  • TLS 1.2/1.3 protocols                                  │  │
+│  │  • Certificate validation                                 │  │
+│  │  • Browser shows "Secure" 🔒                              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ▲
+┌─────────────────────────────────────────────────────────────────┐
+│                   LAYER 4: VPN Encryption                        │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  • WireGuard protocol                                     │  │
+│  │  • All traffic encrypted in transit                       │  │
+│  │  • Modern cryptography (ChaCha20, Poly1305)              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ▲
+┌─────────────────────────────────────────────────────────────────┐
+│                  LAYER 3: Firewall Protection                    │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  • Strict access control rules                           │  │
+│  │  • Only VPN subnet allowed (20.20.20.0/24)               │  │
+│  │  • Default deny all other traffic                        │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ▲
+┌─────────────────────────────────────────────────────────────────┐
+│                 LAYER 2: VPN Authentication                      │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  • Firezone WireGuard VPN                                 │  │
+│  │  • User authentication required                           │  │
+│  │  • Resource-based access control                          │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ▲
+┌─────────────────────────────────────────────────────────────────┐
+│                  LAYER 1: Network Isolation                      │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  • No public IP on Jenkins VM                             │  │
+│  │  • Air-gapped environment                                 │  │
+│  │  • VPC peering only                                       │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                </div>
+                
+                <h3>Security Rating: ⭐⭐⭐⭐⭐ (5/5 - Maximum Security)</h3>
+                
+                <h3>Attack Surface Analysis</h3>
+                <table>
+                    <tr>
+                        <th>Attack Vector</th>
+                        <th>Mitigation</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Direct Internet Access</td>
+                        <td>No public IP on Jenkins</td>
+                        <td><span class="badge badge-success">✅ Blocked</span></td>
+                    </tr>
+                    <tr>
+                        <td>Unauthorized Access</td>
+                        <td>VPN authentication required</td>
+                        <td><span class="badge badge-success">✅ Protected</span></td>
+                    </tr>
+                    <tr>
+                        <td>Network Scanning</td>
+                        <td>Firewall rules + VPN only</td>
+                        <td><span class="badge badge-success">✅ Protected</span></td>
+                    </tr>
+                    <tr>
+                        <td>Man-in-the-Middle</td>
+                        <td>VPN + TLS encryption</td>
+                        <td><span class="badge badge-success">✅ Protected</span></td>
+                    </tr>
+                    <tr>
+                        <td>Certificate Spoofing</td>
+                        <td>Full PKI chain validation</td>
+                        <td><span class="badge badge-success">✅ Protected</span></td>
+                    </tr>
+                </table>
+            </section>
+            
+            <!-- PKI Overview Section -->
+            <section id="pki-overview" class="content-section">
+                <h2>🔐 PKI Infrastructure Overview</h2>
+                
+                <div class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                   LearningMyWay Root CA                          │
+│                                                                  │
+│  Common Name: LearningMyWay Root CA                             │
+│  Key Size: 4096-bit RSA                                         │
+│  Validity: 10 years (Feb 13, 2026 - Feb 13, 2036)              │
+│  Purpose: Trust anchor for organization                         │
+│                                                                  │
+└──────────────────────────┬───────────────────────────────────────┘
+                           │ Signs
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              LearningMyWay Intermediate CA                       │
+│                                                                  │
+│  Common Name: LearningMyWay Intermediate CA                     │
+│  Key Size: 4096-bit RSA                                         │
+│  Validity: 5 years (Feb 13, 2026 - Feb 12, 2031)               │
+│  Purpose: Issue server certificates                             │
+│                                                                  │
+└──────────────────────────┬───────────────────────────────────────┘
+                           │ Signs
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              jenkins.np.learningmyway.space                      │
+│                                                                  │
+│  Common Name: jenkins.np.learningmyway.space                    │
+│  Key Size: 2048-bit RSA                                         │
+│  Validity: 1 year (Feb 13, 2026 - Feb 13, 2027)                │
+│  SAN: DNS:jenkins.np.learningmyway.space, IP:10.10.10.100      │
+│  Purpose: Jenkins HTTPS endpoint                                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                </div>
+                
+                <h3>Why 3-Tier PKI?</h3>
+                <ul>
+                    <li><strong>Security:</strong> Root CA can be kept offline and secure</li>
+                    <li><strong>Flexibility:</strong> Intermediate CA can issue multiple server certificates</li>
+                    <li><strong>Revocation:</strong> Can revoke intermediate CA without affecting root</li>
+                    <li><strong>Best Practice:</strong> Industry-standard PKI architecture</li>
+                    <li><strong>Scalability:</strong> Easy to add more servers with same CA</li>
+                </ul>
+                
+                <h3>Certificate Chain Validation</h3>
+                <p>When a browser connects to Jenkins:</p>
+                <ol>
+                    <li>Server presents its certificate (jenkins.np.learningmyway.space)</li>
+                    <li>Browser checks if it's signed by Intermediate CA</li>
+                    <li>Browser checks if Intermediate CA is signed by Root CA</li>
+                    <li>Browser checks if Root CA is in trusted store</li>
+                    <li>If all checks pass: Connection is secure 🔒</li>
+                </ol>
+            </section>
+            
+            <!-- Certificate Details Section -->
+            <section id="certificates" class="content-section">
+                <h2>📜 Certificate Details</h2>
+                
+                <h3>Root CA Certificate</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Common Name</td>
+                        <td>LearningMyWay Root CA</td>
+                    </tr>
+                    <tr>
+                        <td>Organization</td>
+                        <td>LearningMyWay</td>
+                    </tr>
+                    <tr>
+                        <td>Key Algorithm</td>
+                        <td>RSA 4096-bit</td>
+                    </tr>
+                    <tr>
+                        <td>Signature Algorithm</td>
+                        <td>SHA-256</td>
+                    </tr>
+                    <tr>
+                        <td>Valid From</td>
+                        <td>February 13, 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Valid Until</td>
+                        <td>February 13, 2036 (10 years)</td>
+                    </tr>
+                    <tr>
+                        <td>Location</td>
+                        <td>/etc/pki/CA/certs/ca.cert.pem</td>
+                    </tr>
+                </table>
+                
+                <h3>Intermediate CA Certificate</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Common Name</td>
+                        <td>LearningMyWay Intermediate CA</td>
+                    </tr>
+                    <tr>
+                        <td>Organization</td>
+                        <td>LearningMyWay</td>
+                    </tr>
+                    <tr>
+                        <td>Key Algorithm</td>
+                        <td>RSA 4096-bit</td>
+                    </tr>
+                    <tr>
+                        <td>Signature Algorithm</td>
+                        <td>SHA-256</td>
+                    </tr>
+                    <tr>
+                        <td>Valid From</td>
+                        <td>February 13, 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Valid Until</td>
+                        <td>February 12, 2031 (5 years)</td>
+                    </tr>
+                    <tr>
+                        <td>Signed By</td>
+                        <td>LearningMyWay Root CA</td>
+                    </tr>
+                    <tr>
+                        <td>Location</td>
+                        <td>/etc/pki/CA/intermediate/certs/intermediate.cert.pem</td>
+                    </tr>
+                </table>
+                
+                <h3>Server Certificate</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Common Name</td>
+                        <td>jenkins.np.learningmyway.space</td>
+                    </tr>
+                    <tr>
+                        <td>Organization</td>
+                        <td>LearningMyWay</td>
+                    </tr>
+                    <tr>
+                        <td>Key Algorithm</td>
+                        <td>RSA 2048-bit</td>
+                    </tr>
+                    <tr>
+                        <td>Signature Algorithm</td>
+                        <td>SHA-256</td>
+                    </tr>
+                    <tr>
+                        <td>Valid From</td>
+                        <td>February 13, 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Valid Until</td>
+                        <td>February 13, 2027 (1 year)</td>
+                    </tr>
+                    <tr>
+                        <td>Signed By</td>
+                        <td>LearningMyWay Intermediate CA</td>
+                    </tr>
+                    <tr>
+                        <td>Subject Alternative Names</td>
+                        <td>DNS:jenkins.np.learningmyway.space<br>IP:10.10.10.100</td>
+                    </tr>
+                    <tr>
+                        <td>Location</td>
+                        <td>/etc/jenkins/certs/jenkins.cert.pem</td>
+                    </tr>
+                </table>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ Important:</strong> Server certificate expires in 1 year. Set a calendar reminder for January 2027 to renew it!
+                </div>
+            </section>
+
+            <!-- PKI Setup Guide Section -->
+            <section id="pki-setup" class="content-section">
+                <h2>🛠️ PKI Setup Guide</h2>
+                
+                <div class="alert alert-success">
+                    <strong>✅ PKI Already Created!</strong> This section is for reference. Your PKI infrastructure is already operational.
+                </div>
+                
+                <h3>Automated Setup (Recommended)</h3>
+                <p>The entire PKI was created using an automated script:</p>
+                <pre><code># SSH into Jenkins VM
+gcloud compute ssh jenkins-vm --project=test-project2-485105 --zone=us-central1-a --tunnel-through-iap
+
+# Run PKI creation script
+sudo bash /path/to/create-pki-certificates.sh</code></pre>
+                
+                <h3>What the Script Creates</h3>
+                <ul>
+                    <li>Complete directory structure for PKI</li>
+                    <li>Root CA certificate and private key</li>
+                    <li>Intermediate CA certificate and private key</li>
+                    <li>Server certificate and private key</li>
+                    <li>Full certificate chain file</li>
+                    <li>PKCS12 keystore for Jenkins</li>
+                    <li>Proper file permissions and ownership</li>
+                </ul>
+                
+                <h3>Certificate Files Created</h3>
+                <pre><code>/etc/pki/CA/
+├── certs/
+│   └── ca.cert.pem                    # Root CA certificate
+├── private/
+│   └── ca.key.pem                     # Root CA private key (PROTECTED!)
+└── intermediate/
+    ├── certs/
+    │   └── intermediate.cert.pem      # Intermediate CA certificate
+    └── private/
+        └── intermediate.key.pem       # Intermediate CA private key (PROTECTED!)
+
+/etc/jenkins/certs/
+├── jenkins.key.pem                    # Server private key
+├── jenkins.cert.pem                   # Server certificate
+├── jenkins-chain.cert.pem             # Full certificate chain
+└── jenkins.p12                        # PKCS12 keystore for Jenkins</code></pre>
+                
+                <h3>Security Passphrases</h3>
+                <div class="alert alert-danger">
+                    <strong>🔐 CRITICAL - Store Securely!</strong>
+                    <pre><code>Root CA Passphrase: RootCA@LearningMyWay2026!
+Intermediate CA Passphrase: IntermediateCA@LearningMyWay2026!
+PKCS12 Password: changeit</code></pre>
+                    <p>Store these in a password manager or secure vault immediately!</p>
+                </div>
+            </section>
+            
+            <!-- Certificate Renewal Section -->
+            <section id="cert-renewal" class="content-section">
+                <h2>🔄 Certificate Renewal Schedule</h2>
+                
+                <h3>Renewal Timeline</h3>
+                <table>
+                    <tr>
+                        <th>Certificate</th>
+                        <th>Issued</th>
+                        <th>Expires</th>
+                        <th>Renewal Due</th>
+                        <th>Days Remaining</th>
+                    </tr>
+                    <tr>
+                        <td>Server Certificate</td>
+                        <td>Feb 13, 2026</td>
+                        <td>Feb 13, 2027</td>
+                        <td>Jan 2027</td>
+                        <td><span class="badge badge-success">365 days</span></td>
+                    </tr>
+                    <tr>
+                        <td>Intermediate CA</td>
+                        <td>Feb 13, 2026</td>
+                        <td>Feb 12, 2031</td>
+                        <td>Jan 2031</td>
+                        <td><span class="badge badge-success">1,825 days</span></td>
+                    </tr>
+                    <tr>
+                        <td>Root CA</td>
+                        <td>Feb 13, 2026</td>
+                        <td>Feb 13, 2036</td>
+                        <td>Jan 2036</td>
+                        <td><span class="badge badge-success">3,650 days</span></td>
+                    </tr>
+                </table>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ ACTION REQUIRED:</strong> Set calendar reminders for:
+                    <ul>
+                        <li><strong>January 2027</strong> - Renew server certificate (30 days before expiry)</li>
+                        <li><strong>January 2031</strong> - Renew intermediate CA</li>
+                        <li><strong>January 2036</strong> - Renew root CA</li>
+                    </ul>
+                </div>
+                
+                <h3>Server Certificate Renewal Process (Annual)</h3>
+                <pre><code># SSH into Jenkins VM
+gcloud compute ssh jenkins-vm --project=test-project2-485105 --zone=us-central1-a --tunnel-through-iap
+
+# Generate new CSR
+sudo openssl req -config /etc/pki/CA/intermediate/openssl-intermediate.cnf \
+  -key /etc/jenkins/certs/jenkins.key.pem \
+  -new -sha256 -out /etc/jenkins/certs/jenkins.csr.pem \
+  -subj "/C=US/ST=California/L=San Francisco/O=LearningMyWay/OU=IT Operations/CN=jenkins.np.learningmyway.space/emailAddress=rksuraj@learningmyway.space"
+
+# Sign with Intermediate CA
+sudo openssl ca -config /etc/pki/CA/intermediate/openssl-intermediate.cnf \
+  -extensions server_cert \
+  -days 365 -notext -md sha256 \
+  -in /etc/jenkins/certs/jenkins.csr.pem \
+  -out /etc/jenkins/certs/jenkins.cert.pem
+
+# Rebuild certificate chain
+sudo cat /etc/jenkins/certs/jenkins.cert.pem \
+  /etc/pki/CA/intermediate/certs/intermediate.cert.pem \
+  /etc/pki/CA/certs/ca.cert.pem | \
+  sudo tee /etc/jenkins/certs/jenkins-chain.cert.pem
+
+# Recreate PKCS12
+sudo openssl pkcs12 -export \
+  -out /etc/jenkins/certs/jenkins.p12 \
+  -inkey /etc/jenkins/certs/jenkins.key.pem \
+  -in /etc/jenkins/certs/jenkins-chain.cert.pem \
+  -password pass:changeit
+
+# Restart services
+sudo systemctl restart nginx
+sudo systemctl restart jenkins</code></pre>
+            </section>
+            
+            <!-- HTTPS Access Section -->
+            <section id="https-access" class="content-section">
+                <h2>🌐 HTTPS Access Configuration</h2>
+                
+                <h3>Prerequisites</h3>
+                <div class="alert alert-info">
+                    <strong>Before accessing Jenkins via HTTPS, ensure:</strong>
+                    <ul>
+                        <li>✅ Root CA certificate installed on your computer</li>
+                        <li>✅ Hosts file entry added</li>
+                        <li>✅ Firezone VPN connected</li>
+                        <li>✅ Firezone resource configured for Jenkins subnet</li>
+                    </ul>
+                </div>
+                
+                <h3>Step 1: Install Root CA on Windows</h3>
+                <p>Open PowerShell as Administrator:</p>
+                <pre><code># Install Root CA certificate
+Import-Certificate -FilePath "LearningMyWay-Root-CA.crt" -CertStoreLocation Cert:\LocalMachine\Root
+
+# Verify installation
+Get-ChildItem -Path Cert:\LocalMachine\Root | Where-Object {$_.Subject -like "*LearningMyWay*"}</code></pre>
+                
+                <h3>Step 2: Add Hosts File Entry</h3>
+                <pre><code># Add DNS entry
+Add-Content C:\Windows\System32\drivers\etc\hosts "`n10.10.10.100 jenkins.np.learningmyway.space"
+
+# Verify entry
+Get-Content C:\Windows\System32\drivers\etc\hosts | Select-String "jenkins"</code></pre>
+                
+                <h3>Step 3: Test Connectivity</h3>
+                <pre><code># Test ping
+ping 10.10.10.100
+
+# Test HTTPS port
+Test-NetConnection -ComputerName 10.10.10.100 -Port 443</code></pre>
+                
+                <h3>Step 4: Access Jenkins</h3>
+                <ol>
+                    <li>Open your browser (Chrome, Edge, Firefox)</li>
+                    <li>Navigate to: <code>https://jenkins.np.learningmyway.space</code></li>
+                    <li>Browser should show "Secure" 🔒 with no warnings</li>
+                    <li>Login with your Jenkins credentials</li>
+                </ol>
+                
+                <h3>Success Indicators</h3>
+                <ul>
+                    <li>✅ Browser address bar shows 🔒 Secure</li>
+                    <li>✅ No certificate warnings or errors</li>
+                    <li>✅ Certificate details show full chain validation</li>
+                    <li>✅ Jenkins login page loads correctly</li>
+                </ul>
+            </section>
+            
+            <!-- Firezone Setup Section -->
+            <section id="firezone-setup" class="content-section">
+                <h2>🔐 Firezone VPN Configuration</h2>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ Critical Step:</strong> Firezone uses resource-based access control. You must explicitly configure access to the Jenkins subnet.
+                </div>
+                
+                <h3>Why This Is Needed</h3>
+                <p>Firezone VPN connection alone doesn't grant access to all networks. You must define which resources (IP ranges) users can access. This provides better security and granular access control.</p>
+                
+                <h3>Configuration Steps</h3>
+                
+                <h4>1. Login to Firezone Admin Portal</h4>
+                <ul>
+                    <li>Open browser and go to: <code>https://app.firezone.dev</code></li>
+                    <li>Login with your Firezone admin credentials</li>
+                </ul>
+                
+                <h4>2. Navigate to Resources</h4>
+                <ul>
+                    <li>Click on <strong>"Resources"</strong> in the left sidebar</li>
+                    <li>Click <strong>"Add Resource"</strong> button</li>
+                </ul>
+                
+                <h4>3. Create Jenkins Resource</h4>
+                <table>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Resource Name</td>
+                        <td>Jenkins Infrastructure</td>
+                    </tr>
+                    <tr>
+                        <td>Description</td>
+                        <td>Jenkins CI/CD server and load balancer</td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>10.10.10.0/24 (entire subnet)<br>OR<br>10.10.10.100/32 (specific IP)</td>
+                    </tr>
+                    <tr>
+                        <td>Gateway</td>
+                        <td>Select your deployed gateway</td>
+                    </tr>
+                </table>
+                
+                <h4>4. Assign Access to Users/Groups</h4>
+                <ul>
+                    <li>After creating the resource, click on it</li>
+                    <li>Go to <strong>"Access"</strong> or <strong>"Policies"</strong> tab</li>
+                    <li>Add your user or group</li>
+                    <li>Click <strong>"Save"</strong></li>
+                </ul>
+                
+                <h4>5. Reconnect VPN</h4>
+                <ul>
+                    <li>Disconnect from Firezone VPN</li>
+                    <li>Reconnect to Firezone VPN</li>
+                    <li>Wait 10 seconds for routes to update</li>
+                </ul>
+                
+                <h4>6. Verify Connectivity</h4>
+                <pre><code># Test connectivity
+Test-NetConnection -ComputerName 10.10.10.100 -Port 443
+
+# Expected output:
+# TcpTestSucceeded : True</code></pre>
+                
+                <h3>Troubleshooting Firezone</h3>
+                <table>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Can't reach Jenkins after VPN connect</td>
+                        <td>Check if Firezone resource is configured and assigned to your user</td>
+                    </tr>
+                    <tr>
+                        <td>Gateway shows offline</td>
+                        <td>Check gateway VM status in GCP console</td>
+                    </tr>
+                    <tr>
+                        <td>Routes not updating</td>
+                        <td>Disconnect and reconnect VPN, wait 10 seconds</td>
+                    </tr>
+                    <tr>
+                        <td>Resource not appearing</td>
+                        <td>Verify gateway is selected and online</td>
+                    </tr>
+                </table>
+            </section>
+            
+            <!-- Client Setup Section -->
+            <section id="client-setup" class="content-section">
+                <h2>💻 Client Setup Guide</h2>
+                
+                <h3>Windows Client Setup</h3>
+                
+                <h4>1. Install Firezone VPN Client</h4>
+                <ul>
+                    <li>Download from Firezone portal or <code>https://www.firezone.dev/downloads</code></li>
+                    <li>Install the client application</li>
+                    <li>Login with your Firezone credentials</li>
+                </ul>
+                
+                <h4>2. Install Root CA Certificate</h4>
+                <p>Run PowerShell as Administrator:</p>
+                <pre><code>Import-Certificate -FilePath "LearningMyWay-Root-CA.crt" -CertStoreLocation Cert:\LocalMachine\Root</code></pre>
+                
+                <p>Or manually:</p>
+                <ol>
+                    <li>Double-click <code>LearningMyWay-Root-CA.crt</code></li>
+                    <li>Click "Install Certificate"</li>
+                    <li>Select "Local Machine"</li>
+                    <li>Choose "Place all certificates in the following store"</li>
+                    <li>Click "Browse" → Select "Trusted Root Certification Authorities"</li>
+                    <li>Click "Next" → "Finish"</li>
+                    <li>Accept security warning</li>
+                </ol>
+                
+                <h4>3. Add Hosts File Entry</h4>
+                <p>Run PowerShell as Administrator:</p>
+                <pre><code>Add-Content C:\Windows\System32\drivers\etc\hosts "`n10.10.10.100 jenkins.np.learningmyway.space"</code></pre>
+                
+                <p>Or manually:</p>
+                <ol>
+                    <li>Open Notepad as Administrator</li>
+                    <li>Open file: <code>C:\Windows\System32\drivers\etc\hosts</code></li>
+                    <li>Add line: <code>10.10.10.100 jenkins.np.learningmyway.space</code></li>
+                    <li>Save and close</li>
+                </ol>
+                
+                <h3>macOS Client Setup</h3>
+                
+                <h4>1. Install Firezone VPN Client</h4>
+                <ul>
+                    <li>Download from Firezone portal</li>
+                    <li>Install the client application</li>
+                    <li>Login with your Firezone credentials</li>
+                </ul>
+                
+                <h4>2. Install Root CA Certificate</h4>
+                <pre><code># Add to system keychain
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain LearningMyWay-Root-CA.crt</code></pre>
+                
+                <h4>3. Add Hosts File Entry</h4>
+                <pre><code># Edit hosts file
+sudo nano /etc/hosts
+
+# Add line:
+10.10.10.100 jenkins.np.learningmyway.space
+
+# Save and exit (Ctrl+X, Y, Enter)</code></pre>
+                
+                <h3>Linux Client Setup</h3>
+                
+                <h4>1. Install Firezone VPN Client</h4>
+                <ul>
+                    <li>Download from Firezone portal</li>
+                    <li>Install the client application</li>
+                    <li>Login with your Firezone credentials</li>
+                </ul>
+                
+                <h4>2. Install Root CA Certificate</h4>
+                <pre><code># Copy to CA certificates directory
+sudo cp LearningMyWay-Root-CA.crt /usr/local/share/ca-certificates/
+
+# Update CA certificates
+sudo update-ca-certificates</code></pre>
+                
+                <h4>3. Add Hosts File Entry</h4>
+                <pre><code># Edit hosts file
+sudo nano /etc/hosts
+
+# Add line:
+10.10.10.100 jenkins.np.learningmyway.space
+
+# Save and exit (Ctrl+X, Y, Enter)</code></pre>
+            </section>
+            
+            <!-- Verification Section -->
+            <section id="verification" class="content-section">
+                <h2>✅ Verification Tests</h2>
+                
+                <h3>Network Connectivity Tests</h3>
+                <pre><code># Test 1: Ping load balancer
+ping 10.10.10.100
+
+# Test 2: HTTPS port connectivity
+Test-NetConnection -ComputerName 10.10.10.100 -Port 443
+
+# Test 3: DNS resolution
+nslookup jenkins.np.learningmyway.space
+
+# Test 4: Certificate validation
+openssl s_client -connect 10.10.10.100:443 -showcerts</code></pre>
+                
+                <h3>Service Status Tests (On Jenkins VM)</h3>
+                <pre><code># SSH into Jenkins VM
+gcloud compute ssh jenkins-vm --project=test-project2-485105 --zone=us-central1-a --tunnel-through-iap
+
+# Test 1: Jenkins service
+sudo systemctl status jenkins
+
+# Test 2: Nginx service
+sudo systemctl status nginx
+
+# Test 3: Ports listening
+sudo ss -tlnp | grep -E '(443|8080)'
+
+# Test 4: Certificate files
+ls -la /etc/jenkins/certs/
+
+# Test 5: Certificate chain validation
+sudo openssl verify -CAfile /etc/pki/CA/certs/ca.cert.pem \
+  -untrusted /etc/pki/CA/intermediate/certs/intermediate.cert.pem \
+  /etc/jenkins/certs/jenkins.cert.pem</code></pre>
+                
+                <h3>Security Tests</h3>
+                <pre><code># Test 1: No public IP on Jenkins
+gcloud compute instances describe jenkins-vm \
+  --project=test-project2-485105 \
+  --zone=us-central1-a \
+  --format="get(networkInterfaces[0].accessConfigs)"
+
+# Expected: Empty (no public IP)
+
+# Test 2: Firewall rules active
+gcloud compute firewall-rules list --project=test-project2-485105
+
+# Test 3: VPC peering active
+gcloud compute networks peerings list --project=test-project1-485105
+gcloud compute networks peerings list --project=test-project2-485105</code></pre>
+                
+                <h3>Expected Results</h3>
+                <table>
+                    <tr>
+                        <th>Test</th>
+                        <th>Expected Result</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Ping 10.10.10.100</td>
+                        <td>Replies received</td>
+                        <td><span class="badge badge-success">✅ Pass</span></td>
+                    </tr>
+                    <tr>
+                        <td>Port 443 connectivity</td>
+                        <td>TcpTestSucceeded: True</td>
+                        <td><span class="badge badge-success">✅ Pass</span></td>
+                    </tr>
+                    <tr>
+                        <td>Jenkins service</td>
+                        <td>Active (running)</td>
+                        <td><span class="badge badge-success">✅ Pass</span></td>
+                    </tr>
+                    <tr>
+                        <td>Nginx service</td>
+                        <td>Active (running)</td>
+                        <td><span class="badge badge-success">✅ Pass</span></td>
+                    </tr>
+                    <tr>
+                        <td>Certificate chain</td>
+                        <td>OK</td>
+                        <td><span class="badge badge-success">✅ Pass</span></td>
+                    </tr>
+                    <tr>
+                        <td>No public IP</td>
+                        <td>Empty result</td>
+                        <td><span class="badge badge-success">✅ Pass</span></td>
+                    </tr>
+                </table>
+            </section>
+            
+            <!-- Troubleshooting Section -->
+            <section id="troubleshooting" class="content-section">
+                <h2>🔧 Troubleshooting Guide</h2>
+                
+                <h3>Common Issues and Solutions</h3>
+                
+                <h4>Issue: "Site can't be reached"</h4>
+                <p><strong>Symptoms:</strong> Browser shows "This site can't be reached" or "ERR_CONNECTION_TIMED_OUT"</p>
+                <p><strong>Causes & Solutions:</strong></p>
+                <ul>
+                    <li><strong>VPN not connected:</strong> Connect to Firezone VPN and try again</li>
+                    <li><strong>Firezone resource not configured:</strong> Add Jenkins subnet (10.10.10.0/24) as a resource in Firezone</li>
+                    <li><strong>Firewall blocking:</strong> Check Windows Firewall or antivirus settings</li>
+                </ul>
+                
+                <h4>Issue: Certificate warning "Not secure"</h4>
+                <p><strong>Symptoms:</strong> Browser shows certificate warning or "Not secure"</p>
+                <p><strong>Causes & Solutions:</strong></p>
+                <ul>
+                    <li><strong>Root CA not installed:</strong> Install LearningMyWay-Root-CA.crt in Trusted Root Certification Authorities</li>
+                    <li><strong>Browser cache:</strong> Clear browser cache and restart browser</li>
+                    <li><strong>Wrong certificate store:</strong> Ensure Root CA is in LocalMachine\Root, not CurrentUser</li>
+                </ul>
+                
+                <h4>Issue: "DNS_PROBE_FINISHED_NXDOMAIN"</h4>
+                <p><strong>Symptoms:</strong> Browser can't resolve jenkins.np.learningmyway.space</p>
+                <p><strong>Causes & Solutions:</strong></p>
+                <ul>
+                    <li><strong>Hosts file entry missing:</strong> Add "10.10.10.100 jenkins.np.learningmyway.space" to hosts file</li>
+                    <li><strong>DNS cache:</strong> Run "ipconfig /flushdns" in PowerShell</li>
+                </ul>
+                
+                <h4>Issue: Jenkins not responding</h4>
+                <p><strong>Symptoms:</strong> Connection times out or Jenkins doesn't load</p>
+                <p><strong>Causes & Solutions:</strong></p>
+                <ul>
+                    <li><strong>Jenkins service down:</strong> SSH to VM and run "sudo systemctl restart jenkins"</li>
+                    <li><strong>Nginx service down:</strong> SSH to VM and run "sudo systemctl restart nginx"</li>
+                    <li><strong>VM stopped:</strong> Check GCP console and start the VM</li>
+                </ul>
+            </section>
+            
+            <!-- Maintenance Section -->
+            <section id="maintenance" class="content-section">
+                <h2>🔧 Maintenance Guide</h2>
+                
+                <h3>Regular Maintenance Tasks</h3>
+                
+                <h4>Monthly Tasks</h4>
+                <ul>
+                    <li>Review Jenkins logs for errors</li>
+                    <li>Check certificate expiration dates</li>
+                    <li>Review security logs</li>
+                    <li>Verify backup integrity</li>
+                    <li>Update Jenkins plugins (manual upload)</li>
+                </ul>
+                
+                <h4>Quarterly Tasks</h4>
+                <ul>
+                    <li>Test disaster recovery procedures</li>
+                    <li>Review and update firewall rules</li>
+                    <li>Audit user access in Firezone</li>
+                    <li>Performance optimization review</li>
+                </ul>
+                
+                <h4>Annual Tasks</h4>
+                <ul>
+                    <li>Renew server certificate (January)</li>
+                    <li>Security audit</li>
+                    <li>Infrastructure cost review</li>
+                    <li>Update documentation</li>
+                </ul>
+                
+                <h3>Backup Procedures</h3>
+                <pre><code># Backup Jenkins data
+gcloud compute ssh jenkins-vm --project=test-project2-485105 --zone=us-central1-a --tunnel-through-iap
+sudo tar -czf jenkins-backup-$(date +%Y%m%d).tar.gz /var/lib/jenkins
+
+# Backup PKI
+sudo tar -czf pki-backup-$(date +%Y%m%d).tar.gz /etc/pki/CA /etc/jenkins/certs
+
+# Download backups
+gcloud compute scp jenkins-vm:jenkins-backup-*.tar.gz . --project=test-project2-485105 --zone=us-central1-a --tunnel-through-iap
+gcloud compute scp jenkins-vm:pki-backup-*.tar.gz . --project=test-project2-485105 --zone=us-central1-a --tunnel-through-iap</code></pre>
+            </section>
+            
+            <!-- Costs Section -->
+            <section id="costs" class="content-section">
+                <h2>💰 Cost Analysis</h2>
+                
+                <h3>Monthly Cost Breakdown</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Specification</th>
+                        <th>Monthly Cost</th>
+                    </tr>
+                    <tr>
+                        <td>Jenkins VM</td>
+                        <td>e2-medium (2 vCPU, 4GB RAM)</td>
+                        <td>$24.27</td>
+                    </tr>
+                    <tr>
+                        <td>Firezone VM</td>
+                        <td>e2-small (2 vCPU, 2GB RAM)</td>
+                        <td>$12.14</td>
+                    </tr>
+                    <tr>
+                        <td>Boot Disks</td>
+                        <td>2x 50GB SSD</td>
+                        <td>$8.00</td>
+                    </tr>
+                    <tr>
+                        <td>Data Disk</td>
+                        <td>100GB SSD</td>
+                        <td>$10.00</td>
+                    </tr>
+                    <tr>
+                        <td>Static IPs</td>
+                        <td>2 external IPs</td>
+                        <td>$4.46</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td></td>
+                        <td><strong>$58.87/month</strong></td>
+                    </tr>
+                </table>
+                
+                <h3>Cost Comparison</h3>
+                <table>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Monthly Cost</th>
+                        <th>Annual Cost</th>
+                        <th>Savings</th>
+                    </tr>
+                    <tr>
+                        <td>Current (Air-gapped)</td>
+                        <td>$58.87</td>
+                        <td>$706.44</td>
+                        <td>Baseline</td>
+                    </tr>
+                    <tr>
+                        <td>With Cloud NAT</td>
+                        <td>$122.87</td>
+                        <td>$1,474.44</td>
+                        <td>-$768/year</td>
+                    </tr>
+                    <tr>
+                        <td>With HTTPS LB</td>
+                        <td>$76.87</td>
+                        <td>$922.44</td>
+                        <td>-$216/year</td>
+                    </tr>
+                </table>
+                
+                <div class="alert alert-success">
+                    <strong>✅ Cost Optimized!</strong> Current setup saves $768/year (52%) compared to Cloud NAT approach, with zero additional cost for HTTPS via nginx.
+                </div>
+            </section>
+            
+            <!-- Commands Section -->
+            <section id="commands" class="content-section">
+                <h2>⚡ Quick Commands Reference</h2>
+                
+                <h3>Access Jenkins VM</h3>
+                <pre><code>gcloud compute ssh jenkins-vm \
+  --project=test-project2-485105 \
+  --zone=us-central1-a \
+  --tunnel-through-iap</code></pre>
+                
+                <h3>Check Service Status</h3>
+                <pre><code># Jenkins status
+sudo systemctl status jenkins
+
+# Nginx status
+sudo systemctl status nginx
+
+# Restart services
+sudo systemctl restart jenkins
+sudo systemctl restart nginx</code></pre>
+                
+                <h3>View Logs</h3>
+                <pre><code># Jenkins logs
+sudo journalctl -u jenkins -n 50 -f
+
+# Nginx logs
+sudo tail -f /var/log/nginx/error.log
+sudo tail -f /var/log/nginx/access.log</code></pre>
+                
+                <h3>Certificate Management</h3>
+                <pre><code># Check certificate expiry
+sudo openssl x509 -noout -dates -in /etc/jenkins/certs/jenkins.cert.pem
+
+# Verify certificate chain
+sudo openssl verify -CAfile /etc/pki/CA/certs/ca.cert.pem \
+  -untrusted /etc/pki/CA/intermediate/certs/intermediate.cert.pem \
+  /etc/jenkins/certs/jenkins.cert.pem
+
+# Test HTTPS connection
+curl -v https://localhost:443</code></pre>
+                
+                <h3>Terraform Operations</h3>
+                <pre><code># View current state
+cd terraform
+terraform show
+
+# View outputs
+terraform output
+
+# Plan changes
+terraform plan
+
+# Apply changes
+terraform apply
+
+# Destroy infrastructure (CAREFUL!)
+terraform destroy</code></pre>
+            </section>
+            
+            <!-- Files Section -->
+            <section id="files" class="content-section">
+                <h2>📁 File Locations Reference</h2>
+                
+                <h3>Certificate Files (Jenkins VM)</h3>
+                <table>
+                    <tr>
+                        <th>File</th>
+                        <th>Location</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>Root CA Certificate</td>
+                        <td>/etc/pki/CA/certs/ca.cert.pem</td>
+                        <td>Trust anchor</td>
+                    </tr>
+                    <tr>
+                        <td>Root CA Private Key</td>
+                        <td>/etc/pki/CA/private/ca.key.pem</td>
+                        <td>Root CA signing key</td>
+                    </tr>
+                    <tr>
+                        <td>Intermediate CA Certificate</td>
+                        <td>/etc/pki/CA/intermediate/certs/intermediate.cert.pem</td>
+                        <td>Intermediate CA</td>
+                    </tr>
+                    <tr>
+                        <td>Intermediate CA Private Key</td>
+                        <td>/etc/pki/CA/intermediate/private/intermediate.key.pem</td>
+                        <td>Intermediate signing key</td>
+                    </tr>
+                    <tr>
+                        <td>Server Certificate</td>
+                        <td>/etc/jenkins/certs/jenkins.cert.pem</td>
+                        <td>Jenkins HTTPS cert</td>
+                    </tr>
+                    <tr>
+                        <td>Server Private Key</td>
+                        <td>/etc/jenkins/certs/jenkins.key.pem</td>
+                        <td>Server private key</td>
+                    </tr>
+                    <tr>
+                        <td>Certificate Chain</td>
+                        <td>/etc/jenkins/certs/jenkins-chain.cert.pem</td>
+                        <td>Full chain file</td>
+                    </tr>
+                    <tr>
+                        <td>PKCS12 Keystore</td>
+                        <td>/etc/jenkins/certs/jenkins.p12</td>
+                        <td>Jenkins keystore</td>
+                    </tr>
+                </table>
+                
+                <h3>Configuration Files</h3>
+                <table>
+                    <tr>
+                        <th>File</th>
+                        <th>Location</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>Nginx Config</td>
+                        <td>/etc/nginx/conf.d/jenkins.conf</td>
+                        <td>Nginx HTTPS configuration</td>
+                    </tr>
+                    <tr>
+                        <td>Jenkins Service</td>
+                        <td>/usr/lib/systemd/system/jenkins.service</td>
+                        <td>Jenkins systemd service</td>
+                    </tr>
+                    <tr>
+                        <td>Terraform Main</td>
+                        <td>terraform/main.tf</td>
+                        <td>Main Terraform configuration</td>
+                    </tr>
+                    <tr>
+                        <td>Terraform Variables</td>
+                        <td>terraform/terraform.tfvars</td>
+                        <td>Terraform variable values</td>
+                    </tr>
+                </table>
+                
+                <h3>Documentation Files (Local)</h3>
+                <ul>
+                    <li><code>FINAL-STATUS-REPORT.md</code> - Complete project status</li>
+                    <li><code>PKI-CERTIFICATE-CHAIN-GUIDE.md</code> - Detailed PKI guide</li>
+                    <li><code>PKI-QUICK-START.md</code> - Quick PKI reference</li>
+                    <li><code>ACCESS-JENKINS-HTTPS.md</code> - HTTPS access guide</li>
+                    <li><code>FIREZONE-RESOURCE-SETUP.md</code> - Firezone configuration</li>
+                    <li><code>SESSION-SUMMARY.md</code> - Complete session log</li>
+                    <li><code>QUICK-REFERENCE-CARD.md</code> - One-page reference</li>
+                    <li><code>diagrams/</code> - Architecture diagrams folder</li>
+                </ul>
+            </section>
+            
+            <!-- Diagrams Section -->
+            <section id="diagrams" class="content-section">
+                <h2>📊 Architecture Diagrams</h2>
+                
+                <p>Complete professional architecture diagrams are available in the <code>diagrams/</code> folder:</p>
+                
+                <h3>Available Diagrams</h3>
+                <ol>
+                    <li><strong>00-INDEX.md</strong> - Master index and usage guide</li>
+                    <li><strong>01-INFRASTRUCTURE-ARCHITECTURE.md</strong> - Complete infrastructure with GCP projects, VPCs, VMs</li>
+                    <li><strong>02-PKI-CERTIFICATE-ARCHITECTURE.md</strong> - Certificate chain hierarchy and validation</li>
+                    <li><strong>03-TLS-HANDSHAKE-FLOW.md</strong> - Step-by-step TLS handshake process</li>
+                    <li><strong>04-REQUEST-FLOW.md</strong> - User request to Jenkins response flow</li>
+                    <li><strong>05-SECURITY-LAYERS.md</strong> - 5-layer defense-in-depth model</li>
+                </ol>
+                
+                <div class="alert alert-info">
+                    <strong>💡 Tip:</strong> These ASCII diagrams can be converted to visual diagrams using tools like Microsoft Visio, Lucidchart, Draw.io, or PlantUML.
+                </div>
+            </section>
+            
+            <!-- Footer -->
+            <section class="content-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h2 style="color: white; border-bottom-color: white;">🎉 Project Complete!</h2>
+                
+                <h3 style="color: white;">Summary</h3>
+                <p>You now have a <strong>production-ready, enterprise-grade, secure Jenkins infrastructure</strong> with:</p>
+                
+                <ul>
+                    <li>✅ Complete 3-tier PKI certificate chain</li>
+                    <li>✅ HTTPS with certificate validation</li>
+                    <li>✅ Air-gapped environment</li>
+                    <li>✅ VPN-only access</li>
+                    <li>✅ 5-layer security architecture</li>
+                    <li>✅ Zero internet exposure</li>
+                    <li>✅ Professional certificate management</li>
+                    <li>✅ Cost-optimized ($58.87/month)</li>
+                    <li>✅ Comprehensive documentation</li>
+                    <li>✅ Automated deployment via Terraform</li>
+                </ul>
+                
+                <h3 style="color: white;">Access Your Jenkins</h3>
+                <p><strong>URL:</strong> <code>https://jenkins.np.learningmyway.space</code></p>
+                <p><strong>Status:</strong> 🔒 Secure (No warnings)</p>
+                <p><strong>Authentication:</strong> Jenkins admin credentials</p>
+                
+                <h3 style="color: white;">Next Steps (Optional)</h3>
+                <ol>
+                    <li>Configure Jenkins jobs</li>
+                    <li>Set up Jenkins users</li>
+                    <li>Install Jenkins plugins (via manual upload)</li>
+                    <li>Configure backup automation</li>
+                    <li>Set up monitoring/alerting</li>
+                </ol>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                    <p><strong>Status:</strong> ✅ PRODUCTION READY</p>
+                    <p><strong>Security:</strong> ⭐⭐⭐⭐⭐ Maximum</p>
+                    <p><strong>Reliability:</strong> ✅ High</p>
+                    <p><strong>Cost:</strong> ✅ Optimized</p>
+                    <p><strong>Documentation:</strong> ✅ Complete</p>
+                    <p style="margin-top: 20px; font-size: 1.2em;">🎊 Congratulations! Your secure Jenkins infrastructure is fully operational!</p>
+                    <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">Last Updated: February 14, 2026</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Update active link
+                    document.querySelectorAll('.nav-section a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+        
+        // Highlight current section in navigation
+        window.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('.content-section').forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.nav-section a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        // Print functionality
+        function printDocumentation() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

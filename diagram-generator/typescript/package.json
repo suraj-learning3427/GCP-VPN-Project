@@ -1,0 +1,19 @@
+{
+  "name": "jenkins-diagram-generator",
+  "version": "1.0.0",
+  "description": "Architecture diagram generator for Jenkins VPN infrastructure",
+  "main": "generate-diagrams.ts",
+  "scripts": {
+    "generate": "ts-node generate-diagrams.ts",
+    "build": "tsc",
+    "start": "node dist/generate-diagrams.js"
+  },
+  "keywords": ["diagrams", "architecture", "jenkins", "mermaid"],
+  "author": "LearningMyWay Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+}

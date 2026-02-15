@@ -1,0 +1,183 @@
+site_name: Jenkins VPN Infrastructure
+site_description: Complete documentation for secure Jenkins CI/CD infrastructure with PKI and HTTPS
+site_author: LearningMyWay Team
+site_url: https://jenkins-docs.learningmyway.space
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+
+  icon:
+    repo: fontawesome/brands/github
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+
+plugins:
+  - search:
+      lang: en
+  - tags
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - def_list
+  - pymdownx.arithmatex:
+      generic: true
+
+nav:
+  - Home:
+    - Overview: index.md
+    - Quick Start: START-HERE.md
+    - README: README.md
+  
+  - Getting Started:
+    - Quick Access Guide: quick-access.md
+    - Current Status: CURRENT-STATUS.md
+    - Quick Reference: QUICK-REFERENCE-CARD.md
+  
+  - Architecture:
+    - Overview: ARCHITECTURE-DIAGRAM.md
+    - Diagrams:
+      - Index: diagrams/00-INDEX.md
+      - Infrastructure: diagrams/01-INFRASTRUCTURE-ARCHITECTURE.md
+      - PKI Architecture: diagrams/02-PKI-CERTIFICATE-ARCHITECTURE.md
+      - TLS Handshake: diagrams/03-TLS-HANDSHAKE-FLOW.md
+      - Request Flow: diagrams/04-REQUEST-FLOW.md
+      - Security Layers: diagrams/05-SECURITY-LAYERS.md
+  
+  - PKI & Certificates:
+    - Quick Start: PKI-QUICK-START.md
+    - Complete Guide: PKI-CERTIFICATE-CHAIN-GUIDE.md
+    - Architecture Diagram: PKI-ARCHITECTURE-DIAGRAM.md
+    - Implementation Status: PKI-IMPLEMENTATION-STATUS.md
+  
+  - HTTPS Setup:
+    - Setup Guide: HTTPS-SETUP-GUIDE.md
+    - Next Steps: HTTPS-NEXT-STEPS.md
+    - Access Instructions: ACCESS-JENKINS-HTTPS.md
+  
+  - VPN & Access:
+    - Firezone Setup: FIREZONE-RESOURCE-SETUP.md
+    - Installation Instructions: INSTALL-INSTRUCTIONS.md
+    - Jenkins Access Info: JENKINS-ACCESS-INFO.md
+  
+  - Deployment:
+    - Deployment Guide: DEPLOYMENT.md
+    - Deployment Status: DEPLOYMENT-STATUS.md
+    - Air-Gapped Guide: AIR-GAPPED-DEPLOYMENT-GUIDE.md
+    - Checklist: CHECKLIST.md
+  
+  - Operations:
+    - Quick Reference: QUICK-REFERENCE.md
+    - Maintenance: maintenance.md
+    - Troubleshooting: troubleshooting.md
+  
+  - Reports & Status:
+    - Final Status Report: FINAL-STATUS-REPORT.md
+    - Session Summary: SESSION-SUMMARY.md
+    - Final Summary: FINAL-SUMMARY.md
+    - Cleanup Complete: CLEANUP-COMPLETE.md
+  
+  - Project Management:
+    - Project IDs: PROJECT-IDS.md
+    - Requirements Gap: REQUIREMENTS-GAP-ANALYSIS.md
+    - Project Audit: PROJECT-AUDIT-REPORT.md
+    - Final Audit: FINAL-AUDIT-REPORT.md
+  
+  - Testing:
+    - Dry Run Test: DRY-RUN-TEST-REPORT.md
+    - Infrastructure Test: CURRENT-INFRASTRUCTURE-TEST-REPORT.md
+  
+  - Cost & Planning:
+    - Cost Optimization: COST-OPTIMIZATION-PLAN.md
+    - Complete Diagrams: COMPLETE-ARCHITECTURE-DIAGRAMS.md
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/yourorg/jenkins-infrastructure
+      name: GitHub Repository
+  
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >-
+            Thanks for your feedback! Help us improve by providing more details.
+
+extra_css:
+  - stylesheets/extra.css
+
+copyright: Copyright &copy; 2026 LearningMyWay - Jenkins Infrastructure Documentation

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Jenkins Infrastructure - Architecture Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+        .nav {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #dee2e6;
+            overflow-x: auto;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-btn {
+            padding: 20px 35px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 17px;
+            font-weight: 700;
+            color: #495057;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-btn:hover { background: #e9ecef; }
+        .nav-btn.active {
+            background: white;
+            color: #1e3c72;
+            border-bottom: 4px solid #1e3c72;
+        }
+        .content { padding: 50px; }
+        .diagram-page { display: none; }
+        .diagram-page.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .diagram-title {
+            font-size: 2.5em;
+            color: #1e3c72;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #1e3c72;
+        }
+        .diagram-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .diagram-info h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .diagram-info ul {
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+        .mermaid {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid #dee2e6;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        .feature {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+        }
+        .feature:hover { transform: translateY(-5px); }
+        .feature h3 {
+            font-size: 1.4em;
+            margin-bottom: 12px;
+        }
+        .feature p {
+            opacity: 0.95;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏗️ Architecture Diagrams</h1>
+            <p>VPN-Based Air-Gapped Jenkins Infrastructure on GCP</p>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showPage('infra')">🌐 Infrastructure</button>
+            <button class="nav-btn" onclick="showPage('pki')">🔐 PKI Chain</button>
+            <button class="nav-btn" onclick="showPage('tls')">🔒 TLS Handshake</button>
+            <button class="nav-btn" onclick="showPage('flow')">📊 Request Flow</button>
+            <button class="nav-btn" onclick="showPage('security')">🛡️ Security</button>
+            <button class="nav-btn" onclick="showPage('network')">🌍 Network Topology</button>
+        </div>
+
+        <div class="content">
+            <!-- Infrastructure Architecture -->
+            <div id="infra" class="diagram-page active">
+                <h2 class="diagram-title">Infrastructure Architecture</h2>
+                <div class="diagram-info">
+                    <h3>📋 Overview</h3>
+                    <ul>
+                        <li>Two GCP projects with VPC peering for secure isolation</li>
+                        <li>Firezone VPN Gateway (WireGuard) for encrypted access</li>
+                        <li>Air-gapped Jenkins VM with zero internet exposure</li>
+                        <li>Internal Load Balancer for traffic distribution</li>
+                        <li>Private DNS zones for internal name resolution</li>
+                    </ul>
+                </div>
+                <div class="mermaid">
+graph TB
+    subgraph User["👤 User Environment"]
+        Client[Windows Client<br/>Firezone VPN Client]
+    end
+    
+    subgraph GCP1["☁️ GCP Project 1: test-project1-485105"]
+        subgraph VPC1["VPC: firezone-vpc (10.0.0.0/16)"]
+            FZ[🛡️ Firezone Gateway<br/>IP: 10.0.0.10<br/>Type: e2-medium<br/>WireGuard Protocol]
+        end
+    end
+    
+    subgraph GCP2["☁️ GCP Project 2: test-project2-485105"]
+        subgraph VPC2["VPC: jenkins-vpc (10.10.0.0/16)"]
+            subgraph Subnet["Subnet: jenkins-subnet (10.10.10.0/24)"]
+                LB[⚖️ Internal Load Balancer<br/>IP: 10.10.10.100<br/>Ports: 443, 8080]
+                Jenkins[🔧 Jenkins VM<br/>IP: 10.10.10.2<br/>OS: Rocky Linux 8<br/>Type: n1-standard-2]
+                DNS[📋 Private DNS<br/>learningmyway.space]
+            end
+        end
+    end
+
+    Client -->|1. VPN Connect| FZ
+    FZ -->|2. VPC Peering| LB
+    LB -->|3. Forward| Jenkins
+    Jenkins -.->|4. DNS Lookup| DNS
+    
+    style Client fill:#e3f2fd
+    style FZ fill:#ffebee
+    style LB fill:#e8f5e9
+    style Jenkins fill:#f3e5f5
+    style DNS fill:#fff3e0
+                </div>
+
+                <div class="features">
+                    <div class="feature">
+                        <h3>🔒 Zero Internet Exposure</h3>
+                        <p>Jenkins VM has no public IP, no Cloud NAT. Completely isolated from internet threats.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🌐 VPN-Only Access</h3>
+                        <p>All access through Firezone VPN with WireGuard protocol. Military-grade encryption.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>💰 Cost Optimized</h3>
+                        <p>$58.87/month when running. Saves $768/year vs Cloud NAT solution. Currently destroyed ($0/month).</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔗 VPC Peering</h3>
+                        <p>Secure private connectivity between projects. No internet gateway required.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PKI Certificate Chain -->
+            <div id="pki" class="diagram-page">
+                <h2 class="diagram-title">PKI Certificate Chain Architecture</h2>
+                <div class="diagram-info">
+                    <h3>📋 Three-Tier PKI Infrastructure</h3>
+                    <ul>
+                        <li>Root CA: 4096-bit RSA, 10-year validity (expires Feb 13, 2036)</li>
+                        <li>Intermediate CA: 4096-bit RSA, 5-year validity (expires Feb 12, 2031)</li>
+                        <li>Server Certificate: 2048-bit RSA, 1-year validity (expires Feb 13, 2027)</li>
+                        <li>Subject Alternative Names (SAN): DNS and IP address</li>
+                    </ul>
+                </div>
+                <div class="mermaid">
+graph TD
+    Root[🏛️ Root CA<br/>LearningMyWay Root CA<br/>━━━━━━━━━━━━━━━<br/>Algorithm: RSA 4096-bit<br/>Validity: 10 years<br/>Status: Self-Signed<br/>Location: /etc/pki/CA/root]
+    
+    Intermediate[🔐 Intermediate CA<br/>LearningMyWay Intermediate CA<br/>━━━━━━━━━━━━━━━<br/>Algorithm: RSA 4096-bit<br/>Validity: 5 years<br/>Signed by: Root CA<br/>Location: /etc/pki/CA/intermediate]
+    
+    Server[📜 Server Certificate<br/>jenkins.np.learningmyway.space<br/>━━━━━━━━━━━━━━━<br/>Algorithm: RSA 2048-bit<br/>Validity: 1 year<br/>Signed by: Intermediate CA<br/>Location: /etc/jenkins/certs]
+    
+    Root -->|Signs & Validates| Intermediate
+    Intermediate -->|Signs & Validates| Server
+    
+    Server -->|SAN Entry 1| DNS[DNS: jenkins.np.learningmyway.space]
+    Server -->|SAN Entry 2| IP[IP: 10.10.10.100]
+    
+    style Root fill:#ff6b6b,color:#fff
+    style Intermediate fill:#4ecdc4,color:#fff
+    style Server fill:#45b7d1,color:#fff
+    style DNS fill:#96ceb4
+    style IP fill:#96ceb4
+                </div>
+
+                <div class="features">
+                    <div class="feature">
+                        <h3>🏛️ Root CA</h3>
+                        <p>Self-signed root certificate. Must be installed on all client machines in Trusted Root Certification Authorities store.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔐 Intermediate CA</h3>
+                        <p>Signed by Root CA. Used to sign server certificates. Provides security isolation and revocation flexibility.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>📜 Server Certificate</h3>
+                        <p>Signed by Intermediate CA. Includes SAN for both DNS name and IP address. Used by Nginx for HTTPS.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔒 Chain Validation</h3>
+                        <p>Browser validates: Server → Intermediate → Root. Each signature must be valid and not expired.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TLS Handshake -->
+            <div id="tls" class="diagram-page">
+                <h2 class="diagram-title">TLS/SSL Handshake Flow</h2>
+                <div class="diagram-info">
+                    <h3>📋 Complete TLS 1.2/1.3 Handshake Process</h3>
+                    <ul>
+                        <li>Client initiates connection with supported cipher suites</li>
+                        <li>Server presents complete certificate chain</li>
+                        <li>Client validates certificate against installed Root CA</li>
+                        <li>Encrypted session established with session keys</li>
+                        <li>All subsequent traffic encrypted end-to-end</li>
+                    </ul>
+                </div>
+                <div class="mermaid">
+sequenceDiagram
+    participant Browser as 👤 Browser
+    participant Nginx as 🌐 Nginx:443
+    participant Jenkins as 🔧 Jenkins:8080
+    
+    Note over Browser,Nginx: 🔒 TLS Handshake Phase
+    Browser->>Nginx: 1. Client Hello<br/>(TLS 1.2/1.3, Cipher Suites)
+    Nginx->>Browser: 2. Server Hello<br/>(Selected Cipher, Session ID)
+    Nginx->>Browser: 3. Certificate Chain<br/>(Server → Intermediate → Root)
+    Nginx->>Browser: 4. Server Key Exchange<br/>(DH Parameters)
+    Nginx->>Browser: 5. Server Hello Done
+    
+    Note over Browser: 6. Certificate Validation<br/>✓ Signature chain<br/>✓ Root CA trust<br/>✓ SAN match<br/>✓ Expiry date<br/>✓ Revocation status
+    
+    Browser->>Nginx: 7. Client Key Exchange<br/>(Pre-master secret encrypted)
+    Browser->>Nginx: 8. Change Cipher Spec
+    Browser->>Nginx: 9. Finished (encrypted)
+    
+    Nginx->>Browser: 10. Change Cipher Spec
+    Nginx->>Browser: 11. Finished (encrypted)
+    
+    Note over Browser,Nginx: 🔐 Secure Session Established
+    
+    Note over Browser,Jenkins: 📡 Application Data Phase
+    Browser->>Nginx: 12. HTTPS Request (encrypted)
+    Nginx->>Jenkins: 13. HTTP Request (localhost)
+    Jenkins->>Nginx: 14. HTTP Response
+    Nginx->>Browser: 15. HTTPS Response (encrypted)
+                </div>
+
+                <div class="features">
+                    <div class="feature">
+                        <h3>🤝 Handshake</h3>
+                        <p>11-step process to establish secure connection. Negotiates cipher suite and exchanges keys.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>✅ Validation</h3>
+                        <p>Browser validates certificate chain, checks SAN, verifies expiry, and confirms Root CA trust.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔐 Encryption</h3>
+                        <p>AES-256-GCM cipher with perfect forward secrecy. Session keys unique per connection.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🌐 SSL Termination</h3>
+                        <p>Nginx handles TLS encryption/decryption. Jenkins runs plain HTTP on localhost for performance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Flow -->
+            <div id="flow" class="diagram-page">
+                <h2 class="diagram-title">Complete Request Flow</h2>
+                <div class="diagram-info">
+                    <h3>📋 End-to-End Request Journey</h3>
+                    <ul>
+                        <li>User accesses Jenkins via HTTPS URL</li>
+                        <li>DNS resolved via hosts file to internal IP</li>
+                        <li>Traffic encrypted twice: VPN (WireGuard) + TLS (HTTPS)</li>
+                        <li>Load balancer distributes to Jenkins VM</li>
+                        <li>Nginx terminates TLS and forwards to Jenkins</li>
+                    </ul>
+                </div>
+                <div class="mermaid">
+graph LR
+    User[👤 User] -->|1. Enter URL| Browser[🌐 Browser<br/>https://jenkins.np<br/>.learningmyway.space]
+    Browser -->|2. DNS Lookup<br/>hosts file| DNS[10.10.10.100]
+    DNS -->|3. VPN Tunnel<br/>WireGuard Encrypted| VPN[🔐 Firezone VPN<br/>Double Encryption]
+    VPN -->|4. VPC Peering<br/>Private Network| Peer[🔗 VPC Peering<br/>10.0.0.0/16 ↔ 10.10.0.0/16]
+    Peer -->|5. Forward to LB| LB[⚖️ Load Balancer<br/>10.10.10.100:443]
+    LB -->|6. Route to VM| Nginx[🌐 Nginx<br/>10.10.10.2:443<br/>SSL Termination]
+    Nginx -->|7. Decrypt HTTPS<br/>Plain HTTP| Jenkins[🔧 Jenkins<br/>10.10.10.2:8080<br/>HTTP Server]
+    Jenkins -->|8. Response| Nginx
+    Nginx -->|9. Encrypt TLS| Browser
+    
+    style User fill:#e3f2fd
+    style Browser fill:#fff3e0
+    style VPN fill:#ffebee
+    style LB fill:#e8f5e9
+    style Nginx fill:#f3e5f5
+    style Jenkins fill:#fce4ec
+                </div>
+
+                <div class="features">
+                    <div class="feature">
+                        <h3>🔐 Double Encryption</h3>
+                        <p>Layer 1: WireGuard VPN tunnel. Layer 2: TLS/HTTPS. Maximum security for data in transit.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>⚖️ Load Balancing</h3>
+                        <p>Internal LB provides single entry point, health checks, and traffic distribution capability.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🌐 SSL Termination</h3>
+                        <p>Nginx handles TLS complexity. Jenkins runs plain HTTP internally for better performance.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>📋 DNS Resolution</h3>
+                        <p>Hosts file maps domain to internal IP. No external DNS queries. Complete privacy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Layers -->
+            <div id="security" class="diagram-page">
+                <h2 class="diagram-title">Security Architecture - Defense in Depth</h2>
+                <div class="diagram-info">
+                    <h3>📋 Five-Layer Security Model</h3>
+                    <ul>
+                        <li>Layer 1: Network isolation (no public IPs, no Cloud NAT)</li>
+                        <li>Layer 2: VPN authentication (WireGuard with user auth)</li>
+                        <li>Layer 3: Firewall rules (GCP firewall, deny-all default)</li>
+                        <li>Layer 4: TLS encryption (HTTPS with PKI certificates)</li>
+                        <li>Layer 5: Application security (Jenkins authentication)</li>
+                    </ul>
+                </div>
+                <div class="mermaid">
+graph TB
+    subgraph Layer1["🌐 Layer 1: Network Isolation"]
+        L1A[No Public IPs]
+        L1B[No Cloud NAT]
+        L1C[Air-Gapped VM]
+        L1D[Private Subnets Only]
+    end
+    
+    subgraph Layer2["🔐 Layer 2: VPN Authentication"]
+        L2A[Firezone VPN Gateway]
+        L2B[WireGuard Protocol]
+        L2C[User Authentication]
+        L2D[Resource-Based Access]
+    end
+    
+    subgraph Layer3["🛡️ Layer 3: Firewall Rules"]
+        L3A[GCP Firewall]
+        L3B[Allow: VPN → Jenkins]
+        L3C[Deny: All Others]
+        L3D[Stateful Inspection]
+    end
+    
+    subgraph Layer4["🔒 Layer 4: TLS Encryption"]
+        L4A[HTTPS/TLS 1.2+]
+        L4B[PKI Certificate Chain]
+        L4C[Strong Cipher Suites]
+        L4D[Perfect Forward Secrecy]
+    end
+    
+    subgraph Layer5["👤 Layer 5: Application Security"]
+        L5A[Jenkins Authentication]
+        L5B[Role-Based Access Control]
+        L5C[Audit Logging]
+        L5D[Session Management]
+    end
+    
+    Layer1 --> Layer2
+    Layer2 --> Layer3
+    Layer3 --> Layer4
+    Layer4 --> Layer5
+    
+    style Layer1 fill:#ff6b6b,color:#fff
+    style Layer2 fill:#4ecdc4,color:#fff
+    style Layer3 fill:#45b7d1,color:#fff
+    style Layer4 fill:#96ceb4
+    style Layer5 fill:#ffeaa7
+                </div>
+
+                <div class="features">
+                    <div class="feature">
+                        <h3>🌐 Network Isolation</h3>
+                        <p>Zero internet exposure. No public IPs. No Cloud NAT. Complete air-gap from internet threats.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔐 VPN Security</h3>
+                        <p>WireGuard protocol with modern cryptography. User authentication and resource-based access control.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🛡️ Firewall Protection</h3>
+                        <p>GCP firewall with deny-all default. Only VPN traffic allowed. Stateful packet inspection.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔒 Encryption</h3>
+                        <p>Double encryption: VPN tunnel + TLS/HTTPS. AES-256-GCM cipher. Perfect forward secrecy.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>👤 Application Security</h3>
+                        <p>Jenkins authentication, RBAC, audit logging. Multiple security checkpoints before access.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🎯 Defense in Depth</h3>
+                        <p>Five independent security layers. Attacker must breach all layers. Comprehensive protection.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Topology -->
+            <div id="network" class="diagram-page">
+                <h2 class="diagram-title">Network Topology & IP Addressing</h2>
+                <div class="diagram-info">
+                    <h3>📋 Complete Network Layout</h3>
+                    <ul>
+                        <li>Project 1: Firezone VPC (10.0.0.0/16) with VPN gateway</li>
+                        <li>Project 2: Jenkins VPC (10.10.0.0/16) with application subnet</li>
+                        <li>VPC Peering: Private connectivity between projects</li>
+                        <li>No internet gateways, no Cloud NAT, no public IPs</li>
+                        <li>All traffic flows through private IP addresses</li>
+                    </ul>
+                </div>
+                <div class="mermaid">
+graph TB
+    subgraph Internet["🌍 Internet"]
+        Users[👥 Remote Users<br/>Various Locations]
+    end
+    
+    subgraph Project1["☁️ GCP Project 1: test-project1-485105"]
+        subgraph VPC1["VPC: firezone-vpc<br/>CIDR: 10.0.0.0/16"]
+            subgraph Subnet1["Subnet: firezone-subnet<br/>CIDR: 10.0.0.0/24<br/>Region: us-central1"]
+                FZGateway[🛡️ Firezone Gateway<br/>━━━━━━━━━━━━━━━<br/>Internal IP: 10.0.0.10<br/>External IP: Public<br/>Type: e2-medium<br/>Ports: 51820 UDP]
+            end
+        end
+    end
+    
+    Peering[🔗 VPC Peering<br/>━━━━━━━━━━━━━━━<br/>10.0.0.0/16 ↔ 10.10.0.0/16<br/>Private Connectivity<br/>No Internet Gateway]
+    
+    subgraph Project2["☁️ GCP Project 2: test-project2-485105"]
+        subgraph VPC2["VPC: jenkins-vpc<br/>CIDR: 10.10.0.0/16"]
+            subgraph Subnet2["Subnet: jenkins-subnet<br/>CIDR: 10.10.10.0/24<br/>Region: us-central1"]
+                LoadBalancer[⚖️ Internal Load Balancer<br/>━━━━━━━━━━━━━━━<br/>IP: 10.10.10.100<br/>Type: Internal TCP/UDP<br/>Ports: 443, 8080<br/>Health Check: HTTP:8080]
+                
+                JenkinsVM[🔧 Jenkins VM<br/>━━━━━━━━━━━━━━━<br/>Internal IP: 10.10.10.2<br/>External IP: None<br/>Type: n1-standard-2<br/>OS: Rocky Linux 8<br/>Services: Jenkins, Nginx]
+                
+                PrivateDNS[📋 Private DNS Zone<br/>━━━━━━━━━━━━━━━<br/>Domain: learningmyway.space<br/>Record: jenkins.np → 10.10.10.100<br/>Visibility: Private]
+            end
+        end
+    end
+    
+    Users -->|WireGuard VPN| FZGateway
+    FZGateway -->|VPC Peering| Peering
+    Peering --> LoadBalancer
+    LoadBalancer --> JenkinsVM
+    JenkinsVM -.->|DNS Query| PrivateDNS
+    
+    style Users fill:#e3f2fd
+    style FZGateway fill:#ffebee
+    style Peering fill:#fff3e0
+    style LoadBalancer fill:#e8f5e9
+    style JenkinsVM fill:#f3e5f5
+    style PrivateDNS fill:#fce4ec
+                </div>
+
+                <div class="features">
+                    <div class="feature">
+                        <h3>🌐 VPC Architecture</h3>
+                        <p>Two isolated VPCs connected via peering. Project 1: VPN gateway. Project 2: Jenkins application.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>📍 IP Addressing</h3>
+                        <p>10.0.0.0/16 for VPN, 10.10.0.0/16 for Jenkins. Non-overlapping CIDR blocks for clean routing.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔗 VPC Peering</h3>
+                        <p>Private connectivity between projects. No internet gateway. No NAT. Direct private routing.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>⚖️ Load Balancer</h3>
+                        <p>Internal LB at 10.10.10.100. Forwards to Jenkins VM. Health checks on port 8080.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔧 Jenkins VM</h3>
+                        <p>Internal IP only (10.10.10.2). No external IP. Runs Nginx (443) and Jenkins (8080).</p>
+                    </div>
+                    <div class="feature">
+                        <h3>📋 Private DNS</h3>
+                        <p>Internal DNS zone. jenkins.np.learningmyway.space → 10.10.10.100. No external DNS queries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            }
+        });
+
+        function showPage(pageId) {
+            document.querySelectorAll('.diagram-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

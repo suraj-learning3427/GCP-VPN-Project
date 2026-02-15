@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air-Gapped Jenkins Infrastructure | Enterprise CI/CD Solution</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="brand-icon">🔒</span>
+            <span class="brand-text">Air-Gapped Jenkins</span>
+        </div>
+        <div class="nav-links">
+            <a href="#deployment-phases">Phases</a>
+            <a href="#executive">Executive</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#vpn-setup">VPN Setup</a>
+            <a href="#deployment-options">Options</a>
+            <a href="#business">Business Value</a>
+        </div>
+    </nav>
+
+    <section id="hero" class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">✅ Production Ready | February 2026</div>
+            <h1 class="hero-title">Enterprise Air-Gapped<br/>Jenkins Infrastructure</h1>
+            <p class="hero-subtitle">Zero-Trust CI/CD Platform on Google Cloud Platform</p>
+            <div class="hero-metrics">
+                <div class="metric">
+                    <div class="metric-value">$768</div>
+                    <div class="metric-label">Annual Savings</div>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric">
+                    <div class="metric-value">0</div>
+                    <div class="metric-label">Internet Exposure</div>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric">
+                    <div class="metric-value">5</div>
+                    <div class="metric-label">Security Layers</div>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric">
+                    <div class="metric-value">20min</div>
+                    <div class="metric-label">Full Deployment</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="deployment-phases" class="section phases-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Deployment Phases</h2>
+                <p class="section-subtitle">Two-phase deployment: Image creation + Infrastructure deployment</p>
+            </div>
+
+            <div class="phases-container">
+                <div class="phase-card phase-1">
+                    <div class="phase-header">
+                        <div class="phase-number">Phase 1</div>
+                        <div class="phase-info">
+                            <h3>Custom Air-Gapped Image Creation</h3>
+                            <div class="phase-time">⏱️ 10-15 minutes (one-time)</div>
+                        </div>
+                    </div>
+                    <div class="phase-content">
+                        <p class="phase-description">Build a custom Rocky Linux 8 image with Jenkins and Java pre-installed to eliminate internet dependency</p>
+                        <div class="phase-steps">
+                            <div class="phase-step">
+                                <span class="step-icon">1</span>
+                                <span class="step-text">Create temporary builder VM with internet access</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">2</span>
+                                <span class="step-text">Install Jenkins 2.541.1, Java 17, and dependencies</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">3</span>
+                                <span class="step-text">Configure system and firewall settings</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">4</span>
+                                <span class="step-text">Create custom image (jenkins-airgapped-v1)</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">5</span>
+                                <span class="step-text">Delete builder VM and temporary firewall rules</span>
+                            </div>
+                        </div>
+                        <div class="phase-result">
+                            <strong>Result:</strong> Custom image ready for air-gapped deployment (no internet needed)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="phase-card phase-2">
+                    <div class="phase-header">
+                        <div class="phase-number">Phase 2</div>
+                        <div class="phase-info">
+                            <h3>Complete Infrastructure Deployment</h3>
+                            <div class="phase-time">⏱️ 5 minutes (automated)</div>
+                        </div>
+                    </div>
+                    <div class="phase-content">
+                        <p class="phase-description">Deploy entire infrastructure using Terraform with the custom image</p>
+                        <div class="phase-steps">
+                            <div class="phase-step">
+                                <span class="step-icon">1</span>
+                                <span class="step-text">Create VPCs in both projects (20.20.20.0/16 & 10.10.10.0/16)</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">2</span>
+                                <span class="step-text">Establish bidirectional VPC peering with route export</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">3</span>
+                                <span class="step-text">Deploy Firezone VPN gateway (e2-small, Ubuntu 22.04)</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">4</span>
+                                <span class="step-text">Deploy Jenkins VM from custom image (e2-medium, no internet)</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">5</span>
+                                <span class="step-text">Configure internal load balancer (10.10.10.100:8080)</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">6</span>
+                                <span class="step-text">Setup private DNS zone (learningmyway.space)</span>
+                            </div>
+                            <div class="phase-step">
+                                <span class="step-icon">7</span>
+                                <span class="step-text">Apply firewall rules (VPN access, IAP SSH, health checks)</span>
+                            </div>
+                        </div>
+                        <div class="phase-result">
+                            <strong>Result:</strong> Complete air-gapped Jenkins infrastructure ready for VPN access
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="deployment-summary">
+                <div class="summary-box">
+                    <div class="summary-icon">🚀</div>
+                    <div class="summary-content">
+                        <h4>Total Deployment Time</h4>
+                        <div class="summary-value">~20 minutes</div>
+                        <div class="summary-note">Phase 1 is one-time only. Subsequent deployments take just 5 minutes.</div>
+                    </div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-icon">📦</div>
+                    <div class="summary-content">
+                        <h4>Resources Created</h4>
+                        <div class="summary-value">19 resources</div>
+                        <div class="summary-note">2 VPCs, 2 VMs, 1 LB, 1 DNS zone, 6 firewall rules, VPC peering</div>
+                    </div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-icon">💰</div>
+                    <div class="summary-content">
+                        <h4>Monthly Cost</h4>
+                        <div class="summary-value">$84.30</div>
+                        <div class="summary-note">43% cheaper than Cloud NAT approach ($148.30/month)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-command">
+                <h4>Quick Deployment Command</h4>
+                <div class="command-box">
+                    <code>cd terraform && terraform init && terraform apply -auto-approve</code>
+                </div>
+                <p class="command-note">Deploys Phase 2 automatically. See DEPLOYMENT-SHOWCASE-GUIDE.md for Phase 1 details.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="executive" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Executive Summary</h2>
+                <p class="section-subtitle">Strategic infrastructure delivering security, compliance, and cost efficiency</p>
+            </div>
+            
+            <div class="executive-grid">
+                <div class="exec-card primary">
+                    <div class="exec-icon">🎯</div>
+                    <h3>Business Objective</h3>
+                    <p>Secure CI/CD automation platform with zero internet exposure, meeting compliance requirements while reducing operational costs by 43%</p>
+                    <div class="exec-metrics">
+                        <span class="badge success">Compliance Ready</span>
+                        <span class="badge info">Cost Optimized</span>
+                    </div>
+                </div>
+
+                <div class="exec-card">
+                    <div class="exec-icon">🏗️</div>
+                    <h3>Technical Solution</h3>
+                    <p>Multi-project GCP architecture with VPC peering, Firezone VPN gateway, and pre-configured air-gapped Jenkins deployment</p>
+                    <div class="tech-stack">
+                        <span class="tech-badge">GCP</span>
+                        <span class="tech-badge">Terraform</span>
+                        <span class="tech-badge">Jenkins 2.541.1</span>
+                        <span class="tech-badge">Firezone VPN</span>
+                    </div>
+                </div>
+
+                <div class="exec-card">
+                    <div class="exec-icon">📊</div>
+                    <h3>Key Metrics</h3>
+                    <div class="metrics-list">
+                        <div class="metric-row">
+                            <span class="metric-name">Monthly Cost</span>
+                            <span class="metric-val">$84.30</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-name">Cost Reduction</span>
+                            <span class="metric-val success">43%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-name">Deployment Time</span>
+                            <span class="metric-val">20 minutes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-name">Automation Level</span>
+                            <span class="metric-val">100%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="requirements-section">
+                <h3 class="subsection-title">Requirements & Constraints</h3>
+                <div class="requirements-grid">
+                    <div class="req-card">
+                        <div class="req-header security">
+                            <span class="req-icon">🔒</span>
+                            <span class="req-title">Security Requirements</span>
+                        </div>
+                        <ul class="req-list">
+                            <li>Zero internet exposure for CI/CD server</li>
+                            <li>VPN-only authenticated access</li>
+                            <li>Air-gapped deployment (no outbound connections)</li>
+                            <li>Defense-in-depth security architecture</li>
+                            <li>Compliance with regulated industry standards</li>
+                        </ul>
+                    </div>
+
+                    <div class="req-card">
+                        <div class="req-header operational">
+                            <span class="req-icon">⚙️</span>
+                            <span class="req-title">Operational Requirements</span>
+                        </div>
+                        <ul class="req-list">
+                            <li>Infrastructure as Code (Terraform)</li>
+                            <li>Automated deployment in under 30 minutes</li>
+                            <li>Persistent data storage with disaster recovery</li>
+                            <li>Health monitoring and load balancing</li>
+                            <li>Scalable architecture for future growth</li>
+                        </ul>
+                    </div>
+
+                    <div class="req-card">
+                        <div class="req-header business">
+                            <span class="req-icon">💼</span>
+                            <span class="req-title">Business Requirements</span>
+                        </div>
+                        <ul class="req-list">
+                            <li>Cost optimization (eliminate Cloud NAT)</li>
+                            <li>Production-ready with minimal maintenance</li>
+                            <li>Multi-project isolation for security</li>
+                            <li>Comprehensive documentation</li>
+                            <li>Repeatable deployment process</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture" class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">System Architecture</h2>
+                <p class="section-subtitle">Multi-project isolation with VPC peering and zero-trust network design</p>
+            </div>
+
+            <div class="architecture-visual">
+                <div class="arch-diagram">
+                    <div class="arch-tier tier-internet">
+                        <div class="tier-label">Internet Layer</div>
+                        <div class="tier-box">
+                            <div class="node internet-node">
+                                <span class="node-icon">🌐</span>
+                                <span class="node-name">Public Internet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="connection-line vpn">
+                        <span class="connection-label">WireGuard VPN (UDP/51820)</span>
+                    </div>
+
+                    <div class="arch-tier tier-project1">
+                        <div class="tier-label">
+                            <span class="project-badge p1">Project 1</span>
+                            test-project1-485105
+                        </div>
+                        <div class="tier-box">
+                            <div class="node gateway-node">
+                                <div class="node-header">
+                                    <span class="node-icon">🔐</span>
+                                    <span class="node-name">Firezone VPN Gateway</span>
+                                </div>
+                                <div class="node-specs">
+                                    <div class="spec-item"><span class="spec-label">Public IP:</span> 136.114.231.135</div>
+                                    <div class="spec-item"><span class="spec-label">Instance:</span> e2-small (2vCPU, 2GB)</div>
+                                    <div class="spec-item"><span class="spec-label">OS:</span> Ubuntu 22.04 LTS</div>
+                                </div>
+                            </div>
+                            <div class="network-badge">VPC: 20.20.20.0/16</div>
+                        </div>
+                    </div>
+
+                    <div class="connection-line peering">
+                        <span class="connection-label">VPC Peering (Bidirectional)</span>
+                    </div>
+
+                    <div class="arch-tier tier-project2">
+                        <div class="tier-label">
+                            <span class="project-badge p2">Project 2</span>
+                            test-project2-485105
+                        </div>
+                        <div class="tier-box">
+                            <div class="nodes-row">
+                                <div class="node lb-node">
+                                    <div class="node-header">
+                                        <span class="node-icon">⚖️</span>
+                                        <span class="node-name">Internal LB</span>
+                                    </div>
+                                    <div class="node-specs">
+                                        <div class="spec-item">10.10.10.100:8080</div>
+                                        <div class="spec-item">Health: ✅ Active</div>
+                                    </div>
+                                </div>
+                                <div class="node jenkins-node highlight">
+                                    <div class="node-header">
+                                        <span class="node-icon">🏗️</span>
+                                        <span class="node-name">Jenkins VM</span>
+                                    </div>
+                                    <div class="node-specs">
+                                        <div class="spec-item"><span class="spec-label">Private IP:</span> 10.10.10.10</div>
+                                        <div class="spec-item"><span class="spec-label">Instance:</span> e2-medium (2vCPU, 4GB)</div>
+                                        <div class="spec-item"><span class="spec-label">Storage:</span> 50GB + 100GB data</div>
+                                        <div class="spec-item danger">❌ NO INTERNET</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="network-badge">VPC: 10.10.10.0/16 | DNS: jenkins.np.learningmyway.space</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arch-details">
+                    <div class="detail-card">
+                        <h4>🔄 Data Flow</h4>
+                        <ol class="flow-list">
+                            <li>User authenticates via Firezone VPN client</li>
+                            <li>Encrypted tunnel established to gateway (136.114.231.135)</li>
+                            <li>Traffic routed through VPC peering to Project 2</li>
+                            <li>Internal LB performs health check and forwards to Jenkins</li>
+                            <li>Jenkins processes request (no outbound internet possible)</li>
+                        </ol>
+                    </div>
+
+                    <div class="detail-card">
+                        <h4>🛡️ Security Boundaries</h4>
+                        <div class="security-layers-compact">
+                            <div class="layer-item"><span class="layer-num">1</span> Network Isolation (Private IPs only)</div>
+                            <div class="layer-item"><span class="layer-num">2</span> VPN Authentication (Firezone)</div>
+                            <div class="layer-item"><span class="layer-num">3</span> Firewall Rules (Strict ingress/egress)</div>
+                            <div class="layer-item"><span class="layer-num">4</span> IAP for SSH (Google Identity-Aware Proxy)</div>
+                            <div class="layer-item"><span class="layer-num">5</span> Air-Gap (Zero internet connectivity)</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h4>📦 Infrastructure Components</h4>
+                        <div class="components-compact">
+                            <div class="comp-item">
+                                <span class="comp-name">Firezone Gateway</span>
+                                <span class="comp-cost">$15/mo</span>
+                            </div>
+                            <div class="comp-item">
+                                <span class="comp-name">Jenkins VM + Storage</span>
+                                <span class="comp-cost">$42/mo</span>
+                            </div>
+                            <div class="comp-item">
+                                <span class="comp-name">Internal Load Balancer</span>
+                                <span class="comp-cost">$20/mo</span>
+                            </div>
+                            <div class="comp-item">
+                                <span class="comp-name">Networking (VPC, Peering, IP)</span>
+                                <span class="comp-cost">$7.30/mo</span>
+                            </div>
+                            <div class="comp-item total">
+                                <span class="comp-name">Total Monthly Cost</span>
+                                <span class="comp-cost">$84.30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="vpn-setup" class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">VPN Setup & Access</h2>
+                <p class="section-subtitle">Complete Firezone VPN configuration and client setup guide</p>
+            </div>
+
+            <div class="vpn-steps">
+                <div class="vpn-step">
+                    <div class="step-header">
+                        <span class="step-num">1</span>
+                        <h3>Configure Firezone Resource</h3>
+                    </div>
+                    <div class="step-content">
+                        <p>Create Jenkins resource in Firezone dashboard</p>
+                        <div class="code-block">
+                            <div class="code-line"><span class="code-label">URL:</span> https://app.firezone.dev</div>
+                            <div class="code-line"><span class="code-label">Navigate:</span> Resources → Add Resource</div>
+                            <div class="code-line"><span class="code-label">Type:</span> IP</div>
+                            <div class="code-line"><span class="code-label">Address:</span> 10.10.10.100</div>
+                            <div class="code-line"><span class="code-label">Name:</span> Jenkins Server</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vpn-step">
+                    <div class="step-header">
+                        <span class="step-num">2</span>
+                        <h3>Create Access Policy</h3>
+                    </div>
+                    <div class="step-content">
+                        <p>Define who can access Jenkins through VPN</p>
+                        <div class="code-block">
+                            <div class="code-line"><span class="code-label">Action:</span> Click "Create a Policy" on resource</div>
+                            <div class="code-line"><span class="code-label">Group:</span> Everyone (or specific group)</div>
+                            <div class="code-line"><span class="code-label">Resource:</span> Jenkins Server</div>
+                            <div class="code-line"><span class="code-label">Permission:</span> Allow</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vpn-step">
+                    <div class="step-header">
+                        <span class="step-num">3</span>
+                        <h3>Install VPN Client</h3>
+                    </div>
+                    <div class="step-content">
+                        <p>Download and install Firezone client for your platform</p>
+                        <div class="platform-links">
+                            <div class="platform-item">
+                                <span class="platform-icon">🪟</span>
+                                <span class="platform-name">Windows</span>
+                                <span class="platform-link">firezone.dev/windows</span>
+                            </div>
+                            <div class="platform-item">
+                                <span class="platform-icon">🍎</span>
+                                <span class="platform-name">macOS</span>
+                                <span class="platform-link">firezone.dev/macos</span>
+                            </div>
+                            <div class="platform-item">
+                                <span class="platform-icon">🐧</span>
+                                <span class="platform-name">Linux</span>
+                                <span class="platform-link">firezone.dev/linux</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vpn-step">
+                    <div class="step-header">
+                        <span class="step-num">4</span>
+                        <h3>Connect & Access</h3>
+                    </div>
+                    <div class="step-content">
+                        <p>Connect VPN and access Jenkins</p>
+                        <div class="code-block">
+                            <div class="code-line">1. Open Firezone client</div>
+                            <div class="code-line">2. Click "Sign In" with your email</div>
+                            <div class="code-line">3. Complete authentication</div>
+                            <div class="code-line">4. Click "Connect"</div>
+                            <div class="code-line">5. Open browser: http://10.10.10.100:8080</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vpn-verification">
+                <h3 class="subsection-title">Verification Commands</h3>
+                <div class="verification-grid">
+                    <div class="verify-card">
+                        <h4>Test DNS Resolution</h4>
+                        <code>nslookup jenkins.np.learningmyway.space</code>
+                        <div class="expected">Expected: 10.10.10.100</div>
+                    </div>
+                    <div class="verify-card">
+                        <h4>Test Connectivity</h4>
+                        <code>ping 10.10.10.100</code>
+                        <div class="expected">Expected: Successful ping</div>
+                    </div>
+                    <div class="verify-card">
+                        <h4>Test Jenkins Access</h4>
+                        <code>curl http://10.10.10.100:8080</code>
+                        <div class="expected">Expected: HTML response</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="deployment-options" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Deployment Options</h2>
+                <p class="section-subtitle">Choose the right approach for your security and operational needs</p>
+            </div>
+
+            <div class="options-grid">
+                <div class="option-card implemented">
+                    <div class="option-badge">✅ IMPLEMENTED</div>
+                    <h3>Option 1: Air-Gapped Deployment</h3>
+                    <p class="option-desc">Jenkins with zero internet access using pre-built custom image</p>
+                    
+                    <div class="option-details">
+                        <div class="option-section">
+                            <h4>Pros</h4>
+                            <ul>
+                                <li>Maximum security (zero attack surface)</li>
+                                <li>Compliance-ready for regulated industries</li>
+                                <li>Cost savings ($64/month vs Cloud NAT)</li>
+                                <li>No ongoing internet charges</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Cons</h4>
+                            <ul>
+                                <li>Manual plugin updates required</li>
+                                <li>No automatic security patches</li>
+                                <li>Initial image creation time (10-15 min)</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Best For</h4>
+                            <ul>
+                                <li>Regulated industries (finance, healthcare)</li>
+                                <li>High-security environments</li>
+                                <li>Compliance requirements</li>
+                                <li>Cost-sensitive deployments</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="option-cost">
+                        <span class="cost-label">Monthly Cost:</span>
+                        <span class="cost-value">$84.30</span>
+                    </div>
+                </div>
+
+                <div class="option-card">
+                    <h3>Option 2: Cloud NAT with Internet</h3>
+                    <p class="option-desc">Jenkins with outbound internet access via Cloud NAT</p>
+                    
+                    <div class="option-details">
+                        <div class="option-section">
+                            <h4>Pros</h4>
+                            <ul>
+                                <li>Automatic plugin updates</li>
+                                <li>Automatic security patches</li>
+                                <li>Easier maintenance</li>
+                                <li>Standard deployment</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Cons</h4>
+                            <ul>
+                                <li>Higher cost ($148.30/month)</li>
+                                <li>Internet exposure (outbound)</li>
+                                <li>Additional attack surface</li>
+                                <li>Cloud NAT charges ($64/month)</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Best For</h4>
+                            <ul>
+                                <li>Development environments</li>
+                                <li>Less strict security requirements</li>
+                                <li>Need for automatic updates</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="option-cost">
+                        <span class="cost-label">Monthly Cost:</span>
+                        <span class="cost-value">$148.30</span>
+                    </div>
+                </div>
+
+                <div class="option-card">
+                    <h3>Option 3: Temporary Public IP</h3>
+                    <p class="option-desc">Assign public IP temporarily for setup, then remove</p>
+                    
+                    <div class="option-details">
+                        <div class="option-section">
+                            <h4>Pros</h4>
+                            <ul>
+                                <li>Easy initial setup</li>
+                                <li>Can install plugins during setup</li>
+                                <li>Remove IP after configuration</li>
+                                <li>Lower ongoing cost</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Cons</h4>
+                            <ul>
+                                <li>Manual process to add/remove IP</li>
+                                <li>Temporary internet exposure</li>
+                                <li>Requires VM restart</li>
+                                <li>Not fully automated</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Best For</h4>
+                            <ul>
+                                <li>One-time setup scenarios</li>
+                                <li>Hybrid approach</li>
+                                <li>Testing environments</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="option-cost">
+                        <span class="cost-label">Monthly Cost:</span>
+                        <span class="cost-value">$84.30 (after removal)</span>
+                    </div>
+                </div>
+
+                <div class="option-card">
+                    <h3>Option 4: Bastion Host with Proxy</h3>
+                    <p class="option-desc">Use bastion host as proxy for Jenkins updates</p>
+                    
+                    <div class="option-details">
+                        <div class="option-section">
+                            <h4>Pros</h4>
+                            <ul>
+                                <li>Controlled internet access</li>
+                                <li>Audit trail for connections</li>
+                                <li>Can be automated</li>
+                                <li>Maintains air-gap most of time</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Cons</h4>
+                            <ul>
+                                <li>Additional bastion host cost ($25/month)</li>
+                                <li>More complex architecture</li>
+                                <li>Requires proxy configuration</li>
+                                <li>Additional maintenance</li>
+                            </ul>
+                        </div>
+                        <div class="option-section">
+                            <h4>Best For</h4>
+                            <ul>
+                                <li>Need occasional updates</li>
+                                <li>Want audit trail</li>
+                                <li>Hybrid security model</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="option-cost">
+                        <span class="cost-label">Monthly Cost:</span>
+                        <span class="cost-value">$109.30</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="options-comparison">
+                <h3 class="subsection-title">Quick Comparison</h3>
+                <table class="options-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Air-Gapped</th>
+                            <th>Cloud NAT</th>
+                            <th>Temp IP</th>
+                            <th>Bastion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Monthly Cost</td>
+                            <td class="positive">$84.30</td>
+                            <td class="negative">$148.30</td>
+                            <td class="positive">$84.30</td>
+                            <td class="neutral">$109.30</td>
+                        </tr>
+                        <tr>
+                            <td>Security Level</td>
+                            <td class="positive">Maximum</td>
+                            <td class="neutral">Medium</td>
+                            <td class="positive">High</td>
+                            <td class="positive">High</td>
+                        </tr>
+                        <tr>
+                            <td>Maintenance</td>
+                            <td class="neutral">Manual</td>
+                            <td class="positive">Automatic</td>
+                            <td class="neutral">Manual</td>
+                            <td class="neutral">Semi-Auto</td>
+                        </tr>
+                        <tr>
+                            <td>Deployment Time</td>
+                            <td class="neutral">20 min</td>
+                            <td class="positive">15 min</td>
+                            <td class="positive">15 min</td>
+                            <td class="neutral">25 min</td>
+                        </tr>
+                        <tr>
+                            <td>Compliance</td>
+                            <td class="positive">Full</td>
+                            <td class="neutral">Partial</td>
+                            <td class="positive">Full</td>
+                            <td class="positive">Full</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="implementation" class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Implementation Details</h2>
+                <p class="section-subtitle">Automated deployment with Infrastructure as Code</p>
+            </div>
+
+            <div class="implementation-grid">
+                <div class="impl-card featured">
+                    <div class="impl-header">
+                        <span class="impl-icon">💿</span>
+                        <h3>Custom Air-Gapped Image</h3>
+                    </div>
+                    <p class="impl-desc">Pre-configured Rocky Linux 8 image with Jenkins 2.541.1 and Java 17, eliminating internet dependency during deployment</p>
+                    <div class="impl-details">
+                        <div class="impl-row">
+                            <span class="impl-label">Image Name:</span>
+                            <span class="impl-value">jenkins-airgapped-v1</span>
+                        </div>
+                        <div class="impl-row">
+                            <span class="impl-label">Build Time:</span>
+                            <span class="impl-value">10-15 minutes (one-time)</span>
+                        </div>
+                        <div class="impl-row">
+                            <span class="impl-label">Size:</span>
+                            <span class="impl-value">~6GB</span>
+                        </div>
+                        <div class="impl-row">
+                            <span class="impl-label">Benefit:</span>
+                            <span class="impl-value success">No internet needed for deployment</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="impl-card">
+                    <div class="impl-header">
+                        <span class="impl-icon">🔧</span>
+                        <h3>Terraform Modules</h3>
+                    </div>
+                    <p class="impl-desc">Modular Infrastructure as Code architecture for maintainability and reusability</p>
+                    <div class="modules-list">
+                        <div class="module-item">
+                            <span class="module-name">networking</span>
+                            <span class="module-desc">VPC and subnet creation</span>
+                        </div>
+                        <div class="module-item">
+                            <span class="module-name">vpc-peering</span>
+                            <span class="module-desc">Cross-project connectivity</span>
+                        </div>
+                        <div class="module-item">
+                            <span class="module-name">firezone-gateway</span>
+                            <span class="module-desc">VPN server deployment</span>
+                        </div>
+                        <div class="module-item">
+                            <span class="module-name">jenkins-vm</span>
+                            <span class="module-desc">Air-gapped application server</span>
+                        </div>
+                        <div class="module-item">
+                            <span class="module-name">load-balancer</span>
+                            <span class="module-desc">Internal TCP LB with health checks</span>
+                        </div>
+                        <div class="module-item">
+                            <span class="module-name">dns</span>
+                            <span class="module-desc">Private DNS zone and records</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="impl-card">
+                    <div class="impl-header">
+                        <span class="impl-icon">⚡</span>
+                        <h3>Deployment Process</h3>
+                    </div>
+                    <p class="impl-desc">Fully automated deployment in approximately 20 minutes</p>
+                    <div class="deployment-steps">
+                        <div class="step-item">
+                            <span class="step-badge">1</span>
+                            <div class="step-info">
+                                <span class="step-name">Image Creation</span>
+                                <span class="step-time">10-15 min</span>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-badge">2</span>
+                            <div class="step-info">
+                                <span class="step-name">Network Infrastructure</span>
+                                <span class="step-time">2 min</span>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-badge">3</span>
+                            <div class="step-info">
+                                <span class="step-name">Application Deployment</span>
+                                <span class="step-time">3 min</span>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-badge">4</span>
+                            <div class="step-info">
+                                <span class="step-name">VPN Configuration</span>
+                                <span class="step-time">3 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="technical-specs">
+                <h3 class="subsection-title">Technical Specifications</h3>
+                <div class="specs-grid-compact">
+                    <div class="spec-group">
+                        <h4>Compute Resources</h4>
+                        <table class="spec-table">
+                            <tr><td>Firezone Gateway</td><td>e2-small (2 vCPU, 2GB RAM)</td></tr>
+                            <tr><td>Jenkins Server</td><td>e2-medium (2 vCPU, 4GB RAM)</td></tr>
+                            <tr><td>Region</td><td>us-central1</td></tr>
+                            <tr><td>Zone</td><td>us-central1-a</td></tr>
+                        </table>
+                    </div>
+                    <div class="spec-group">
+                        <h4>Network Configuration</h4>
+                        <table class="spec-table">
+                            <tr><td>Project 1 VPC</td><td>20.20.20.0/16</td></tr>
+                            <tr><td>Project 2 VPC</td><td>10.10.10.0/16</td></tr>
+                            <tr><td>VPC Peering</td><td>Bidirectional, Active</td></tr>
+                            <tr><td>DNS Zone</td><td>learningmyway.space (Private)</td></tr>
+                        </table>
+                    </div>
+                    <div class="spec-group">
+                        <h4>Storage & Software</h4>
+                        <table class="spec-table">
+                            <tr><td>Boot Disks</td><td>70GB SSD (total)</td></tr>
+                            <tr><td>Data Disk</td><td>100GB SSD (persistent)</td></tr>
+                            <tr><td>Jenkins Version</td><td>2.541.1</td></tr>
+                            <tr><td>Java Version</td><td>17</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="business" class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Business Value & ROI</h2>
+                <p class="section-subtitle">Quantifiable benefits and strategic advantages</p>
+            </div>
+
+            <div class="business-grid">
+                <div class="value-card primary-value">
+                    <div class="value-header">
+                        <span class="value-icon">💰</span>
+                        <h3>Cost Optimization</h3>
+                    </div>
+                    <div class="cost-comparison-compact">
+                        <div class="cost-row current">
+                            <span class="cost-label">Current Architecture</span>
+                            <span class="cost-value">$84.30/mo</span>
+                        </div>
+                        <div class="cost-row alternative">
+                            <span class="cost-label">With Cloud NAT</span>
+                            <span class="cost-value">$148.30/mo</span>
+                        </div>
+                        <div class="cost-row savings">
+                            <span class="cost-label">Monthly Savings</span>
+                            <span class="cost-value">$64.00</span>
+                        </div>
+                        <div class="cost-row savings-annual">
+                            <span class="cost-label">Annual Savings</span>
+                            <span class="cost-value">$768.00</span>
+                        </div>
+                    </div>
+                    <div class="value-metric">43% cost reduction vs traditional approach</div>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-header">
+                        <span class="value-icon">🔒</span>
+                        <h3>Security & Compliance</h3>
+                    </div>
+                    <ul class="value-list">
+                        <li><span class="check">✓</span> Zero attack surface (no internet exposure)</li>
+                        <li><span class="check">✓</span> Meets air-gapped compliance requirements</li>
+                        <li><span class="check">✓</span> Suitable for regulated industries (finance, healthcare)</li>
+                        <li><span class="check">✓</span> Defense-in-depth with 5 security layers</li>
+                        <li><span class="check">✓</span> Audit-ready with comprehensive logging</li>
+                    </ul>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-header">
+                        <span class="value-icon">⚡</span>
+                        <h3>Operational Efficiency</h3>
+                    </div>
+                    <ul class="value-list">
+                        <li><span class="check">✓</span> 20-minute deployment (100% automated)</li>
+                        <li><span class="check">✓</span> Infrastructure as Code (version controlled)</li>
+                        <li><span class="check">✓</span> Minimal maintenance overhead</li>
+                        <li><span class="check">✓</span> Repeatable across environments</li>
+                        <li><span class="check">✓</span> Disaster recovery ready</li>
+                    </ul>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-header">
+                        <span class="value-icon">📈</span>
+                        <h3>Scalability & Future-Proofing</h3>
+                    </div>
+                    <ul class="value-list">
+                        <li><span class="check">✓</span> Load balancer enables horizontal scaling</li>
+                        <li><span class="check">✓</span> Modular architecture for easy expansion</li>
+                        <li><span class="check">✓</span> Multi-region deployment capable</li>
+                        <li><span class="check">✓</span> Supports additional Jenkins nodes</li>
+                        <li><span class="check">✓</span> Kubernetes migration path available</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="comparison-table-section">
+                <h3 class="subsection-title">Solution Comparison</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Air-Gapped (Current)</th>
+                            <th>Cloud NAT Approach</th>
+                            <th>Public Jenkins</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Internet Exposure</td>
+                            <td class="positive">❌ None</td>
+                            <td class="neutral">⚠️ Outbound Only</td>
+                            <td class="negative">✗ Full Exposure</td>
+                        </tr>
+                        <tr>
+                            <td>Monthly Cost</td>
+                            <td class="positive">✓ $84.30</td>
+                            <td class="neutral">$148.30</td>
+                            <td class="positive">✓ $40-60</td>
+                        </tr>
+                        <tr>
+                            <td>Compliance Ready</td>
+                            <td class="positive">✓ Yes</td>
+                            <td class="neutral">⚠️ Partial</td>
+                            <td class="negative">✗ No</td>
+                        </tr>
+                        <tr>
+                            <td>Deployment Time</td>
+                            <td class="positive">✓ 20 min</td>
+                            <td class="positive">✓ 15 min</td>
+                            <td class="positive">✓ 10 min</td>
+                        </tr>
+                        <tr>
+                            <td>Maintenance</td>
+                            <td class="neutral">⚠️ Manual Updates</td>
+                            <td class="positive">✓ Automated</td>
+                            <td class="positive">✓ Automated</td>
+                        </tr>
+                        <tr>
+                            <td>Security Level</td>
+                            <td class="positive">✓ Maximum</td>
+                            <td class="neutral">⚠️ Medium</td>
+                            <td class="negative">✗ Low</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="project-summary">
+                <div class="summary-card">
+                    <h3>Project Information</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">Owner</span>
+                            <span class="summary-value">rksuraj@learningmyway.space</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Status</span>
+                            <span class="summary-value success">✅ Production Ready</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Deployment Date</span>
+                            <span class="summary-value">February 2026</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Jenkins URL</span>
+                            <span class="summary-value code">http://10.10.10.100:8080</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Domain</span>
+                            <span class="summary-value code">jenkins.np.learningmyway.space</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">GCP Projects</span>
+                            <span class="summary-value">test-project1-485105, test-project2-485105</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Key Achievements</h3>
+                    <div class="achievements-compact">
+                        <span class="achievement-badge">Zero Internet Exposure</span>
+                        <span class="achievement-badge">43% Cost Reduction</span>
+                        <span class="achievement-badge">20-Min Deployment</span>
+                        <span class="achievement-badge">5-Layer Security</span>
+                        <span class="achievement-badge">100% Automated</span>
+                        <span class="achievement-badge">Compliance Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="brand-icon">🔒</span>
+                        <span class="brand-text">Air-Gapped Jenkins Infrastructure</span>
+                    </div>
+                    <p class="footer-tagline">Enterprise CI/CD with Zero-Trust Architecture</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li>PROJECT-OVERVIEW.md</li>
+                            <li>DEPLOYMENT-SHOWCASE-GUIDE.md</li>
+                            <li>terraform/ (Infrastructure Code)</li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Quick Stats</h4>
+                        <ul>
+                            <li>Monthly Cost: $84.30</li>
+                            <li>Annual Savings: $768</li>
+                            <li>Deployment: 20 minutes</li>
+                            <li>Security Layers: 5</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 learningmyway.space | Production Ready | Last Updated: February 13, 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

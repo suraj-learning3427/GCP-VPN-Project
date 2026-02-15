@@ -1,0 +1,47 @@
+// Jenkins VPN Infrastructure
+digraph {
+	nodesep=1 rankdir=TB ranksep=1.5 splines=ortho
+	node [fontname=Arial shape=box style="rounded,filled"]
+	subgraph cluster_user {
+		color=lightblue label="User Laptop" style=filled
+		user [label="User
+Browser" fillcolor="#e1f5ff"]
+	}
+	subgraph cluster_project1 {
+		color=lightgray label="GCP Project 1
+test-project1-485105
+(VPN Gateway)" style=filled
+		subgraph cluster_vpc1 {
+			color=blue label="VPC: networkingglobal-vpc
+20.20.20.0/16" style=dashed
+			firezone [label="Firezone Gateway
+e2-small
+20.20.20.10
+Public IP" fillcolor="#fff3cd"]
+		}
+	}
+	subgraph cluster_project2 {
+		color=lightgray label="GCP Project 2
+test-project2-485105
+(Jenkins Application)" style=filled
+		subgraph cluster_vpc2 {
+			color=blue label="VPC: core-it-vpc
+10.10.10.0/16" style=dashed
+			lb [label="Internal Load Balancer
+10.10.10.100
+Ports: 443, 8080" fillcolor="#d4edda"]
+			jenkins [label="Jenkins VM
+e2-medium
+10.10.10.10
+Air-gapped" fillcolor="#d1ecf1"]
+			nginx [label="Nginx
+HTTPS:443 → HTTP:8080" fillcolor="#d1ecf1"]
+		}
+	}
+	user -> firezone [label="VPN
+WireGuard" color=green style=bold]
+	firezone -> lb [label="VPC Peering
+20.20.20.0/24 → 10.10.10.0/24" color=blue style=bold]
+	lb -> nginx [label="Port 443" color=red]
+	nginx -> jenkins [label="Port 8080" color=orange]
+}

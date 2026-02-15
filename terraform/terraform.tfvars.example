@@ -1,0 +1,10 @@
+# Terraform Variables for learningmyway.space Jenkins Infrastructure
+# Copy this file to terraform.tfvars and update the firezone_token
+
+project_id_networking = "test-project1-485105"
+project_id_coreit     = "test-project2-485105"
+region                = "us-central1"
+zone                  = "us-central1-a"
+domain_name           = "learningmyway.space"
+jenkins_hostname      = "jenkins.np.learningmyway.space"
+firezone_token        = "YOUR_FIREZONE_TOKEN_HERE"

@@ -1,0 +1,44 @@
+# Outputs for VPN-Jenkins Infrastructure
+
+output "project1_vpc_name" {
+  description = "VPC name in Project 1"
+  value       = module.networking_project1.vpc_name
+}
+
+output "project2_vpc_name" {
+  description = "VPC name in Project 2"
+  value       = module.networking_project2.vpc_name
+}
+
+output "jenkins_vm_private_ip" {
+  description = "Jenkins VM private IP address"
+  value       = module.jenkins_vm.private_ip
+}
+
+output "jenkins_lb_ip" {
+  description = "Internal Load Balancer IP address"
+  value       = module.load_balancer.lb_ip_address
+}
+
+output "jenkins_url" {
+  description = "Jenkins access URL"
+  value       = "https://${var.jenkins_hostname}"
+}
+
+output "firezone_gateway_ip" {
+  description = "Firezone gateway IP address"
+  value       = module.firezone_gateway.gateway_ip
+}
+
+output "dns_zone_name" {
+  description = "Private DNS zone name"
+  value       = module.dns.zone_name
+}
+
+output "vpc_peering_status" {
+  description = "VPC peering connection status"
+  value = {
+    peering_1_to_2 = module.vpc_peering.peering_1_to_2_state
+    peering_2_to_1 = module.vpc_peering.peering_2_to_1_state
+  }
+}
