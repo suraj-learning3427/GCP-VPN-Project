@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete DNS Guide - Real World: Hostinger + Google Cloud DNS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0f1c;
+            --bg-card: #111827;
+            --bg-code: #1a1f2e;
+            --hostinger: #6b46f2;
+            --google-blue: #4285f4;
+            --google-red: #ea4335;
+            --google-yellow: #fbbc04;
+            --google-green: #34a853;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #a855f7;
+            --text-bright: #f9fafb;
+            --text-dim: #9ca3af;
+            --border: #1f2937;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-bright);
+            line-height: 1.7;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(66, 133, 244, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(107, 70, 242, 0.1) 0%, transparent 40%);
+            z-index: -1;
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        /* Header */
+        header {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .tech-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-hostinger {
+            background: rgba(107, 70, 242, 0.2);
+            border: 2px solid var(--hostinger);
+            color: var(--hostinger);
+        }
+
+        .badge-google {
+            background: rgba(66, 133, 244, 0.2);
+            border: 2px solid var(--google-blue);
+            color: var(--google-blue);
+        }
+
+        .badge-gcp {
+            background: rgba(52, 168, 83, 0.2);
+            border: 2px solid var(--google-green);
+            color: var(--google-green);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 5rem 5% 3rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--google-blue), var(--hostinger), var(--google-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .domain-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border: 2px solid var(--google-blue);
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--google-blue);
+            box-shadow: 0 0 40px rgba(66, 133, 244, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            flex: 1;
+        }
+
+        .step-number {
+            background: var(--google-blue);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            box-shadow: 0 4px 20px rgba(66, 133, 244, 0.4);
+        }
+
+        /* Content Card */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .content-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            color: var(--google-blue);
+        }
+
+        .content-card h4 {
+            font-size: 1.3rem;
+            margin: 2rem 0 1rem;
+            color: var(--accent-purple);
+        }
+
+        .content-card p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        .content-card ul, .content-card ol {
+            margin-left: 2rem;
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--google-blue);
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: var(--google-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: var(--google-green);
+            transform: translateY(-2px);
+        }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-bright);
+            margin: 0;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(66, 133, 244, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--google-blue);
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1));
+            border-left: 4px solid var(--google-blue);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 168, 83, 0.1));
+            border-left: 4px solid var(--success);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .box-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Screenshot placeholder */
+        .screenshot {
+            background: var(--bg-code);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        /* Flowchart */
+        .flowchart {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .flow-step {
+            background: var(--bg-code);
+            border: 2px solid var(--google-blue);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .flow-step::before {
+            content: '↓';
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            color: var(--google-blue);
+        }
+
+        .flow-step:last-child::before {
+            display: none;
+        }
+
+        .flow-title {
+            font-weight: 700;
+            color: var(--google-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+            border-left: 3px solid var(--google-blue);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3.7rem;
+            top: 1.5rem;
+            width: 20px;
+            height: 20px;
+            background: var(--google-blue);
+            border-radius: 50%;
+            border: 4px solid var(--bg-dark);
+        }
+
+        .timeline-number {
+            display: inline-block;
+            background: var(--google-blue);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--bg-code);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--google-blue);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* DNS Record Card */
+        .dns-record {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-left: 5px solid var(--google-blue);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .record-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--google-blue);
+        }
+
+        .record-priority {
+            background: var(--google-green);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .record-example {
+            background: var(--bg-code);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        /* Progress */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-card);
+            z-index: 9999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--google-blue), var(--google-green));
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 0.8rem 0 0.8rem 2.5rem;
+            position: relative;
+            color: var(--text-dim);
+        }
+
+        .checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--google-green);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Command */
+        .command {
+            background: var(--bg-code);
+            border: 1px solid var(--google-blue);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--google-green);
+            margin: 1rem 0;
+        }
+
+        .command-prompt {
+            color: var(--google-blue);
+            margin-right: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .content-card {
+                padding: 1.5rem;
+            }
+            
+            .timeline {
+                padding-left: 2rem;
+            }
+        }
+
+        .key-concept {
+            background: linear-gradient(135deg, rgba(107, 70, 242, 0.1), rgba(66, 133, 244, 0.1));
+            border: 2px solid var(--hostinger);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-container {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🌐</span>
+                <span>DNS Complete Guide</span>
+            </div>
+            <div class="tech-badges">
+                <div class="tech-badge badge-hostinger">
+                    <span>🔷</span> Hostinger
+                </div>
+                <div class="tech-badge badge-google">
+                    <span>☁️</span> Google Cloud DNS
+                </div>
+                <div class="tech-badge badge-gcp">
+                    <span>🚀</span> GCP VPN
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Complete <span class="gradient-text">Real-World DNS</span> Guide</h1>
+        <p class="hero-subtitle">Step-by-step: From buying domain on Hostinger to complete Google Cloud DNS setup</p>
+        <div class="domain-display">
+            <span>🎯</span>
+            learningmyway.space
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- TABLE OF CONTENTS -->
+        <section class="section">
+            <div class="content-card" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-code));">
+                <h3>📚 Complete Table of Contents</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+                    <div>
+                        <h4 style="color: var(--google-blue); margin: 0 0 0.5rem 0;">Part 1: Foundation</h4>
+                        <ul style="margin: 0;">
+                            <li>What is DNS & How it Works</li>
+                            <li>DNS Resolution Real-Time Flow</li>
+                            <li>Domain Name Hierarchy</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--google-blue); margin: 0 0 0.5rem 0;">Part 2: Hostinger Setup</h4>
+                        <ul style="margin: 0;">
+                            <li>Buy Domain from Hostinger</li>
+                            <li>Hostinger Dashboard Tour</li>
+                            <li>Initial DNS Configuration</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--google-blue); margin: 0 0 0.5rem 0;">Part 3: Google Cloud DNS</h4>
+                        <ul style="margin: 0;">
+                            <li>Create DNS Zone in GCP</li>
+                            <li>Switch Nameservers</li>
+                            <li>Configure All DNS Records</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--google-blue); margin: 0 0 0.5rem 0;">Part 4: Advanced</h4>
+                        <ul style="margin: 0;">
+                            <li>All DNS Record Types</li>
+                            <li>GCP VPN Integration</li>
+                            <li>SSL/TLS Configuration</li>
+                            <li>Troubleshooting & Tools</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 1: DNS BASICS -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">📖</span>
+                <h2 class="section-title">Part 1: Understanding DNS</h2>
+            </div>
+
+            <div class="content-card">
+                <h3>What is DNS? (Simple Explanation)</h3>
+                <p><strong>DNS = Domain Name System</strong> is like the internet's phone book. It translates human-friendly domain names into computer-friendly IP addresses.</p>
+
+                <div class="key-concept">
+                    <div class="box-title">🔑 Key Concept</div>
+                    <p><strong>You type:</strong> learningmyway.space</p>
+                    <p><strong>DNS converts to:</strong> 34.118.224.132 (example IP)</p>
+                    <p><strong>Your browser:</strong> Connects to the IP address and loads the website</p>
+                </div>
+
+                <h4>Why Do We Need DNS?</h4>
+                <p><strong>Without DNS:</strong> You'd need to remember 34.118.224.132 to visit your website</p>
+                <p><strong>With DNS:</strong> You just type learningmyway.space (easy to remember!)</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Complete DNS Resolution Flow (Real-Time)</h3>
+                <p>Here's exactly what happens when someone visits <code>learningmyway.space</code>:</p>
+
+                <div class="flowchart">
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 1: User Types Domain</div>
+                        <p>👤 User enters: <strong>learningmyway.space</strong> in browser</p>
+                        <p>⏱️ Time: 0ms</p>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 2: Check Browser Cache</div>
+                        <p>🔍 Browser checks: "Have I visited this recently?"</p>
+                        <p>✅ If YES → Use cached IP (instant!)</p>
+                        <p>❌ If NO → Continue to next step</p>
+                        <p>⏱️ Time: 1-2ms</p>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 3: Check OS Cache</div>
+                        <p>🖥️ Operating System checks its DNS cache</p>
+                        <p>Location: <code>/etc/hosts</code> (Linux/Mac) or DNS Client Service (Windows)</p>
+                        <p>⏱️ Time: 2-5ms</p>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 4: Query Recursive Resolver</div>
+                        <p>📡 Your ISP's DNS or Public DNS (8.8.8.8, 1.1.1.1)</p>
+                        <p>Request: "What's the IP for learningmyway.space?"</p>
+                        <p>⏱️ Time: 10-50ms</p>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 5: Query Root Nameserver</div>
+                        <p>🌍 Recursive resolver asks: "Where can I find .space domains?"</p>
+                        <p>Root server responds: "Ask the .space TLD nameservers"</p>
+                        <p>Returns: TLD nameserver addresses</p>
+                        <p>⏱️ Time: 20-100ms</p>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 6: Query TLD Nameserver (.space)</div>
+                        <p>🏢 Recursive resolver asks: "Where is learningmyway.space?"</p>
+                        <p>.space TLD responds: "Ask these authoritative nameservers"</p>
+                        <p>Returns: <strong>ns-cloud-c1.googledomains.com</strong> (your Google Cloud DNS)</p>
+                        <p>⏱️ Time: 50-150ms</p>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 7: Query Authoritative Nameserver</div>
+                        <p>☁️ Recursive resolver asks Google Cloud DNS: "What's the IP?"</p>
+                        <p><strong>Google Cloud DNS responds:</strong> "34.118.224.132"</p>
+                        <p>This is YOUR DNS zone with YOUR records!</p>
+                        <p>⏱️ Time: 10-30ms</p>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="flow-title">STEP 8: Cache & Return</div>
+                        <p>💾 Recursive resolver caches the result</p>
+                        <p>TTL: 300 seconds (configurable)</p>
+                        <p>Returns IP to browser</p>
+                        <p>⏱️ Total time: <strong>100-400ms</strong> (first visit)</p>
+                        <p>⏱️ Cached: <strong>&lt;1ms</strong> (subsequent visits)</p>
+                    </div>
+
+                    <div class="flow-step" style="border-color: var(--google-green);">
+                        <div class="flow-title" style="color: var(--google-green);">STEP 9: Browser Connects</div>
+                        <p>🌐 Browser connects to <strong>34.118.224.132</strong></p>
+                        <p>🔒 Initiates HTTPS handshake</p>
+                        <p>📄 Loads website</p>
+                        <p>✅ <strong>Success!</strong></p>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <div class="box-title">⚡ Speed Optimization</div>
+                    <p>This entire process happens in <strong>milliseconds</strong>! Caching at multiple levels (browser, OS, recursive resolver) ensures most DNS lookups are nearly instant.</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Domain Name Hierarchy</h3>
+                <p>Understanding your domain structure: <code>www.learningmyway.space</code></p>
+
+                <div class="flowchart">
+                    <div class="flow-step" style="border-color: var(--warning);">
+                        <div class="flow-title" style="color: var(--warning);">. (Root)</div>
+                        <p>The very top of DNS hierarchy (usually invisible)</p>
+                        <p>Managed by: ICANN / IANA</p>
+                        <p>13 root server clusters worldwide</p>
+                    </div>
+
+                    <div class="flow-step" style="border-color: var(--accent-purple);">
+                        <div class="flow-title" style="color: var(--accent-purple);">.space (TLD - Top Level Domain)</div>
+                        <p>Managed by: Radix Registry</p>
+                        <p>Other examples: .com, .org, .net, .tech</p>
+                        <p>You can't own a TLD, only register domains under it</p>
+                    </div>
+
+                    <div class="flow-step" style="border-color: var(--hostinger);">
+                        <div class="flow-title" style="color: var(--hostinger);">learningmyway (Second Level Domain)</div>
+                        <p>This is what you purchased from Hostinger!</p>
+                        <p>You "own" (lease) this for 1-10 years</p>
+                        <p>Cost: ~$10-15/year for .space</p>
+                        <p>Managed by: YOU</p>
+                    </div>
+
+                    <div class="flow-step" style="border-color: var(--google-blue);">
+                        <div class="flow-title" style="color: var(--google-blue);">www (Subdomain)</div>
+                        <p>Optional prefix you control</p>
+                        <p>You can create unlimited subdomains:</p>
+                        <p>• api.learningmyway.space</p>
+                        <p>• blog.learningmyway.space</p>
+                        <p>• vpn.learningmyway.space</p>
+                        <p>• mail.learningmyway.space</p>
+                        <p>Managed by: YOU (via DNS records)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: HOSTINGER PURCHASE -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">🛒</span>
+                <h2 class="section-title">Part 2: Buying Domain from Hostinger</h2>
+            </div>
+
+            <div class="content-card">
+                <h3>Step-by-Step: Purchasing learningmyway.space</h3>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 1</div>
+                        <h4>Go to Hostinger</h4>
+                        <p>Visit: <a href="https://www.hostinger.com" target="_blank" style="color: var(--hostinger);">hostinger.com</a></p>
+                        <p>Click on <strong>"Domains"</strong> in the top menu</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 2</div>
+                        <h4>Search for Your Domain</h4>
+                        <div class="command">
+                            <span class="command-prompt">Search:</span> learningmyway.space
+                        </div>
+                        <p>Hostinger will check availability across multiple TLDs:</p>
+                        <ul>
+                            <li>✅ learningmyway.space - <strong>Available</strong> - $12.99/year</li>
+                            <li>❌ learningmyway.com - Taken</li>
+                            <li>✅ learningmyway.tech - Available - $9.99/year</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 3</div>
+                        <h4>Configure Domain Settings (IMPORTANT!)</h4>
+                        <p>During checkout, you'll see these options:</p>
+                        
+                        <div class="info-box">
+                            <div class="box-title">✅ ENABLE These:</div>
+                            <ul>
+                                <li><strong>Domain Privacy Protection (WHOIS Privacy)</strong> ← IMPORTANT!</li>
+                                <li>Hides your personal information (name, address, phone, email)</li>
+                                <li>Without this, your info is publicly searchable</li>
+                                <li>Usually FREE with Hostinger</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-box">
+                            <div class="box-title">✅ RECOMMENDED:</div>
+                            <ul>
+                                <li><strong>Auto-Renewal</strong> - Prevents accidental expiration</li>
+                                <li>You'll get email reminders before charging</li>
+                                <li>Can cancel anytime</li>
+                            </ul>
+                        </div>
+
+                        <div class="warning-box">
+                            <div class="box-title">❌ SKIP These (Not Needed):</div>
+                            <ul>
+                                <li>Website Builder - You're using GCP</li>
+                                <li>Email Hosting - Can add later if needed</li>
+                                <li>SSL Certificate - Let's Encrypt is free</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 4</div>
+                        <h4>Complete Purchase</h4>
+                        <p>1. Review your cart:</p>
+                        <div class="code-block">
+                            <pre><code>learningmyway.space - 1 year
+Registration: $12.99
+WHOIS Privacy: $0.00 (FREE)
+---
+Total: $12.99</code></pre>
+                        </div>
+                        <p>2. Enter payment details (Credit Card / PayPal)</p>
+                        <p>3. Create Hostinger account or login</p>
+                        <p>4. Complete payment</p>
+                        <p>5. ✅ <strong>You now own learningmyway.space for 1 year!</strong></p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 5</div>
+                        <h4>What Happens Behind the Scenes</h4>
+                        <p>Immediately after purchase:</p>
+                        <ol>
+                            <li>Hostinger contacts <strong>.space registry</strong> (Radix)</li>
+                            <li>Registry adds your domain to global DNS database</li>
+                            <li>Your contact info added to WHOIS (hidden by privacy protection)</li>
+                            <li>Default nameservers assigned: <code>ns1.dns-parking.com</code>, <code>ns2.dns-parking.com</code></li>
+                            <li>Propagates globally within 1-4 hours</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Hostinger Dashboard Tour</h3>
+                <p>After purchase, login to <strong>Hostinger hPanel</strong>:</p>
+
+                <h4>Key Sections You'll Use:</h4>
+
+                <div class="dns-record">
+                    <div class="record-header">
+                        <div class="record-type">🏠 DOMAINS</div>
+                        <div class="record-priority">MAIN AREA</div>
+                    </div>
+                    <p>Shows all your domains</p>
+                    <p>Click on <strong>learningmyway.space</strong> to manage it</p>
+                </div>
+
+                <div class="dns-record">
+                    <div class="record-header">
+                        <div class="record-type">⚙️ DNS / NAMESERVERS</div>
+                        <div class="record-priority">IMPORTANT</div>
+                    </div>
+                    <p>Current nameservers: <code>ns1.dns-parking.com</code></p>
+                    <p>We'll change these to Google Cloud DNS!</p>
+                    <p>Location: Domain → DNS/Nameservers tab</p>
+                </div>
+
+                <div class="dns-record">
+                    <div class="record-header">
+                        <div class="record-type">🔒 DOMAIN LOCK</div>
+                        <div class="record-priority">SECURITY</div>
+                    </div>
+                    <p>Prevents unauthorized domain transfers</p>
+                    <p>Keep this <strong>ENABLED</strong> always</p>
+                    <p>Only disable temporarily if transferring to another registrar</p>
+                </div>
+
+                <div class="dns-record">
+                    <div class="record-header">
+                        <div class="record-type">📧 WHOIS CONTACT</div>
+                        <div class="record-priority">PRIVACY</div>
+                    </div>
+                    <p>Your registration details</p>
+                    <p>Should show Hostinger's privacy service info (not yours)</p>
+                    <p>Check: <code>whois learningmyway.space</code></p>
+                </div>
+
+                <div class="warning-box">
+                    <div class="box-title">⚠️ Important: Hostinger DNS vs Google Cloud DNS</div>
+                    <p>By default, Hostinger gives you their nameservers. We'll change to Google Cloud DNS because:</p>
+                    <ul>
+                        <li>✅ Better for GCP integration</li>
+                        <li>✅ Faster global performance (Google's infrastructure)</li>
+                        <li>✅ More control and features</li>
+                        <li>✅ Better for your GCP VPN project</li>
+                        <li>✅ Advanced DNS features (DNSSEC, health checks)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 3: GOOGLE CLOUD DNS SETUP -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">☁️</span>
+                <h2 class="section-title">Part 3: Google Cloud DNS Setup</h2>
+            </div>
+
+            <div class="content-card">
+                <h3>Why Use Google Cloud DNS?</h3>
+                <p>Since you're already using GCP for your VPN project, using Google Cloud DNS gives you:</p>
+
+                <div class="success-box">
+                    <div class="box-title">✅ Benefits:</div>
+                    <ul>
+                        <li><strong>Integration:</strong> Seamless with GCP Compute Engine, Load Balancers, VPN</li>
+                        <li><strong>Performance:</strong> Google's global Anycast network (ultra-low latency)</li>
+                        <li><strong>Reliability:</strong> 100% SLA uptime guarantee</li>
+                        <li><strong>Security:</strong> DNSSEC support, DDoS protection</li>
+                        <li><strong>Cost:</strong> $0.20 per million queries (very cheap)</li>
+                        <li><strong>Management:</strong> All in one console with your VPN project</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Step-by-Step: Create DNS Zone in GCP</h3>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 1</div>
+                        <h4>Open Google Cloud Console</h4>
+                        <p>1. Go to: <a href="https://console.cloud.google.com" target="_blank" style="color: var(--google-blue);">console.cloud.google.com</a></p>
+                        <p>2. Select your project (same as your VPN project)</p>
+                        <p>3. In the navigation menu (☰), find <strong>"Network Services"</strong> → <strong>"Cloud DNS"</strong></p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 2</div>
+                        <h4>Create DNS Zone</h4>
+                        <p>1. Click <strong>"Create Zone"</strong></p>
+                        <p>2. Fill in the form:</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-label">DNS Zone Configuration</span>
+                            </div>
+                            <pre><code>Zone type: Public
+Zone name: learningmyway-space
+DNS name: learningmyway.space
+DNSSEC: Off (you can enable later)
+Description: Main DNS zone for learningmyway.space</code></pre>
+                        </div>
+                        <p>3. Click <strong>"Create"</strong></p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 3</div>
+                        <h4>Note Your Nameservers</h4>
+                        <p>After creating the zone, you'll see <strong>NS records</strong> automatically created:</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-label">Your Google Cloud DNS Nameservers</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code>ns-cloud-c1.googledomains.com
+ns-cloud-c2.googledomains.com
+ns-cloud-c3.googledomains.com
+ns-cloud-c4.googledomains.com</code></pre>
+                        </div>
+                        <div class="warning-box">
+                            <div class="box-title">⚠️ IMPORTANT</div>
+                            <p><strong>Copy these nameservers!</strong> You'll need them in the next step. Your actual nameservers might be slightly different (c1, d1, e1, etc.) - use YOUR exact nameservers shown in GCP console.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 4</div>
+                        <h4>Change Nameservers in Hostinger</h4>
+                        <p>Now we tell Hostinger to use Google's nameservers instead of theirs:</p>
+                        
+                        <ol>
+                            <li>Go back to <strong>Hostinger hPanel</strong></li>
+                            <li>Click on <strong>Domains</strong> → <strong>learningmyway.space</strong></li>
+                            <li>Find <strong>"Nameservers"</strong> or <strong>"DNS"</strong> section</li>
+                            <li>Click <strong>"Change Nameservers"</strong></li>
+                            <li>Select <strong>"Use custom nameservers"</strong></li>
+                            <li>Enter Google's nameservers (one per line):</li>
+                        </ol>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-label">Enter in Hostinger</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code>Nameserver 1: ns-cloud-c1.googledomains.com
+Nameserver 2: ns-cloud-c2.googledomains.com
+Nameserver 3: ns-cloud-c3.googledomains.com
+Nameserver 4: ns-cloud-c4.googledomains.com</code></pre>
+                        </div>
+
+                        <p>7. Click <strong>"Save"</strong> or <strong>"Change Nameservers"</strong></p>
+                        <p>8. Hostinger will show a confirmation</p>
+
+                        <div class="info-box">
+                            <div class="box-title">⏳ DNS Propagation</div>
+                            <p><strong>Wait Time:</strong> 0-48 hours (usually 2-4 hours)</p>
+                            <p><strong>What's happening:</strong></p>
+                            <ul>
+                                <li>Hostinger updates .space registry</li>
+                                <li>Registry updates TLD nameservers</li>
+                                <li>Changes propagate globally</li>
+                                <li>Old DNS caches expire</li>
+                            </ul>
+                            <p><strong>Check status:</strong> <code>dig learningmyway.space NS</code></p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-number">STEP 5</div>
+                        <h4>Verify Nameserver Change</h4>
+                        <p>Check if nameservers have propagated:</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-label">Terminal Commands</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code># Check nameservers
+dig learningmyway.space NS +short
+
+# Expected output:
+# ns-cloud-c1.googledomains.com.
+# ns-cloud-c2.googledomains.com.
+# ns-cloud-c3.googledomains.com.
+# ns-cloud-c4.googledomains.com.
+
+# Check from multiple locations
+nslookup -type=NS learningmyway.space 8.8.8.8
+
+# Online tool (check multiple countries):
+# https://dnschecker.org/#NS/learningmyway.space</code></pre>
+                        </div>
+
+                        <div class="success-box">
+                            <div class="box-title">✅ When you see Google's nameservers, you're ready!</div>
+                            <p>Now ALL DNS management happens in <strong>Google Cloud Console</strong>, not Hostinger!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Configure DNS Records in Google Cloud DNS</h3>
+                <p>Now let's add all necessary DNS records for your website, email, and services.</p>
+
+                <h4>Complete Production Setup for learningmyway.space:</h4>
+
+                <div class="warning-box">
+                    <div class="box-title">📝 Before You Start</div>
+                    <p>You'll need:</p>
+                    <ul>
+                        <li>Your GCP VM/Load Balancer IP address (e.g., 34.118.224.132)</li>
+                        <li>Email provider's MX records (if using email)</li>
+                        <li>Any subdomain requirements</li>
+                    </ul>
+                </div>
+
+                <h4>Add Records in GCP Console:</h4>
+                <p>In Cloud DNS → Your Zone → Click <strong>"Add Record Set"</strong> for each:</p>
+
+                <div class="step-container">
+                    <h4>🌐 Record 1: Main Domain (A Record)</h4>
+                    <p>Points your main domain to your server/load balancer</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-label">Configuration in GCP</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code>DNS Name: learningmyway.space (or leave blank for @)
+Resource Record Type: A
+TTL: 300 (5 minutes)
+TTL Unit: Seconds
+IP Address: 34.118.224.132
+
+# Replace with YOUR GCP VM external IP
+# Find it: Compute Engine → VM Instances → External IP</code></pre>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h4>🌐 Record 2: WWW Subdomain (A Record)</h4>
+                    <p>So www.learningmyway.space works too</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-label">Configuration in GCP</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code>DNS Name: www.learningmyway.space
+Resource Record Type: A
+TTL: 300
+IP Address: 34.118.224.132
+
+# Same IP as main domain
+# Alternative: Use CNAME to learningmyway.space</code></pre>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h4>📧 Record 3: Email (MX Records)</h4>
+                    <p>If you want email like: rksuraj@learningmyway.space</p>
+                    
+                    <div class="info-box">
+                        <div class="box-title">Choose Email Provider:</div>
+                        <p><strong>Google Workspace ($6/user/month):</strong></p>
+                        <div class="code-block">
+                            <pre><code>DNS Name: learningmyway.space
+Resource Record Type: MX
+TTL: 3600
+Priority | Mail Server
+1        | aspmx.l.google.com.
+5        | alt1.aspmx.l.google.com.
+5        | alt2.aspmx.l.google.com.
+10       | alt3.aspmx.l.google.com.
+10       | alt4.aspmx.l.google.com.</code></pre>
+                        </div>
+
+                        <p><strong>Zoho Mail (FREE up to 5 users):</strong></p>
+                        <div class="code-block">
+                            <pre><code>DNS Name: learningmyway.space
+Resource Record Type: MX
+Priority | Mail Server
+10       | mx.zoho.com.
+20       | mx2.zoho.com.
+50       | mx3.zoho.com.</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h4>🔐 Record 4: Email Authentication (TXT Records)</h4>
+                    <p>Prevents email spoofing, improves deliverability</p>
+
+                    <p><strong>SPF Record:</strong> (Authorizes who can send email from your domain)</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-label">SPF Configuration</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code>DNS Name: learningmyway.space
+Resource Record Type: TXT
+TTL: 3600
+Value: "v=spf1 include:_spf.google.com ~all"
+
+# For Zoho: "v=spf1 include:zoho.com ~all"
+# ~all means "soft fail" (recommended)
+# -all means "hard fail" (strict, may cause issues)</code></pre>
+                    </div>
+
+                    <p><strong>DKIM Record:</strong> (Digital signature for emails)</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-label">DKIM Configuration</span>
+                        </div>
+                        <pre><code>DNS Name: google._domainkey.learningmyway.space
+Resource Record Type: TXT
+TTL: 3600
+Value: "v=DKIM1; k=rsa; p=YOUR_PUBLIC_KEY_HERE"
+
+# Get YOUR key from:
+# Google Workspace Admin → Apps → Gmail → Authenticate Email
+# Or Zoho: Control Panel → Email → DKIM</code></pre>
+                    </div>
+
+                    <p><strong>DMARC Record:</strong> (Email policy & reporting)</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-label">DMARC Configuration</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code>DNS Name: _dmarc.learningmyway.space
+Resource Record Type: TXT
+TTL: 3600
+Value: "v=DMARC1; p=quarantine; rua=mailto:dmarc@learningmyway.space"
+
+# p=none (monitoring only)
+# p=quarantine (suspicious emails to spam)
+# p=reject (block failed emails)</code></pre>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h4>🔒 Record 5: SSL Certificate Authorization (CAA)</h4>
+                    <p>Specifies which CAs can issue SSL certificates for your domain</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-label">CAA Configuration</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code>DNS Name: learningmyway.space
+Resource Record Type: CAA
+TTL: 3600
+Flags: 0
+Tag: issue
+Value: "letsencrypt.org"
+
+# Add another for wildcard certificates:
+DNS Name: learningmyway.space
+Resource Record Type: CAA
+Flags: 0
+Tag: issuewild
+Value: "letsencrypt.org"</code></pre>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h4>🌐 Record 6: Subdomains</h4>
+                    <p>Add records for different services:</p>
+
+                    <p><strong>VPN Subdomain:</strong></p>
+                    <div class="code-block">
+                        <pre><code>DNS Name: vpn.learningmyway.space
+Resource Record Type: A
+TTL: 300
+IP Address: 34.118.224.132 (your VPN server IP)</code></pre>
+                    </div>
+
+                    <p><strong>API Subdomain:</strong></p>
+                    <div class="code-block">
+                        <pre><code>DNS Name: api.learningmyway.space
+Resource Record Type: A
+TTL: 300
+IP Address: 34.118.224.200 (if different server)</code></pre>
+                    </div>
+
+                    <p><strong>Blog Subdomain (external service):</strong></p>
+                    <div class="code-block">
+                        <pre><code>DNS Name: blog.learningmyway.space
+Resource Record Type: CNAME
+TTL: 3600
+Canonical Name: myblog.ghost.io.</code></pre>
+                    </div>
+                </div>
+
+                <div class="step-container">
+                    <h4>✅ Record 7: Domain Verification</h4>
+                    <p>Verify domain ownership with various services:</p>
+
+                    <p><strong>Google Search Console:</strong></p>
+                    <div class="code-block">
+                        <pre><code>DNS Name: learningmyway.space
+Resource Record Type: TXT
+TTL: 3600
+Value: "google-site-verification=abc123xyz789..."
+
+# Get YOUR code from:
+# Google Search Console → Add Property → Verify via DNS</code></pre>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <div class="box-title">✅ Complete DNS Setup!</div>
+                    <p>You now have:</p>
+                    <ul>
+                        <li>✅ Main website: learningmyway.space</li>
+                        <li>✅ WWW variant: www.learningmyway.space</li>
+                        <li>✅ Email: rksuraj@learningmyway.space</li>
+                        <li>✅ Email security: SPF, DKIM, DMARC</li>
+                        <li>✅ SSL security: CAA records</li>
+                        <li>✅ Subdomains: vpn, api, blog</li>
+                        <li>✅ Verification: Google, others</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 4: ALL DNS RECORD TYPES -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">📚</span>
+                <h2 class="section-title">Part 4: All DNS Record Types Explained</h2>
+            </div>
+
+            <div class="content-card">
+                <h3>Complete DNS Records Reference</h3>
+                <p>Every DNS record type you'll ever need, with real examples for learningmyway.space:</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Record</th>
+                                <th>Purpose</th>
+                                <th>Example</th>
+                                <th>When to Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>A</strong></td>
+                                <td>IPv4 address</td>
+                                <td>learningmyway.space → 34.118.224.132</td>
+                                <td>🔥 Essential - Main website</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AAAA</strong></td>
+                                <td>IPv6 address</td>
+                                <td>learningmyway.space → 2001:db8::1</td>
+                                <td>✅ Recommended - IPv6 support</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CNAME</strong></td>
+                                <td>Alias</td>
+                                <td>www → learningmyway.space</td>
+                                <td>🔥 Essential - WWW redirect</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MX</strong></td>
+                                <td>Mail server</td>
+                                <td>@ → aspmx.l.google.com (priority 1)</td>
+                                <td>📧 If using email</td>
+                            </tr>
+                            <tr>
+                                <td><strong>TXT</strong></td>
+                                <td>Text data</td>
+                                <td>SPF, DKIM, verification</td>
+                                <td>✅ Recommended - Security</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NS</strong></td>
+                                <td>Nameservers</td>
+                                <td>@ → ns-cloud-c1.googledomains.com</td>
+                                <td>⚙️ Auto-created by GCP</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CAA</strong></td>
+                                <td>SSL authority</td>
+                                <td>@ → 0 issue "letsencrypt.org"</td>
+                                <td>🔒 Security - SSL control</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SOA</strong></td>
+                                <td>Zone info</td>
+                                <td>Zone metadata</td>
+                                <td>⚙️ Auto-created by GCP</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SRV</strong></td>
+                                <td>Service location</td>
+                                <td>Minecraft, VoIP, XMPP</td>
+                                <td>⚡ Special services only</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PTR</strong></td>
+                                <td>Reverse DNS</td>
+                                <td>IP → domain</td>
+                                <td>📧 Email reputation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Detailed Record Explanations</h3>
+
+                <h4>A Record (Address Record)</h4>
+                <div class="dns-record">
+                    <div class="record-example">
+                        <strong>Real Example for learningmyway.space:</strong><br><br>
+                        Name: @<br>
+                        Type: A<br>
+                        TTL: 300<br>
+                        Data: 34.118.224.132
+                    </div>
+                    <p><strong>What it does:</strong> Points your domain to an IPv4 address</p>
+                    <p><strong>Use cases:</strong></p>
+                    <ul>
+                        <li>Main website (learningmyway.space)</li>
+                        <li>Subdomains (vpn.learningmyway.space)</li>
+                        <li>Multiple IPs for load balancing</li>
+                    </ul>
+                </div>
+
+                <h4>CNAME Record (Canonical Name)</h4>
+                <div class="dns-record">
+                    <div class="record-example">
+                        <strong>Real Example:</strong><br><br>
+                        Name: www<br>
+                        Type: CNAME<br>
+                        TTL: 3600<br>
+                        Data: learningmyway.space.
+                    </div>
+                    <p><strong>What it does:</strong> Creates an alias pointing to another domain</p>
+                    <p><strong>Use cases:</strong></p>
+                    <ul>
+                        <li>www pointing to root domain</li>
+                        <li>blog.learningmyway.space → myblog.ghost.io</li>
+                        <li>External services (CDN, hosting)</li>
+                    </ul>
+                    <div class="warning-box">
+                        <div class="box-title">⚠️ CNAME Restrictions</div>
+                        <p>Cannot use CNAME for:</p>
+                        <ul>
+                            <li>Root domain (@) - Use A/AAAA instead</li>
+                            <li>If other records exist for that name (MX, TXT, etc.)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>MX Record (Mail Exchange)</h4>
+                <div class="dns-record">
+                    <div class="record-example">
+                        <strong>Real Example (Google Workspace):</strong><br><br>
+                        Name: @<br>
+                        Type: MX<br>
+                        TTL: 3600<br>
+                        Priority: 1<br>
+                        Data: aspmx.l.google.com.
+                    </div>
+                    <p><strong>What it does:</strong> Specifies mail servers to handle email</p>
+                    <p><strong>Priority:</strong> Lower number = higher priority (try first)</p>
+                    <p><strong>Multiple MX records:</strong> Provides redundancy if primary fails</p>
+                </div>
+
+                <h4>TXT Record (Text)</h4>
+                <div class="dns-record">
+                    <div class="record-example">
+                        <strong>SPF Example:</strong><br><br>
+                        Name: @<br>
+                        Type: TXT<br>
+                        TTL: 3600<br>
+                        Data: "v=spf1 include:_spf.google.com ~all"
+                    </div>
+                    <p><strong>What it does:</strong> Stores arbitrary text (most versatile!)</p>
+                    <p><strong>Common uses:</strong></p>
+                    <ul>
+                        <li>SPF - Email sender authorization</li>
+                        <li>DKIM - Email signature</li>
+                        <li>DMARC - Email policy</li>
+                        <li>Domain verification (Google, Facebook, etc.)</li>
+                        <li>Site ownership proof</li>
+                    </ul>
+                </div>
+
+                <h4>CAA Record (Certificate Authority Authorization)</h4>
+                <div class="dns-record">
+                    <div class="record-example">
+                        <strong>Real Example:</strong><br><br>
+                        Name: @<br>
+                        Type: CAA<br>
+                        TTL: 3600<br>
+                        Flags: 0<br>
+                        Tag: issue<br>
+                        Value: "letsencrypt.org"
+                    </div>
+                    <p><strong>What it does:</strong> Controls which CAs can issue SSL certificates</p>
+                    <p><strong>Why important:</strong> Prevents unauthorized certificate issuance</p>
+                    <div class="info-box">
+                        <div class="box-title">💡 Tags:</div>
+                        <ul>
+                            <li><strong>issue</strong> - Authorize certificate issuance</li>
+                            <li><strong>issuewild</strong> - Authorize wildcard certificates</li>
+                            <li><strong>iodef</strong> - Report violations to email</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GCP VPN INTEGRATION -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">🔐</span>
+                <h2 class="section-title">Part 5: GCP VPN Integration</h2>
+            </div>
+
+            <div class="content-card">
+                <h3>DNS for Your GCP VPN Project</h3>
+                <p>Since you have a GCP VPN project, here's how DNS integrates:</p>
+
+                <h4>Scenario 1: VPN Access via Domain</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Add VPN Subdomain</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># In Google Cloud DNS, add:
+DNS Name: vpn.learningmyway.space
+Resource Record Type: A
+TTL: 300
+IP Address: YOUR_VPN_SERVER_EXTERNAL_IP
+
+# Now users can connect to: vpn.learningmyway.space
+# Instead of remembering: 34.118.224.xxx</code></pre>
+                </div>
+
+                <h4>Scenario 2: Internal DNS (Private Zone)</h4>
+                <p>For internal services only accessible through VPN:</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Create Private DNS Zone</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># In GCP Console:
+Zone type: Private
+Zone name: internal-learningmyway
+DNS name: internal.learningmyway.space
+VPC Networks: [Select your VPN VPC]
+
+# Add internal-only records:
+database.internal.learningmyway.space → 10.0.1.10
+jenkins.internal.learningmyway.space → 10.0.1.20
+monitoring.internal.learningmyway.space → 10.0.1.30
+
+# Only accessible through VPN connection!</code></pre>
+                </div>
+
+                <h4>Scenario 3: Split-Horizon DNS</h4>
+                <p>Different answers for internal vs external queries:</p>
+                <div class="info-box">
+                    <div class="box-title">Example:</div>
+                    <p><strong>External (Public DNS):</strong><br>
+                    app.learningmyway.space → 34.118.224.132 (public load balancer)</p>
+                    
+                    <p><strong>Internal (Private DNS):</strong><br>
+                    app.learningmyway.space → 10.0.1.50 (internal server)</p>
+                    
+                    <p><strong>Benefit:</strong> Internal traffic stays internal, faster, cheaper!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VERIFICATION & TESTING -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">🧪</span>
+                <h2 class="section-title">Part 6: Verification & Testing</h2>
+            </div>
+
+            <div class="content-card">
+                <h3>Essential DNS Testing Commands</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Command Line Tools</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># Check A records
+dig learningmyway.space A
+dig +short learningmyway.space A
+
+# Check nameservers
+dig learningmyway.space NS
+dig +short learningmyway.space NS
+
+# Check MX records
+dig learningmyway.space MX
+
+# Check TXT records (SPF, DKIM, etc.)
+dig learningmyway.space TXT
+
+# Full DNS trace (see entire resolution path)
+dig +trace learningmyway.space
+
+# Query specific DNS server
+dig @8.8.8.8 learningmyway.space
+dig @ns-cloud-c1.googledomains.com learningmyway.space
+
+# Check TTL
+dig learningmyway.space | grep TTL
+
+# Check from Google's DNS
+dig @8.8.8.8 learningmyway.space A
+
+# Check DNSSEC
+dig learningmyway.space +dnssec
+
+# Windows equivalent
+nslookup learningmyway.space
+nslookup -type=MX learningmyway.space
+nslookup -type=NS learningmyway.space</code></pre>
+                </div>
+
+                <h4>Online DNS Tools</h4>
+                <div class="checklist">
+                    <li><strong>DNS Checker:</strong> <a href="https://dnschecker.org" target="_blank">dnschecker.org</a> - Check propagation worldwide</li>
+                    <li><strong>MXToolbox:</strong> <a href="https://mxtoolbox.com" target="_blank">mxtoolbox.com</a> - Email & DNS testing</li>
+                    <li><strong>Google DNS:</strong> <a href="https://dns.google" target="_blank">dns.google</a> - Query Google's DNS</li>
+                    <li><strong>WhatsMyDNS:</strong> <a href="https://whatsmydns.net" target="_blank">whatsmydns.net</a> - Global DNS checker</li>
+                    <li><strong>IntoDNS:</strong> <a href="https://intodns.com" target="_blank">intodns.com</a> - DNS health check</li>
+                </div>
+
+                <h4>GCP Console Verification</h4>
+                <div class="code-block">
+                    <pre><code>1. Go to Cloud DNS → Your Zone
+2. Check all records are listed
+3. Click "Registrar Setup" to see NS records
+4. Verify in Hostinger that NS match
+
+Query example in GCP:
+gcloud dns record-sets list --zone=learningmyway-space
+
+Export records:
+gcloud dns record-sets export records.txt --zone=learningmyway-space</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- TROUBLESHOOTING -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">🔧</span>
+                <h2 class="section-title">Part 7: Troubleshooting</h2>
+            </div>
+
+            <div class="content-card">
+                <h3>Common Issues & Solutions</h3>
+
+                <h4>❌ Issue 1: Domain Not Resolving</h4>
+                <div class="warning-box">
+                    <div class="box-title">Symptoms:</div>
+                    <p>Browser shows "This site can't be reached" or "Server not found"</p>
+                    
+                    <div class="box-title" style="margin-top: 1rem;">Troubleshooting Steps:</div>
+                    <ol>
+                        <li><strong>Check nameservers are correct:</strong>
+                            <div class="command"><span class="command-prompt">$</span> dig learningmyway.space NS +short</div>
+                            Should show: ns-cloud-c1.googledomains.com
+                        </li>
+                        <li><strong>Check A record exists:</strong>
+                            <div class="command"><span class="command-prompt">$</span> dig learningmyway.space A +short</div>
+                            Should show: 34.118.224.132
+                        </li>
+                        <li><strong>Check from Google's DNS:</strong>
+                            <div class="command"><span class="command-prompt">$</span> dig @8.8.8.8 learningmyway.space A</div>
+                        </li>
+                        <li><strong>Wait for propagation:</strong> Up to 48 hours, usually 2-4 hours</li>
+                        <li><strong>Clear local DNS cache:</strong>
+                            <div class="command">
+                                <span class="command-prompt">$</span> # Windows<br>
+                                ipconfig /flushdns<br><br>
+                                <span class="command-prompt">$</span> # Mac<br>
+                                sudo dscacheutil -flushcache<br><br>
+                                <span class="command-prompt">$</span> # Linux<br>
+                                sudo systemd-resolve --flush-caches
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <h4>❌ Issue 2: WWW Not Working (but root domain works)</h4>
+                <div class="warning-box">
+                    <div class="box-title">Solution:</div>
+                    <p>Add CNAME record for www:</p>
+                    <div class="code-block">
+                        <pre><code>DNS Name: www.learningmyway.space
+Type: CNAME
+TTL: 300
+Data: learningmyway.space.</code></pre>
+                    </div>
+                </div>
+
+                <h4>❌ Issue 3: Email Not Receiving</h4>
+                <div class="warning-box">
+                    <div class="box-title">Checklist:</div>
+                    <div class="checklist">
+                        <li>MX records exist: <code>dig learningmyway.space MX</code></li>
+                        <li>SPF record configured</li>
+                        <li>Email service (Google Workspace/Zoho) activated</li>
+                        <li>Check with email provider's diagnostic tool</li>
+                    </div>
+                </div>
+
+                <h4>❌ Issue 4: Changes Not Taking Effect</h4>
+                <div class="warning-box">
+                    <div class="box-title">Reason: TTL & Caching</div>
+                    <p>DNS changes are cached for the TTL period. If you had TTL=3600 (1 hour), changes take up to 1 hour to fully propagate.</p>
+                    
+                    <div class="box-title" style="margin-top: 1rem;">Solution:</div>
+                    <ol>
+                        <li><strong>Before making changes:</strong> Lower TTL to 300 (5 min)</li>
+                        <li><strong>Wait for old TTL to expire</strong></li>
+                        <li><strong>Make your changes</strong></li>
+                        <li><strong>After changes propagate:</strong> Raise TTL back to 3600</li>
+                    </ol>
+
+                    <p style="margin-top: 1rem;"><strong>Check propagation:</strong></p>
+                    <div class="command"><span class="command-prompt">$</span> dig @8.8.8.8 learningmyway.space A</div>
+                </div>
+
+                <h4>❌ Issue 5: GCP Billing Issues</h4>
+                <div class="info-box">
+                    <div class="box-title">Google Cloud DNS Costs:</div>
+                    <p><strong>Hosted Zone:</strong> $0.20/month per zone (first 25 zones)</p>
+                    <p><strong>Queries:</strong> $0.40 per million queries (first billion/month)</p>
+                    <p><strong>Typical small site:</strong> ~$0.50-2.00/month</p>
+                    
+                    <p style="margin-top: 1rem;"><strong>Ensure billing is enabled:</strong></p>
+                    <ol>
+                        <li>GCP Console → Billing</li>
+                        <li>Check payment method active</li>
+                        <li>Verify project linked to billing account</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- FINAL CHECKLIST -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">✅</span>
+                <h2 class="section-title">Final Checklist</h2>
+            </div>
+
+            <div class="content-card" style="background: linear-gradient(135deg, rgba(52, 168, 83, 0.1), rgba(66, 133, 244, 0.1)); border: 2px solid var(--google-green);">
+                <h3>Complete DNS Setup Verification</h3>
+                
+                <div class="checklist">
+                    <li>Domain purchased from Hostinger</li>
+                    <li>WHOIS privacy enabled</li>
+                    <li>Google Cloud DNS zone created</li>
+                    <li>Nameservers changed to Google in Hostinger</li>
+                    <li>Nameserver propagation verified</li>
+                    <li>A record for root domain (@)</li>
+                    <li>A or CNAME record for www</li>
+                    <li>MX records (if using email)</li>
+                    <li>SPF, DKIM, DMARC records (email security)</li>
+                    <li>CAA records (SSL security)</li>
+                    <li>Subdomain records (vpn, api, etc.)</li>
+                    <li>Domain verification (Google, etc.)</li>
+                    <li>DNS tested with dig/nslookup</li>
+                    <li>Website accessible via domain</li>
+                    <li>SSL certificate installed</li>
+                    <li>Email working (if configured)</li>
+                </div>
+
+                <div class="success-box" style="margin-top: 2rem;">
+                    <div class="box-title">🎉 Congratulations!</div>
+                    <p>You now have a complete, production-ready DNS setup with:</p>
+                    <ul>
+                        <li>✅ Domain from Hostinger</li>
+                        <li>✅ Google Cloud DNS management</li>
+                        <li>✅ Integrated with GCP VPN project</li>
+                        <li>✅ Email configured and secured</li>
+                        <li>✅ SSL certificate authorized</li>
+                        <li>✅ All subdomains working</li>
+                        <li>✅ Global DNS propagation</li>
+                    </ul>
+                    <p><strong>learningmyway.space is now live! 🚀</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUICK REFERENCE -->
+        <section class="section">
+            <div class="content-card" style="background: var(--bg-code);">
+                <h3>📋 Quick Reference Commands</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Save These Commands</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># Check everything
+dig learningmyway.space ANY
+
+# Check nameservers
+dig learningmyway.space NS +short
+
+# Check A record
+dig learningmyway.space A +short
+
+# Check MX records
+dig learningmyway.space MX
+
+# Check TXT records
+dig learningmyway.space TXT
+
+# Full trace
+dig +trace learningmyway.space
+
+# Check from Google DNS
+dig @8.8.8.8 learningmyway.space
+
+# Check propagation
+nslookup learningmyway.space 8.8.8.8
+
+# GCP commands
+gcloud dns record-sets list --zone=learningmyway-space
+gcloud dns record-sets describe learningmyway.space. --type=A --zone=learningmyway-space
+
+# Clear local cache
+ipconfig /flushdns  # Windows
+sudo dscacheutil -flushcache  # Mac
+sudo systemd-resolve --flush-caches  # Linux</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress').style.width = scrolled + '%';
+        });
+
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--google-green)';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'var(--google-blue)';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

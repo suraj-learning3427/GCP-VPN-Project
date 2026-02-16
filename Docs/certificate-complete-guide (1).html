@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSL/TLS Certificates - Complete Guide from Beginner to Expert</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@400;600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-elevated: #1c2128;
+            --accent-green: #2ea043;
+            --accent-blue: #1f6feb;
+            --accent-orange: #fb8500;
+            --accent-purple: #8957e5;
+            --text-primary: #e6edf3;
+            --text-secondary: #8d96a0;
+            --border: #30363d;
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(46, 160, 67, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(31, 111, 235, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(251, 133, 0, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: bgPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 5%;
+            z-index: 1000;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-green);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 5% 4rem;
+            text-align: center;
+            animation: fadeIn 1s ease 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero .gradient-text {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .difficulty-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 2px solid;
+        }
+
+        .badge-beginner { border-color: var(--success); color: var(--success); background: rgba(63, 185, 80, 0.1); }
+        .badge-intermediate { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(31, 111, 235, 0.1); }
+        .badge-advanced { border-color: var(--accent-orange); color: var(--accent-orange); background: rgba(251, 133, 0, 0.1); }
+        .badge-expert { border-color: var(--accent-purple); color: var(--accent-purple); background: rgba(137, 87, 229, 0.1); }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 5rem;
+            animation: fadeIn 1s ease both;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .section-level {
+            margin-left: auto;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Content Card */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(46, 160, 67, 0.15);
+        }
+
+        .content-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-green);
+        }
+
+        .content-card p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .content-card strong {
+            color: var(--text-primary);
+        }
+
+        /* Flowchart */
+        .flowchart {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .flow-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--accent-blue);
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            min-width: 600px;
+        }
+
+        .flow-box {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            min-width: 250px;
+            text-align: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            animation: flowPulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes flowPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(46, 160, 67, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(46, 160, 67, 0.6); }
+        }
+
+        .flow-box.blue { border-color: var(--accent-blue); }
+        .flow-box.orange { border-color: var(--accent-orange); }
+        .flow-box.purple { border-color: var(--accent-purple); }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--accent-green);
+            animation: arrowBounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes arrowBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        /* Split Layout */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        /* Key Points Box */
+        .key-points {
+            background: linear-gradient(135deg, rgba(46, 160, 67, 0.1), rgba(31, 111, 235, 0.1));
+            border-left: 4px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .key-points h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-green);
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            padding: 0.8rem 0 0.8rem 2rem;
+            position: relative;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        .key-points li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: rgba(251, 133, 0, 0.1);
+            border: 2px solid var(--accent-orange);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .warning-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .warning-box p {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-label {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+        }
+
+        pre {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        code {
+            font-family: 'IBM Plex Mono', monospace;
+            background: rgba(46, 160, 67, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--accent-green);
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: var(--bg-elevated);
+            padding: 1.2rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Visual Diagram */
+        .visual-diagram {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .diagram-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--accent-purple);
+        }
+
+        .diagram-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .diagram-item {
+            flex: 1;
+            min-width: 150px;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .diagram-item:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-green);
+        }
+
+        .diagram-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .diagram-label {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .diagram-arrow {
+            font-size: 2rem;
+            color: var(--accent-green);
+        }
+
+        /* Interactive Question */
+        .interactive-question {
+            background: linear-gradient(135deg, rgba(31, 111, 235, 0.1), rgba(137, 87, 229, 0.1));
+            border: 2px dashed var(--accent-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .question-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-blue);
+        }
+
+        .answer-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .answer-box.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .reveal-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .reveal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(31, 111, 235, 0.4);
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-card);
+            z-index: 9999;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .split-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .flow-container {
+                min-width: auto;
+            }
+
+            .diagram-content {
+                flex-direction: column;
+            }
+        }
+
+        /* Scroll Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Indicator -->
+    <div class="progress-indicator">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-content">
+            <a href="#" class="logo">🔐 CertLearn</a>
+            <ul class="nav-links">
+                <li><a href="#basics">Basics</a></li>
+                <li><a href="#intermediate">Intermediate</a></li>
+                <li><a href="#advanced">Advanced</a></li>
+                <li><a href="#expert">Expert</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Understanding <span class="gradient-text">SSL/TLS Certificates</span></h1>
+        <p class="hero-subtitle">A complete journey from absolute beginner to expert level with visual flowcharts, real-world examples, and deep technical insights</p>
+        <div class="difficulty-badges">
+            <span class="badge badge-beginner">🌱 Beginner</span>
+            <span class="badge badge-intermediate">📚 Intermediate</span>
+            <span class="badge badge-advanced">🎓 Advanced</span>
+            <span class="badge badge-expert">🚀 Expert</span>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+
+        <!-- LEVEL 1: BEGINNER -->
+        <section class="section reveal" id="basics">
+            <div class="section-header">
+                <span class="section-icon">🌱</span>
+                <h2 class="section-title">Level 1: The Basics</h2>
+                <span class="section-level badge-beginner">Beginner</span>
+            </div>
+
+            <div class="content-card">
+                <h3>What is a Certificate? (Simple Analogy)</h3>
+                <p>Imagine you're meeting someone online for the first time. How do you know they are who they say they are?</p>
+                <p><strong>In the real world:</strong> You check their ID card (passport, driver's license)</p>
+                <p><strong>On the internet:</strong> Websites use <strong>SSL/TLS Certificates</strong> as their "digital ID card"</p>
+                
+                <div class="key-points">
+                    <h4>Key Concept:</h4>
+                    <ul>
+                        <li>A certificate proves a website's identity</li>
+                        <li>It's like a digital passport for websites</li>
+                        <li>It helps encrypt your data (keep it secret)</li>
+                        <li>You see the padlock 🔒 in your browser when a certificate is valid</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flowchart">
+                <div class="flow-title">How Certificates Work (Basic Flow)</div>
+                <div class="flow-container">
+                    <div class="flow-box">
+                        👤 You visit a website<br>(example.com)
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box blue">
+                        🔐 Website shows its certificate<br>("Hi, I'm example.com, here's my ID")
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box orange">
+                        ✅ Your browser checks the certificate<br>("Is this ID real?")
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box purple">
+                        🔒 Secure connection established<br>(Your data is encrypted)
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Why Do We Need Certificates?</h3>
+                <p>Three main reasons:</p>
+                
+                <div class="split-layout">
+                    <div class="visual-diagram">
+                        <div class="diagram-icon">🔐</div>
+                        <div class="diagram-label"><strong>1. Encryption</strong></div>
+                        <p>Scrambles your data so hackers can't read it</p>
+                    </div>
+                    <div class="visual-diagram">
+                        <div class="diagram-icon">✅</div>
+                        <div class="diagram-label"><strong>2. Authentication</strong></div>
+                        <p>Proves the website is who they say they are</p>
+                    </div>
+                </div>
+                <div class="visual-diagram">
+                    <div class="diagram-icon">🛡️</div>
+                    <div class="diagram-label"><strong>3. Data Integrity</strong></div>
+                    <p>Ensures data isn't tampered with during transmission</p>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <span class="warning-icon">⚠️</span>
+                <p><strong>Without certificates:</strong> Your passwords, credit card numbers, and personal information could be stolen by hackers intercepting your connection!</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Real-World Example</h3>
+                <p>When you shop on Amazon:</p>
+                <ol style="margin-left: 2rem; color: var(--text-secondary); line-height: 2;">
+                    <li>You type <code>https://amazon.com</code> (notice the "s" = secure)</li>
+                    <li>Amazon shows its certificate to your browser</li>
+                    <li>Your browser verifies it's really Amazon (not a fake site)</li>
+                    <li>🔒 appears, and your connection is encrypted</li>
+                    <li>You can safely enter your credit card</li>
+                </ol>
+            </div>
+
+            <div class="interactive-question">
+                <div class="question-title">💡 Quick Check: What happens without a certificate?</div>
+                <button class="reveal-btn" onclick="toggleAnswer('answer1')">Reveal Answer</button>
+                <div class="answer-box" id="answer1">
+                    <p>Without a certificate:</p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem;">
+                        <li>❌ Your browser shows "Not Secure"</li>
+                        <li>❌ Data is sent in plain text (unencrypted)</li>
+                        <li>❌ Anyone on the network can see your passwords</li>
+                        <li>❌ You can't trust the website is real</li>
+                        <li>❌ Modern browsers will warn or block the site</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: INTERMEDIATE -->
+        <section class="section reveal" id="intermediate">
+            <div class="section-header">
+                <span class="section-icon">📚</span>
+                <h2 class="section-title">Level 2: Understanding the Details</h2>
+                <span class="section-level badge-intermediate">Intermediate</span>
+            </div>
+
+            <div class="content-card">
+                <h3>What's Actually IN a Certificate?</h3>
+                <p>A certificate contains important information:</p>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>What It Means</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Common Name (CN)</strong></td>
+                                <td>The website's domain</td>
+                                <td>www.google.com</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Organization (O)</strong></td>
+                                <td>The company name</td>
+                                <td>Google LLC</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Issuer</strong></td>
+                                <td>Who gave the certificate</td>
+                                <td>DigiCert, Let's Encrypt</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Valid From/To</strong></td>
+                                <td>Expiration dates</td>
+                                <td>Jan 1, 2024 - Jan 1, 2025</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Public Key</strong></td>
+                                <td>Used for encryption</td>
+                                <td>Long cryptographic key</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Signature</strong></td>
+                                <td>Proof it's legitimate</td>
+                                <td>Encrypted by CA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flowchart">
+                <div class="flow-title">How Certificates Are Created (Complete Process)</div>
+                <div class="flow-container">
+                    <div class="flow-box">
+                        🏢 Website Owner<br>("I need a certificate for my site")
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">
+                        📝 Generate CSR<br>(Certificate Signing Request)<br>Contains: domain name, public key, company info
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box blue">
+                        📤 Submit CSR to CA<br>(Certificate Authority)<br>Examples: DigiCert, Let's Encrypt, GoDaddy
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box orange">
+                        🔍 CA Verifies Identity<br>Checks domain ownership, company details<br>(Can take minutes to days)
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box purple">
+                        ✍️ CA Signs the Certificate<br>Uses their private key to sign it<br>(This makes it trusted)
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">
+                        📥 Website Receives Certificate<br>Installs it on their web server
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">
+                        🌐 Website is Now Secure<br>Shows HTTPS with padlock 🔒
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Types of Certificates</h3>
+                
+                <div class="visual-diagram">
+                    <div class="diagram-title">Three Main Types:</div>
+                    <div class="diagram-content">
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🔷</div>
+                            <div class="diagram-label">Domain Validated (DV)</div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">✅ Quickest (minutes)<br>✅ Cheapest/Free<br>⚠️ Only verifies domain ownership<br>📌 Use: Blogs, personal sites</p>
+                        </div>
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🔶</div>
+                            <div class="diagram-label">Organization Validated (OV)</div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">✅ Medium verification<br>✅ Shows company name<br>⚠️ Takes 1-3 days<br>📌 Use: Business websites</p>
+                        </div>
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🔺</div>
+                            <div class="diagram-label">Extended Validation (EV)</div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">✅ Highest trust<br>✅ Shows company in address bar<br>⚠️ Expensive, takes weeks<br>📌 Use: Banks, e-commerce</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Certificate Authorities (CAs): The Trust Chain</h3>
+                <p>Who decides if a certificate is trustworthy? <strong>Certificate Authorities (CAs)</strong></p>
+                
+                <div class="key-points">
+                    <h4>Understanding CAs:</h4>
+                    <ul>
+                        <li><strong>Root CAs:</strong> Top-level authorities trusted by browsers (DigiCert, GlobalSign, Let's Encrypt)</li>
+                        <li><strong>Intermediate CAs:</strong> Middle layer, issued by Root CAs</li>
+                        <li><strong>End Entity Certificates:</strong> Your website's certificate</li>
+                    </ul>
+                </div>
+
+                <div class="flowchart">
+                    <div class="flow-title">Certificate Chain of Trust</div>
+                    <div class="flow-container">
+                        <div class="flow-box">
+                            👑 Root CA Certificate<br>(Pre-installed in your browser/OS)<br>Example: DigiCert Global Root CA
+                        </div>
+                        <div class="flow-arrow">↓ signs</div>
+                        <div class="flow-box blue">
+                            🔗 Intermediate CA Certificate<br>(Issued by Root CA)<br>Example: DigiCert TLS RSA SHA256
+                        </div>
+                        <div class="flow-arrow">↓ signs</div>
+                        <div class="flow-box purple">
+                            🌐 Website Certificate<br>(Your actual certificate)<br>Example: www.yoursite.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-question">
+                <div class="question-title">💡 Think: Why do browsers trust Root CAs?</div>
+                <button class="reveal-btn" onclick="toggleAnswer('answer2')">Reveal Answer</button>
+                <div class="answer-box" id="answer2">
+                    <p><strong>Answer:</strong> Root CA certificates are pre-installed in your browser and operating system by Microsoft, Apple, Google, Mozilla, etc. These companies carefully vet which CAs they trust. When you install a browser or OS, you're implicitly trusting their choice of Root CAs. This is why fake certificates from untrusted CAs don't work—they're not in your browser's trust store!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: ADVANCED -->
+        <section class="section reveal" id="advanced">
+            <div class="section-header">
+                <span class="section-icon">🎓</span>
+                <h2 class="section-title">Level 3: Technical Deep Dive</h2>
+                <span class="section-level badge-advanced">Advanced</span>
+            </div>
+
+            <div class="content-card">
+                <h3>How Encryption Actually Works (Public Key Cryptography)</h3>
+                <p>This is where it gets interesting! Certificates use <strong>asymmetric encryption</strong>:</p>
+                
+                <div class="visual-diagram">
+                    <div class="diagram-title">Public & Private Keys</div>
+                    <div class="diagram-content">
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🔓</div>
+                            <div class="diagram-label">Public Key</div>
+                            <p style="margin-top: 1rem;">✅ Everyone can see it<br>✅ In the certificate<br>✅ Used to ENCRYPT data</p>
+                        </div>
+                        <div class="diagram-arrow">+</div>
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🔐</div>
+                            <div class="diagram-label">Private Key</div>
+                            <p style="margin-top: 1rem;">🔒 Secret! Only server has it<br>🔒 Never shared<br>🔒 Used to DECRYPT data</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="key-points">
+                    <h4>The Magic:</h4>
+                    <ul>
+                        <li>Data encrypted with PUBLIC key can ONLY be decrypted with PRIVATE key</li>
+                        <li>This means you can send secrets to a website even over an untrusted network</li>
+                        <li>Hackers can see the encrypted data but can't decrypt it without the private key</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flowchart">
+                <div class="flow-title">SSL/TLS Handshake (Technical Flow)</div>
+                <div class="flow-container" style="align-items: flex-start;">
+                    <div class="flow-box">
+                        👤 Client: "ClientHello"<br>
+                        <small>Sends: supported cipher suites, SSL/TLS version, random number</small>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box blue">
+                        🖥️ Server: "ServerHello"<br>
+                        <small>Sends: chosen cipher suite, certificate, random number</small>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box orange">
+                        👤 Client Validates Certificate<br>
+                        <small>1. Check signature from trusted CA<br>
+                        2. Verify domain matches<br>
+                        3. Check expiration date<br>
+                        4. Verify certificate chain</small>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box purple">
+                        👤 Client: Generate Pre-Master Secret<br>
+                        <small>Encrypts with server's public key from certificate</small>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">
+                        🖥️ Server: Decrypt Pre-Master Secret<br>
+                        <small>Uses private key (only server has this!)</small>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box blue">
+                        🤝 Both: Generate Session Keys<br>
+                        <small>Using pre-master secret + random numbers<br>
+                        Now both have the same symmetric encryption key</small>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">
+                        🔐 Encrypted Communication Begins<br>
+                        <small>Using fast symmetric encryption (AES) with session keys</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Certificate Formats Explained</h3>
+                <p>Certificates come in different file formats. Here's what you need to know:</p>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Format</th>
+                                <th>Extension</th>
+                                <th>Description</th>
+                                <th>Common Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>PEM</strong></td>
+                                <td>.pem, .crt, .cer, .key</td>
+                                <td>Base64 encoded text<br>Starts with "-----BEGIN CERTIFICATE-----"</td>
+                                <td>Linux/Unix servers, most common</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DER</strong></td>
+                                <td>.der, .cer</td>
+                                <td>Binary format</td>
+                                <td>Java applications</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PKCS#12</strong></td>
+                                <td>.pfx, .p12</td>
+                                <td>Binary, contains cert + private key</td>
+                                <td>Windows servers, password protected</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PKCS#7</strong></td>
+                                <td>.p7b, .p7c</td>
+                                <td>Contains cert chain, no private key</td>
+                                <td>Windows, Java</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Example: PEM Certificate</span>
+                    </div>
+                    <pre><code>-----BEGIN CERTIFICATE-----
+MIIFazCCBFOgAwIBAgISA+YourCertDataHere...
+(This is base64 encoded text)
+-----END CERTIFICATE-----</code></pre>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Common Certificate Issues & Troubleshooting</h3>
+                
+                <div class="warning-box">
+                    <span class="warning-icon">🔴</span>
+                    <div>
+                        <strong>Certificate Expired</strong>
+                        <p><strong>Why:</strong> Certificates have expiration dates (usually 90 days to 1 year)</p>
+                        <p><strong>Fix:</strong> Renew the certificate before expiration</p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <span class="warning-icon">🔴</span>
+                    <div>
+                        <strong>Hostname Mismatch</strong>
+                        <p><strong>Why:</strong> Certificate issued for "www.example.com" but you're accessing "example.com"</p>
+                        <p><strong>Fix:</strong> Use a certificate with multiple SANs (Subject Alternative Names)</p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <span class="warning-icon">🔴</span>
+                    <div>
+                        <strong>Untrusted Certificate Authority</strong>
+                        <p><strong>Why:</strong> Certificate signed by unknown or self-signed CA</p>
+                        <p><strong>Fix:</strong> Get certificate from a trusted public CA</p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <span class="warning-icon">🔴</span>
+                    <div>
+                        <strong>Incomplete Certificate Chain</strong>
+                        <p><strong>Why:</strong> Intermediate certificates not installed on server</p>
+                        <p><strong>Fix:</strong> Install the full certificate chain (root + intermediate + end entity)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-question">
+                <div class="question-title">💡 Challenge: Why use asymmetric encryption for handshake then switch to symmetric?</div>
+                <button class="reveal-btn" onclick="toggleAnswer('answer3')">Reveal Answer</button>
+                <div class="answer-box" id="answer3">
+                    <p><strong>Answer:</strong> Great question! Here's why:</p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem;">
+                        <li><strong>Asymmetric (Public/Private Key):</strong> Very secure but SLOW</li>
+                        <li><strong>Symmetric (AES):</strong> Very fast but requires both parties to have the same key</li>
+                        <li><strong>Solution:</strong> Use asymmetric encryption to securely exchange a symmetric key, then use that fast symmetric key for actual data transfer</li>
+                        <li><strong>Analogy:</strong> It's like using a heavy safe to transport a lightweight key, then using that key for everyday operations</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 4: EXPERT -->
+        <section class="section reveal" id="expert">
+            <div class="section-header">
+                <span class="section-icon">🚀</span>
+                <h2 class="section-title">Level 4: Expert Knowledge</h2>
+                <span class="section-level badge-expert">Expert</span>
+            </div>
+
+            <div class="content-card">
+                <h3>Certificate Pinning</h3>
+                <p><strong>What:</strong> Hard-coding or pre-loading the expected certificate or public key in your application</p>
+                <p><strong>Why:</strong> Prevents man-in-the-middle attacks even if a CA is compromised</p>
+                <p><strong>Used by:</strong> Banking apps, high-security applications</p>
+                
+                <div class="key-points">
+                    <h4>How It Works:</h4>
+                    <ul>
+                        <li>App stores the hash of the expected certificate</li>
+                        <li>When connecting, app checks if the server's cert matches the stored hash</li>
+                        <li>If it doesn't match, connection is rejected even if cert is valid</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <span class="warning-icon">⚠️</span>
+                    <p><strong>Risk:</strong> If you pin and then need to change certificates (expiration, compromise), you must update all apps. Users on old versions will be locked out!</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Certificate Transparency (CT)</h3>
+                <p>A system to detect rogue or mis-issued certificates</p>
+                
+                <div class="flowchart">
+                    <div class="flow-title">How CT Works</div>
+                    <div class="flow-container">
+                        <div class="flow-box">
+                            🏢 CA Issues Certificate<br>for example.com
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box blue">
+                            📝 CA Submits to CT Logs<br>Public, append-only ledgers
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box orange">
+                            📊 CT Log Accepts & Records<br>Issues Signed Certificate Timestamp (SCT)
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            🔍 Monitors Watch CT Logs<br>Domain owners can detect unauthorized certs
+                        </div>
+                    </div>
+                </div>
+
+                <div class="key-points">
+                    <h4>Benefits:</h4>
+                    <ul>
+                        <li>Makes it impossible to issue certificates in secret</li>
+                        <li>Domain owners can monitor for unauthorized certificates</li>
+                        <li>Browsers require CT for EV certificates</li>
+                        <li>Helps catch compromised or rogue CAs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Modern Protocol: TLS 1.3</h3>
+                <p>The latest version of TLS (2018) with major improvements:</p>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Improvement</th>
+                                <th>TLS 1.2</th>
+                                <th>TLS 1.3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Handshake Time</strong></td>
+                                <td>2 round trips</td>
+                                <td>1 round trip (faster!)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cipher Suites</strong></td>
+                                <td>37 options (some weak)</td>
+                                <td>5 strong options only</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Forward Secrecy</strong></td>
+                                <td>Optional</td>
+                                <td>Mandatory</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Encrypted Handshake</strong></td>
+                                <td>Partially</td>
+                                <td>Fully encrypted</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Let's Encrypt: The Game Changer</h3>
+                <p><strong>Revolutionary:</strong> Free, automated certificate authority launched in 2015</p>
+                
+                <div class="key-points">
+                    <h4>Why It Matters:</h4>
+                    <ul>
+                        <li><strong>100% Free:</strong> No cost for certificates (previously $50-$300/year)</li>
+                        <li><strong>Automated:</strong> ACME protocol enables auto-renewal</li>
+                        <li><strong>Impact:</strong> Enabled HTTPS for millions of small websites</li>
+                        <li><strong>Stats:</strong> Issues over 2 million certificates per day</li>
+                    </ul>
+                </div>
+
+                <div class="flowchart">
+                    <div class="flow-title">ACME Protocol (Automated Certificate Management)</div>
+                    <div class="flow-container">
+                        <div class="flow-box">
+                            🤖 Your Server: "I need a cert for example.com"<br>
+                            <small>Uses certbot or similar tool</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box blue">
+                            🔐 Let's Encrypt: "Prove you own example.com"<br>
+                            <small>Sends challenge (HTTP or DNS)</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box orange">
+                            🤖 Your Server: Completes Challenge<br>
+                            <small>Places file on website or creates DNS record</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            ✅ Let's Encrypt: Verifies & Issues<br>
+                            <small>Certificate delivered in seconds!</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            🔄 Auto-Renewal<br>
+                            <small>Cron job renews every 60 days (cert valid for 90)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Advanced Security: HSTS & CAA</h3>
+                
+                <div class="split-layout">
+                    <div class="visual-diagram">
+                        <div class="diagram-icon">🛡️</div>
+                        <div class="diagram-label"><strong>HSTS</strong><br>HTTP Strict Transport Security</div>
+                        <p style="margin-top: 1rem; text-align: left;">
+                            <strong>Purpose:</strong> Forces browsers to only use HTTPS<br><br>
+                            <strong>How:</strong> Server sends header:<br>
+                            <code>Strict-Transport-Security: max-age=31536000</code><br><br>
+                            <strong>Effect:</strong> Browser remembers and auto-converts HTTP → HTTPS
+                        </p>
+                    </div>
+                    <div class="visual-diagram">
+                        <div class="diagram-icon">🚫</div>
+                        <div class="diagram-label"><strong>CAA</strong><br>Certification Authority Authorization</div>
+                        <p style="margin-top: 1rem; text-align: left;">
+                            <strong>Purpose:</strong> Specify which CAs can issue certs for your domain<br><br>
+                            <strong>How:</strong> DNS record:<br>
+                            <code>example.com CAA 0 issue "letsencrypt.org"</code><br><br>
+                            <strong>Effect:</strong> Other CAs cannot issue certs for your domain
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Future: Post-Quantum Cryptography</h3>
+                <p><strong>The Problem:</strong> Quantum computers (when they become powerful enough) could break current RSA/ECC encryption</p>
+                
+                <div class="warning-box">
+                    <span class="warning-icon">🔮</span>
+                    <p><strong>Timeline:</strong> Quantum computers capable of breaking current encryption might exist in 10-20 years. The industry is already preparing new "quantum-resistant" algorithms.</p>
+                </div>
+
+                <div class="key-points">
+                    <h4>What's Being Developed:</h4>
+                    <ul>
+                        <li><strong>NIST Standards:</strong> New quantum-resistant algorithms selected in 2022</li>
+                        <li><strong>Hybrid Approach:</strong> Using both classical and quantum-resistant algorithms during transition</li>
+                        <li><strong>Timeline:</strong> Expect adoption in certificates within 5-10 years</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="interactive-question">
+                <div class="question-title">🎓 Expert Challenge: Design a certificate infrastructure for a global bank</div>
+                <button class="reveal-btn" onclick="toggleAnswer('answer4')">Reveal Expert Solution</button>
+                <div class="answer-box" id="answer4">
+                    <h4 style="margin-bottom: 1rem;">Comprehensive Solution:</h4>
+                    <ol style="margin-left: 2rem; line-height: 2;">
+                        <li><strong>Certificate Type:</strong> EV certificates for main domains (highest trust)</li>
+                        <li><strong>CA Choice:</strong> Multiple CAs for redundancy (DigiCert + Sectigo)</li>
+                        <li><strong>Key Length:</strong> 4096-bit RSA or 384-bit ECC for maximum security</li>
+                        <li><strong>Certificate Pinning:</strong> Implement in mobile apps with backup pins</li>
+                        <li><strong>CT Monitoring:</strong> Continuous monitoring of Certificate Transparency logs</li>
+                        <li><strong>HSTS Preload:</strong> Submit domains to browser preload lists</li>
+                        <li><strong>CAA Records:</strong> Lock down which CAs can issue certificates</li>
+                        <li><strong>Automation:</strong> Automated renewal with 30-day buffer before expiration</li>
+                        <li><strong>HSM Storage:</strong> Store private keys in Hardware Security Modules</li>
+                        <li><strong>Monitoring:</strong> 24/7 certificate expiration and validity monitoring</li>
+                        <li><strong>Revocation:</strong> OCSP stapling for fast revocation checking</li>
+                        <li><strong>Geo-Distribution:</strong> CDN integration for global performance</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="section reveal">
+            <div class="content-card" style="background: linear-gradient(135deg, rgba(46, 160, 67, 0.1), rgba(31, 111, 235, 0.1)); border: 2px solid var(--accent-green);">
+                <h3>🎯 Complete Learning Journey Summary</h3>
+                
+                <div class="visual-diagram">
+                    <div class="diagram-content">
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🌱</div>
+                            <div class="diagram-label"><strong>Beginner</strong></div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                                ✓ What certificates are<br>
+                                ✓ Why we need them<br>
+                                ✓ How to recognize secure sites
+                            </p>
+                        </div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-item">
+                            <div class="diagram-icon">📚</div>
+                            <div class="diagram-label"><strong>Intermediate</strong></div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                                ✓ Certificate contents<br>
+                                ✓ How they're created<br>
+                                ✓ Trust chain & CAs
+                            </p>
+                        </div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🎓</div>
+                            <div class="diagram-label"><strong>Advanced</strong></div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                                ✓ Encryption mechanics<br>
+                                ✓ TLS handshake<br>
+                                ✓ Troubleshooting
+                            </p>
+                        </div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-item">
+                            <div class="diagram-icon">🚀</div>
+                            <div class="diagram-label"><strong>Expert</strong></div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                                ✓ Pinning & CT<br>
+                                ✓ ACME automation<br>
+                                ✓ Future tech
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="key-points" style="margin-top: 2rem;">
+                    <h4>🎓 You Now Understand:</h4>
+                    <ul>
+                        <li>How certificates prove website identity</li>
+                        <li>The complete certificate creation and validation process</li>
+                        <li>Public key cryptography and how encryption works</li>
+                        <li>The TLS handshake in technical detail</li>
+                        <li>Certificate types, formats, and troubleshooting</li>
+                        <li>Advanced concepts like CT, pinning, and ACME</li>
+                        <li>Future developments in certificate technology</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Smooth scroll reveal animation
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            reveals.forEach(reveal => {
+                const windowHeight = window.innerHeight;
+                const revealTop = reveal.getBoundingClientRect().top;
+                const revealPoint = 150;
+
+                if (revealTop < windowHeight - revealPoint) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Initial check
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress-bar').style.width = scrolled + '%';
+        });
+
+        // Toggle answer function
+        function toggleAnswer(id) {
+            const answerBox = document.getElementById(id);
+            answerBox.classList.toggle('show');
+            
+            const button = event.target;
+            if (answerBox.classList.contains('show')) {
+                button.textContent = 'Hide Answer';
+                button.style.background = 'var(--accent-green)';
+            } else {
+                button.textContent = 'Reveal Answer';
+                button.style.background = 'var(--accent-blue)';
+            }
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

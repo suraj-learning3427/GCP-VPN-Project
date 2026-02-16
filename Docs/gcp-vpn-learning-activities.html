@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCP VPN Infrastructure - Educational Activities</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 20px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .nav-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            margin: 25px 0 15px 0;
+            font-size: 1.4em;
+        }
+
+        .lab-exercise {
+            background: white;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .lab-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .lab-title {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .difficulty {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .difficulty.beginner { background: #d4edda; color: #155724; }
+        .difficulty.intermediate { background: #fff3cd; color: #856404; }
+        .difficulty.advanced { background: #f8d7da; color: #721c24; }
+
+        .lab-content {
+            color: #555;
+        }
+
+        .lab-content ul, .lab-content ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .lab-content li {
+            margin: 8px 0;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .options {
+            margin-left: 10px;
+        }
+
+        .option {
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            border: 2px solid #dee2e6;
+            background: white;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .score-display {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #667eea;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .concept-map {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .concept-node {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin: 10px;
+            display: inline-block;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .concept-connection {
+            color: #666;
+            font-style: italic;
+            margin: 10px 20px;
+            padding-left: 20px;
+            border-left: 3px solid #667eea;
+        }
+
+        .project-card {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-top: 5px solid #667eea;
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .project-title {
+            font-size: 1.5em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .duration {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .project-section {
+            margin: 20px 0;
+        }
+
+        .project-section h4 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 10px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding-left: 35px;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: "☐";
+            position: absolute;
+            left: 10px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #e9ecef;
+            border-radius: 15px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 5px solid;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #0c5460;
+            color: #0c5460;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #856404;
+            color: #856404;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-color: #155724;
+            color: #155724;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .diagram-svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .resource-link {
+            display: block;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 5px;
+            color: #667eea;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 2px solid #dee2e6;
+        }
+
+        .resource-link:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            .content { padding: 20px; }
+            .section { padding: 20px; }
+            .nav-tab { padding: 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 GCP VPN Infrastructure</h1>
+            <p>Professional Learning Activities for DevOps Engineers</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">📚 Overview</button>
+            <button class="nav-tab" onclick="showTab('labs')">🔬 Lab Exercises</button>
+            <button class="nav-tab" onclick="showTab('quizzes')">✅ Quizzes</button>
+            <button class="nav-tab" onclick="showTab('concepts')">🗺️ Concept Maps</button>
+            <button class="nav-tab" onclick="showTab('projects')">🚀 Projects</button>
+            <button class="nav-tab" onclick="showTab('resources')">📖 Resources</button>
+        </div>
+
+        <div class="content">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <div class="section">
+                    <h2>Welcome to GCP VPN Infrastructure Learning</h2>
+                    <p>This comprehensive educational package is designed for professional DevOps engineers and cloud architects who want to master secure, air-gapped infrastructure deployment on Google Cloud Platform.</p>
+                    
+                    <div class="alert alert-info">
+                        <strong>📌 Learning Objectives:</strong> By completing these activities, you will understand VPN architectures, PKI certificate chains, Terraform infrastructure as code, and defense-in-depth security strategies.
+                    </div>
+
+                    <h3>What You'll Learn</h3>
+                    <div class="lab-content">
+                        <ul>
+                            <li><strong>Infrastructure Architecture:</strong> Design and implement air-gapped, VPN-only access patterns</li>
+                            <li><strong>Security Best Practices:</strong> 5-layer defense in depth, zero internet exposure</li>
+                            <li><strong>PKI & TLS:</strong> Complete 3-tier certificate chain implementation</li>
+                            <li><strong>Terraform IaC:</strong> Modular, reusable infrastructure code</li>
+                            <li><strong>VPN Technologies:</strong> WireGuard, Firezone, and modern VPN protocols</li>
+                            <li><strong>Cost Optimization:</strong> Cloud resource management and cost analysis</li>
+                        </ul>
+                    </div>
+
+                    <h3>Activity Structure</h3>
+                    <div class="lab-exercise">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div>
+                                <h4 style="color: #667eea;">🔬 Lab Exercises</h4>
+                                <p>12 hands-on labs covering all aspects of the infrastructure</p>
+                            </div>
+                            <div>
+                                <h4 style="color: #667eea;">✅ Assessment Quizzes</h4>
+                                <p>3 comprehensive quizzes with 45+ questions</p>
+                            </div>
+                            <div>
+                                <h4 style="color: #667eea;">🗺️ Concept Maps</h4>
+                                <p>Visual learning aids for complex topics</p>
+                            </div>
+                            <div>
+                                <h4 style="color: #667eea;">🚀 Capstone Projects</h4>
+                                <p>Real-world scenarios to apply your knowledge</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Prerequisites</h3>
+                    <div class="lab-content">
+                        <ul>
+                            <li>Familiarity with cloud computing concepts (GCP preferred)</li>
+                            <li>Basic understanding of networking (TCP/IP, DNS, VPN)</li>
+                            <li>Command-line experience (Linux/Bash)</li>
+                            <li>Basic knowledge of Infrastructure as Code concepts</li>
+                            <li>GCP account with billing enabled (for practical labs)</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Cost Warning:</strong> Running the complete infrastructure costs approximately $91/month. Use terraform destroy after labs to minimize costs. Many labs can be completed with dry-run or planning commands.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labs Tab -->
+            <div id="labs" class="tab-content">
+                <div class="section">
+                    <h2>Interactive Lab Exercises</h2>
+                    <p>Hands-on exercises to build and understand the complete infrastructure.</p>
+
+                    <!-- Lab 1 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 1: Terraform Setup & Configuration</div>
+                            <span class="difficulty beginner">Beginner</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 45 minutes</p>
+                            <p><strong>Objective:</strong> Set up your local Terraform environment and understand the project structure.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Clone the repository and explore the directory structure</li>
+                                <li>Install Terraform and verify the installation</li>
+                                <li>Configure GCP credentials and authenticate</li>
+                                <li>Review and customize terraform.tfvars</li>
+                                <li>Initialize Terraform and review the planned infrastructure</li>
+                            </ol>
+
+                            <h4>Commands:</h4>
+                            <div class="code-block">git clone https://github.com/suraj-learning3427/GCP-VPN-Project.git
+cd GCP-VPN-Project/terraform
+terraform --version
+gcloud auth application-default login
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your values
+terraform init
+terraform plan</div>
+
+                            <h4>Deliverables:</h4>
+                            <ul>
+                                <li>Screenshot of successful terraform init</li>
+                                <li>Terraform plan output saved to a file</li>
+                                <li>Document any variables you customized and why</li>
+                            </ul>
+
+                            <div class="alert alert-info">
+                                <strong>💡 Tip:</strong> Use terraform plan -out=plan.tfplan to save your plan for later review.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 2 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 2: VPC Network Architecture</div>
+                            <span class="difficulty beginner">Beginner</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 60 minutes</p>
+                            <p><strong>Objective:</strong> Understand and configure VPC networks for both projects with proper CIDR ranges.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Analyze the VPC configurations in the Terraform code</li>
+                                <li>Understand CIDR block allocation (10.0.0.0/16 vs 10.10.0.0/16)</li>
+                                <li>Deploy VPC networks (comment out other resources first)</li>
+                                <li>Verify VPC creation in GCP console</li>
+                                <li>Document the network architecture</li>
+                            </ol>
+
+                            <h4>Discussion Questions:</h4>
+                            <ul>
+                                <li>Why use different CIDR ranges for each project?</li>
+                                <li>What is the maximum number of hosts in each VPC?</li>
+                                <li>How does GCP's VPC differ from traditional network segmentation?</li>
+                            </ul>
+
+                            <h4>Challenge:</h4>
+                            <p>Calculate the subnet mask, network address, and broadcast address for both VPC ranges.</p>
+                        </div>
+                    </div>
+
+                    <!-- Lab 3 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 3: VPC Peering Implementation</div>
+                            <span class="difficulty intermediate">Intermediate</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 90 minutes</p>
+                            <p><strong>Objective:</strong> Configure VPC peering between projects to enable private connectivity.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Review VPC peering module in Terraform</li>
+                                <li>Deploy VPC peering connections</li>
+                                <li>Verify bidirectional peering in both projects</li>
+                                <li>Test connectivity between VPCs using ping</li>
+                                <li>Analyze routing tables and understand route propagation</li>
+                            </ol>
+
+                            <h4>Verification Commands:</h4>
+                            <div class="code-block">gcloud compute networks peerings list
+gcloud compute routes list --project=PROJECT_1
+gcloud compute routes list --project=PROJECT_2</div>
+
+                            <h4>Troubleshooting Exercise:</h4>
+                            <p>Intentionally misconfigure the peering (e.g., wrong project ID) and document the error messages. Then fix it and explain what went wrong.</p>
+
+                            <div class="alert alert-warning">
+                                <strong>⚠️ Common Pitfall:</strong> VPC peering is non-transitive. If VPC-A peers with VPC-B, and VPC-B peers with VPC-C, VPC-A cannot communicate with VPC-C directly.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 4 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 4: Firezone VPN Gateway Setup</div>
+                            <span class="difficulty intermediate">Intermediate</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 120 minutes</p>
+                            <p><strong>Objective:</strong> Deploy and configure Firezone VPN gateway with WireGuard protocol.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Create a Firezone account and obtain API tokens</li>
+                                <li>Deploy the Firezone gateway VM using Terraform</li>
+                                <li>Configure Firezone through the web portal</li>
+                                <li>Create VPN users and assign permissions</li>
+                                <li>Install Firezone client and test connection</li>
+                            </ol>
+
+                            <h4>Configuration Checklist:</h4>
+                            <ul class="checklist">
+                                <li>Firezone account created</li>
+                                <li>Gateway VM deployed and accessible</li>
+                                <li>DNS configuration completed</li>
+                                <li>User accounts created</li>
+                                <li>Client successfully connected</li>
+                            </ul>
+
+                            <h4>Security Analysis:</h4>
+                            <p>Document the security features of WireGuard vs traditional VPN protocols (IPsec, OpenVPN). Include cryptographic primitives used.</p>
+                        </div>
+                    </div>
+
+                    <!-- Lab 5 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 5: Jenkins VM Deployment (Air-Gapped)</div>
+                            <span class="difficulty intermediate">Intermediate</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 90 minutes</p>
+                            <p><strong>Objective:</strong> Deploy Jenkins VM with no public IP and no internet access.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Review the Jenkins VM Terraform module</li>
+                                <li>Deploy Jenkins VM with startup script</li>
+                                <li>Verify that no public IP is assigned</li>
+                                <li>Confirm that Cloud NAT is not configured</li>
+                                <li>Access VM through VPN and verify Jenkins installation</li>
+                            </ol>
+
+                            <h4>Verification Commands:</h4>
+                            <div class="code-block"># From your local machine (after VPN connection)
+gcloud compute instances describe jenkins-vm \
+  --zone=us-central1-a \
+  --format="get(networkInterfaces[0].accessConfigs)"
+
+# Should return empty - no public IP
+
+# SSH through internal IP
+gcloud compute ssh jenkins-vm \
+  --internal-ip \
+  --zone=us-central1-a
+
+# On Jenkins VM, verify no internet access
+curl -I https://google.com --connect-timeout 5
+# Should timeout or fail</div>
+
+                            <div class="alert alert-success">
+                                <strong>✅ Success Criteria:</strong> Jenkins VM is running and accessible via VPN, but has zero internet connectivity.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 6 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 6: Internal Load Balancer Configuration</div>
+                            <span class="difficulty intermediate">Intermediate</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 75 minutes</p>
+                            <p><strong>Objective:</strong> Configure an internal TCP load balancer for Jenkins.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Understand internal vs external load balancers</li>
+                                <li>Deploy the internal load balancer via Terraform</li>
+                                <li>Configure health checks for Jenkins (port 8080)</li>
+                                <li>Test load balancer connectivity from VPN</li>
+                                <li>Review load balancer metrics and logs</li>
+                            </ol>
+
+                            <h4>Architecture Question:</h4>
+                            <p>Why use an internal load balancer instead of direct VM access? Consider: scalability, reliability, and future growth.</p>
+
+                            <h4>Performance Testing:</h4>
+                            <div class="code-block"># Test from VPN-connected machine
+for i in {1..100}; do
+  curl -s -o /dev/null -w "%{http_code}\n" \
+    http://LOAD_BALANCER_IP:8080
+done | sort | uniq -c</div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 7 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 7: PKI Certificate Chain - Root CA</div>
+                            <span class="difficulty advanced">Advanced</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 120 minutes</p>
+                            <p><strong>Objective:</strong> Create a 3-tier PKI infrastructure starting with the Root CA.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Understand PKI hierarchies and trust chains</li>
+                                <li>Generate Root CA private key (4096-bit RSA)</li>
+                                <li>Create Root CA certificate with proper extensions</li>
+                                <li>Configure OpenSSL configuration file</li>
+                                <li>Verify Root CA certificate properties</li>
+                            </ol>
+
+                            <h4>Root CA Generation:</h4>
+                            <div class="code-block"># Generate Root CA private key
+openssl genrsa -aes256 -out root-ca.key 4096
+
+# Create Root CA certificate
+openssl req -x509 -new -nodes -key root-ca.key \
+  -sha256 -days 3650 -out root-ca.crt \
+  -subj "/C=US/ST=State/L=City/O=YourOrg/OU=IT/CN=Root CA"
+
+# Verify certificate
+openssl x509 -in root-ca.crt -text -noout</div>
+
+                            <h4>Analysis Questions:</h4>
+                            <ul>
+                                <li>Why use 4096-bit keys for Root CA vs 2048-bit for server certs?</li>
+                                <li>What is the significance of the 10-year validity period?</li>
+                                <li>What happens if the Root CA key is compromised?</li>
+                            </ul>
+
+                            <div class="alert alert-warning">
+                                <strong>🔒 Security:</strong> The Root CA private key is the most sensitive component. In production, it should be kept offline and stored in a Hardware Security Module (HSM).
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 8 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 8: PKI Certificate Chain - Intermediate CA</div>
+                            <span class="difficulty advanced">Advanced</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 90 minutes</p>
+                            <p><strong>Objective:</strong> Create an Intermediate CA signed by the Root CA.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Generate Intermediate CA private key</li>
+                                <li>Create Certificate Signing Request (CSR)</li>
+                                <li>Sign the CSR with Root CA</li>
+                                <li>Verify the certificate chain</li>
+                                <li>Create the certificate bundle (chain)</li>
+                            </ol>
+
+                            <h4>Intermediate CA Creation:</h4>
+                            <div class="code-block"># Generate Intermediate CA key
+openssl genrsa -aes256 -out intermediate-ca.key 4096
+
+# Create CSR
+openssl req -new -key intermediate-ca.key \
+  -out intermediate-ca.csr \
+  -subj "/C=US/ST=State/L=City/O=YourOrg/OU=IT/CN=Intermediate CA"
+
+# Sign with Root CA
+openssl x509 -req -in intermediate-ca.csr \
+  -CA root-ca.crt -CAkey root-ca.key \
+  -CAcreateserial -out intermediate-ca.crt \
+  -days 1825 -sha256 \
+  -extensions v3_ca
+
+# Create certificate chain
+cat intermediate-ca.crt root-ca.crt > ca-chain.crt
+
+# Verify chain
+openssl verify -CAfile root-ca.crt intermediate-ca.crt</div>
+
+                            <h4>Challenge Exercise:</h4>
+                            <p>Intentionally create an invalid intermediate certificate (e.g., expired or wrong issuer) and analyze the error messages during verification.</p>
+                        </div>
+                    </div>
+
+                    <!-- Lab 9 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 9: Server Certificate & SAN Configuration</div>
+                            <span class="difficulty advanced">Advanced</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 120 minutes</p>
+                            <p><strong>Objective:</strong> Generate server certificate with Subject Alternative Names (SAN).</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Generate server private key</li>
+                                <li>Create CSR with SAN extension</li>
+                                <li>Sign server certificate with Intermediate CA</li>
+                                <li>Verify complete certificate chain</li>
+                                <li>Test certificate with OpenSSL s_client</li>
+                            </ol>
+
+                            <h4>SAN Configuration File (san.cnf):</h4>
+                            <div class="code-block">[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+
+[req_distinguished_name]
+CN = jenkins.np.learningmyway.space
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = jenkins.np.learningmyway.space
+DNS.2 = jenkins
+IP.1 = 10.10.0.10</div>
+
+                            <h4>Server Certificate Generation:</h4>
+                            <div class="code-block"># Generate server key
+openssl genrsa -out jenkins.key 2048
+
+# Create CSR with SAN
+openssl req -new -key jenkins.key \
+  -out jenkins.csr \
+  -config san.cnf
+
+# Sign with Intermediate CA
+openssl x509 -req -in jenkins.csr \
+  -CA intermediate-ca.crt -CAkey intermediate-ca.key \
+  -CAcreateserial -out jenkins.crt \
+  -days 365 -sha256 \
+  -extfile san.cnf -extensions v3_req
+
+# Verify chain
+openssl verify -CAfile ca-chain.crt jenkins.crt</div>
+
+                            <div class="alert alert-info">
+                                <strong>📝 Note:</strong> Modern browsers require SAN; the CN field alone is deprecated for hostname validation.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 10 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 10: Nginx SSL/TLS Configuration</div>
+                            <span class="difficulty intermediate">Intermediate</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 90 minutes</p>
+                            <p><strong>Objective:</strong> Configure Nginx as HTTPS reverse proxy with TLS termination.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Install Nginx on Jenkins VM</li>
+                                <li>Configure SSL/TLS with your certificates</li>
+                                <li>Set up reverse proxy to Jenkins (localhost:8080)</li>
+                                <li>Configure security headers and cipher suites</li>
+                                <li>Test HTTPS connection and verify certificate chain</li>
+                            </ol>
+
+                            <h4>Nginx Configuration:</h4>
+                            <div class="code-block">server {
+    listen 443 ssl http2;
+    server_name jenkins.np.learningmyway.space;
+
+    ssl_certificate /etc/nginx/ssl/jenkins.crt;
+    ssl_certificate_key /etc/nginx/ssl/jenkins.key;
+    ssl_trusted_certificate /etc/nginx/ssl/ca-chain.crt;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Security headers
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</div>
+
+                            <h4>TLS Testing:</h4>
+                            <div class="code-block"># Test SSL/TLS connection
+openssl s_client -connect jenkins.np.learningmyway.space:443 \
+  -showcerts -CAfile ca-chain.crt
+
+# Check SSL Labs grade (after making public)
+# https://www.ssllabs.com/ssltest/
+
+# Test cipher suites
+nmap --script ssl-enum-ciphers -p 443 jenkins.np.learningmyway.space</div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 11 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 11: Firewall Rules & Security Groups</div>
+                            <span class="difficulty intermediate">Intermediate</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 60 minutes</p>
+                            <p><strong>Objective:</strong> Configure GCP firewall rules for least-privilege access.</p>
+                            
+                            <h4>Tasks:</h4>
+                            <ol>
+                                <li>Review existing firewall rules in Terraform</li>
+                                <li>Understand implicit deny-all policy</li>
+                                <li>Configure rules for VPN to Jenkins access</li>
+                                <li>Test connectivity from authorized and unauthorized sources</li>
+                                <li>Analyze firewall logs for blocked traffic</li>
+                            </ol>
+
+                            <h4>Required Firewall Rules:</h4>
+                            <ul>
+                                <li><strong>VPN to Jenkins (HTTPS):</strong> Source: 10.0.0.0/16, Destination: 10.10.0.0/16, Port: 443</li>
+                                <li><strong>VPN to Jenkins (SSH):</strong> Source: 10.0.0.0/16, Destination: 10.10.0.0/16, Port: 22</li>
+                                <li><strong>Health Check:</strong> Source: Google health check ranges, Destination: Jenkins, Port: 8080</li>
+                            </ul>
+
+                            <h4>Testing Matrix:</h4>
+                            <table style="width:100%; border-collapse: collapse; margin-top: 15px;">
+                                <tr style="background: #667eea; color: white;">
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Source</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Destination</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Port</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Expected Result</th>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">VPN Network</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Jenkins HTTPS</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">443</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd; background: #d4edda;">✅ Allow</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Internet</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Jenkins</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Any</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd; background: #f8d7da;">❌ Deny</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Jenkins</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Internet</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Any</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd; background: #f8d7da;">❌ Deny</td>
+                                </tr>
+                            </table>
+
+                            <div class="alert alert-warning">
+                                <strong>⚠️ Security:</strong> Never use 0.0.0.0/0 as a source in production firewall rules unless absolutely necessary.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lab 12 -->
+                    <div class="lab-exercise">
+                        <div class="lab-header">
+                            <div class="lab-title">Lab 12: Complete System Verification & Testing</div>
+                            <span class="difficulty advanced">Advanced</span>
+                        </div>
+                        <div class="lab-content">
+                            <p><strong>Duration:</strong> 120 minutes</p>
+                            <p><strong>Objective:</strong> Perform end-to-end testing of the complete infrastructure.</p>
+                            
+                            <h4>Testing Checklist:</h4>
+                            <ul class="checklist">
+                                <li>VPN client connection successful</li>
+                                <li>DNS resolution for jenkins.np.learningmyway.space</li>
+                                <li>HTTPS connection established (port 443)</li>
+                                <li>Certificate chain validates correctly</li>
+                                <li>Jenkins login page accessible</li>
+                                <li>Jenkins functionality verified (create job, run build)</li>
+                                <li>No internet access from Jenkins VM</li>
+                                <li>Firewall rules blocking unauthorized access</li>
+                                <li>Logs showing all components working</li>
+                            </ul>
+
+                            <h4>Comprehensive Test Script:</h4>
+                            <div class="code-block">#!/bin/bash
+# Save as test-infrastructure.sh
+
+echo "=== Infrastructure Verification ==="
+
+# Test 1: VPN Connection
+echo "Test 1: Checking VPN connection..."
+if ip addr show tun0 &>/dev/null; then
+    echo "✅ VPN connected"
+else
+    echo "❌ VPN not connected"
+fi
+
+# Test 2: DNS Resolution
+echo "Test 2: Testing DNS resolution..."
+if nslookup jenkins.np.learningmyway.space &>/dev/null; then
+    echo "✅ DNS resolution successful"
+else
+    echo "❌ DNS resolution failed"
+fi
+
+# Test 3: HTTPS Connectivity
+echo "Test 3: Testing HTTPS connection..."
+if curl -k -s -o /dev/null -w "%{http_code}" \
+   https://jenkins.np.learningmyway.space | grep -q 200; then
+    echo "✅ HTTPS connection successful"
+else
+    echo "❌ HTTPS connection failed"
+fi
+
+# Test 4: Certificate Validation
+echo "Test 4: Validating certificate chain..."
+echo | openssl s_client -connect jenkins.np.learningmyway.space:443 \
+  -CAfile ca-chain.crt 2>/dev/null | grep -q "Verify return code: 0"
+if [ $? -eq 0 ]; then
+    echo "✅ Certificate chain valid"
+else
+    echo "❌ Certificate chain invalid"
+fi
+
+# Test 5: Jenkins Accessibility
+echo "Test 5: Checking Jenkins accessibility..."
+if curl -k -s https://jenkins.np.learningmyway.space | grep -q "Jenkins"; then
+    echo "✅ Jenkins accessible"
+else
+    echo "❌ Jenkins not accessible"
+fi
+
+echo "=== Test Complete ==="</div>
+
+                            <h4>Performance Benchmarking:</h4>
+                            <p>Measure and document:</p>
+                            <ul>
+                                <li>VPN connection latency</li>
+                                <li>HTTPS response time</li>
+                                <li>Jenkins build execution time</li>
+                                <li>Overall system resource utilization</li>
+                            </ul>
+
+                            <h4>Final Report:</h4>
+                            <p>Create a comprehensive report including:</p>
+                            <ol>
+                                <li>Architecture diagram with all components</li>
+                                <li>Test results and metrics</li>
+                                <li>Security analysis and recommendations</li>
+                                <li>Cost breakdown and optimization suggestions</li>
+                                <li>Lessons learned and best practices</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quizzes Tab -->
+            <div id="quizzes" class="tab-content">
+                <div class="section">
+                    <h2>Assessment Quizzes</h2>
+                    <p>Test your knowledge with comprehensive quizzes covering all aspects of the infrastructure.</p>
+
+                    <!-- Quiz 1: Infrastructure & Networking -->
+                    <div class="quiz-container">
+                        <h3 style="color: #667eea; margin-bottom: 20px;">Quiz 1: Infrastructure & Networking Fundamentals</h3>
+                        
+                        <div class="question" data-quiz="1" data-question="1">
+                            <div class="question-text">1. What is the primary benefit of using VPC peering over VPN tunnels for inter-project connectivity?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Lower latency and higher throughput</div>
+                                <div class="option" data-correct="false">Better security with encryption</div>
+                                <div class="option" data-correct="true">Uses Google's internal network without encryption overhead</div>
+                                <div class="option" data-correct="false">Allows transitive routing between multiple VPCs</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="2">
+                            <div class="question-text">2. In the project architecture, why are the CIDR ranges 10.0.0.0/16 and 10.10.0.0/16 chosen?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">They are the only RFC 1918 ranges available</div>
+                                <div class="option" data-correct="true">They don't overlap, allowing VPC peering to work correctly</div>
+                                <div class="option" data-correct="false">They provide the maximum number of hosts</div>
+                                <div class="option" data-correct="false">They are required by GCP for inter-project connectivity</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="3">
+                            <div class="question-text">3. What would happen if you configured Cloud NAT on the Jenkins VM project?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It would improve VPN connection stability</div>
+                                <div class="option" data-correct="true">It would compromise the air-gapped architecture by allowing internet access</div>
+                                <div class="option" data-correct="false">It would reduce costs by ~$45/month</div>
+                                <div class="option" data-correct="false">It would enable better firewall rule management</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="4">
+                            <div class="question-text">4. How many usable IP addresses are available in a /16 CIDR block?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">256</div>
+                                <div class="option" data-correct="false">4,096</div>
+                                <div class="option" data-correct="false">16,384</div>
+                                <div class="option" data-correct="true">65,536 (minus reserved addresses)</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="5">
+                            <div class="question-text">5. What is the purpose of the Internal Load Balancer in this architecture?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To provide public internet access to Jenkins</div>
+                                <div class="option" data-correct="true">To provide a stable endpoint and enable future horizontal scaling</div>
+                                <div class="option" data-correct="false">To reduce costs by sharing resources</div>
+                                <div class="option" data-correct="false">To improve VPN connection speed</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="6">
+                            <div class="question-text">6. Which GCP firewall rule configuration follows the principle of least privilege?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Allow all traffic from 0.0.0.0/0</div>
+                                <div class="option" data-correct="true">Allow only specific ports from VPN CIDR range (10.0.0.0/16)</div>
+                                <div class="option" data-correct="false">Allow all traffic between peered VPCs</div>
+                                <div class="option" data-correct="false">Deny all traffic and manually approve each connection</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="7">
+                            <div class="question-text">7. What is the primary security advantage of an air-gapped architecture?</div>
+                            <div class="options">
+                                <div class="option" data-correct="true">Zero exposure to internet-based attacks and malware</div>
+                                <div class="option" data-correct="false">Reduced operational costs</div>
+                                <div class="option" data-correct="false">Faster network performance</div>
+                                <div class="option" data-correct="false">Easier compliance auditing</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="8">
+                            <div class="question-text">8. In Terraform, what is the advantage of using modules for infrastructure components?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Modules make infrastructure deployment faster</div>
+                                <div class="option" data-correct="true">Modules promote code reusability and maintainability</div>
+                                <div class="option" data-correct="false">Modules reduce GCP costs</div>
+                                <div class="option" data-correct="false">Modules are required by GCP</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="9">
+                            <div class="question-text">9. What is the purpose of the health check in the Internal Load Balancer configuration?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To measure network latency</div>
+                                <div class="option" data-correct="true">To ensure traffic is only sent to healthy backend instances</div>
+                                <div class="option" data-correct="false">To authenticate VPN users</div>
+                                <div class="option" data-correct="false">To validate SSL certificates</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="10">
+                            <div class="question-text">10. Why use Private DNS zones in this architecture?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To reduce DNS query costs</div>
+                                <div class="option" data-correct="false">To improve DNS resolution speed</div>
+                                <div class="option" data-correct="true">To resolve internal hostnames without exposing to public DNS</div>
+                                <div class="option" data-correct="false">To comply with GCP requirements</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="11">
+                            <div class="question-text">11. What is a key limitation of VPC peering in GCP?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It only works within the same region</div>
+                                <div class="option" data-correct="true">It is non-transitive (A↔B and B↔C doesn't mean A↔C)</div>
+                                <div class="option" data-correct="false">It requires additional firewall rules</div>
+                                <div class="option" data-correct="false">It has higher latency than VPN tunnels</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="12">
+                            <div class="question-text">12. What is the monthly cost savings by NOT using Cloud NAT in this architecture?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">$15-20</div>
+                                <div class="option" data-correct="false">$30-35</div>
+                                <div class="option" data-correct="true">$45-50</div>
+                                <div class="option" data-correct="false">$60-65</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="13">
+                            <div class="question-text">13. Which Terraform command should you run before applying changes to see what will be created/modified?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">terraform validate</div>
+                                <div class="option" data-correct="true">terraform plan</div>
+                                <div class="option" data-correct="false">terraform show</div>
+                                <div class="option" data-correct="false">terraform preview</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="14">
+                            <div class="question-text">14. What happens to the infrastructure when you run 'terraform destroy'?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Only VMs are deleted, networking remains</div>
+                                <div class="option" data-correct="true">All resources defined in Terraform are deleted</div>
+                                <div class="option" data-correct="false">Resources are stopped but not deleted</div>
+                                <div class="option" data-correct="false">Only billable resources are deleted</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="1" data-question="15">
+                            <div class="question-text">15. In a production environment, what would be the recommended approach for managing Terraform state?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Store locally on developer machines</div>
+                                <div class="option" data-correct="false">Check into Git with the code</div>
+                                <div class="option" data-correct="true">Use remote backend (GCS bucket) with state locking</div>
+                                <div class="option" data-correct="false">Recreate infrastructure each time rather than tracking state</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="checkQuiz(1)">Submit Quiz 1</button>
+                        <button class="btn btn-secondary" onclick="resetQuiz(1)">Reset</button>
+                        <div id="score-1" class="score-display" style="display: none;"></div>
+                    </div>
+
+                    <!-- Quiz 2: Security & PKI -->
+                    <div class="quiz-container">
+                        <h3 style="color: #667eea; margin-bottom: 20px;">Quiz 2: Security, PKI & Certificates</h3>
+                        
+                        <div class="question" data-quiz="2" data-question="1">
+                            <div class="question-text">1. What are the three tiers in the PKI certificate chain used in this project?</div>
+                            <div class="options">
+                                <div class="option" data-correct="true">Root CA → Intermediate CA → Server Certificate</div>
+                                <div class="option" data-correct="false">Root CA → Server Certificate → User Certificate</div>
+                                <div class="option" data-correct="false">Primary CA → Secondary CA → SSL Certificate</div>
+                                <div class="option" data-correct="false">Public CA → Private CA → TLS Certificate</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="2">
+                            <div class="question-text">2. Why is the Root CA private key encrypted with AES-256?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It's required by OpenSSL</div>
+                                <div class="option" data-correct="true">To protect it from unauthorized access even if the file is stolen</div>
+                                <div class="option" data-correct="false">To reduce file size</div>
+                                <div class="option" data-correct="false">To improve certificate generation speed</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="3">
+                            <div class="question-text">3. What is the purpose of Subject Alternative Names (SAN) in the server certificate?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To increase certificate security</div>
+                                <div class="option" data-correct="true">To support multiple hostnames and IP addresses in one certificate</div>
+                                <div class="option" data-correct="false">To reduce certificate size</div>
+                                <div class="option" data-correct="false">To enable certificate rotation</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="4">
+                            <div class="question-text">4. Why use 4096-bit RSA keys for Root/Intermediate CAs but 2048-bit for server certificates?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">4096-bit keys are faster for server operations</div>
+                                <div class="option" data-correct="true">Higher security for long-lived CAs; 2048-bit balances security and performance for servers</div>
+                                <div class="option" data-correct="false">2048-bit keys are more compatible with browsers</div>
+                                <div class="option" data-correct="false">GCP requires different key sizes</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="5">
+                            <div class="question-text">5. What is the recommended validity period for the Root CA certificate?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">1 year</div>
+                                <div class="option" data-correct="false">3 years</div>
+                                <div class="option" data-correct="false">5 years</div>
+                                <div class="option" data-correct="true">10 years</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="6">
+                            <div class="question-text">6. What command verifies that a certificate chain is valid?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">openssl x509 -check</div>
+                                <div class="option" data-correct="true">openssl verify -CAfile root-ca.crt intermediate-ca.crt</div>
+                                <div class="option" data-correct="false">openssl validate chain.crt</div>
+                                <div class="option" data-correct="false">openssl test -cert chain.crt</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="7">
+                            <div class="question-text">7. In the TLS handshake, what does the server send to prove its identity?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Only the server certificate</div>
+                                <div class="option" data-correct="true">Complete certificate chain (server + intermediate + root)</div>
+                                <div class="option" data-correct="false">Only the public key</div>
+                                <div class="option" data-correct="false">The server's IP address</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="8">
+                            <div class="question-text">8. What is the purpose of the Strict-Transport-Security (HSTS) header?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To improve website loading speed</div>
+                                <div class="option" data-correct="true">To force browsers to only use HTTPS connections</div>
+                                <div class="option" data-correct="false">To prevent SQL injection attacks</div>
+                                <div class="option" data-correct="false">To enable HTTP/2 support</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="9">
+                            <div class="question-text">9. Which TLS versions should be enabled for modern security?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">TLS 1.0 and 1.1 only</div>
+                                <div class="option" data-correct="false">All versions for maximum compatibility</div>
+                                <div class="option" data-correct="true">TLS 1.2 and 1.3 only</div>
+                                <div class="option" data-correct="false">TLS 1.3 only</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="10">
+                            <div class="question-text">10. What happens if the Intermediate CA certificate expires?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Only new certificates will fail to validate</div>
+                                <div class="option" data-correct="true">All server certificates signed by it will fail validation</div>
+                                <div class="option" data-correct="false">The Root CA must be regenerated</div>
+                                <div class="option" data-correct="false">Nothing, as long as the Root CA is valid</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="11">
+                            <div class="question-text">11. How does Nginx know which certificate chain to send during TLS handshake?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It queries the CA each time</div>
+                                <div class="option" data-correct="true">It reads from the configured ssl_certificate and ssl_trusted_certificate files</div>
+                                <div class="option" data-correct="false">It generates them dynamically</div>
+                                <div class="option" data-correct="false">The client provides the chain</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="12">
+                            <div class="question-text">12. What is the purpose of the Certificate Signing Request (CSR)?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To encrypt the private key</div>
+                                <div class="option" data-correct="true">To request a certificate from a CA with identity information</div>
+                                <div class="option" data-correct="false">To verify an existing certificate</div>
+                                <div class="option" data-correct="false">To revoke a compromised certificate</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="13">
+                            <div class="question-text">13. In production, where should the Root CA private key be stored?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">On the web server alongside the server certificate</div>
+                                <div class="option" data-correct="false">In a Git repository with encryption</div>
+                                <div class="option" data-correct="true">Offline in a Hardware Security Module (HSM) or secure vault</div>
+                                <div class="option" data-correct="false">In cloud storage with strong passwords</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="14">
+                            <div class="question-text">14. What cryptographic hash function is recommended for certificate signing?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">MD5</div>
+                                <div class="option" data-correct="false">SHA-1</div>
+                                <div class="option" data-correct="true">SHA-256 or higher</div>
+                                <div class="option" data-correct="false">CRC32</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="2" data-question="15">
+                            <div class="question-text">15. What are the five security layers in the defense-in-depth architecture?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Physical, Network, Host, Application, Data</div>
+                                <div class="option" data-correct="true">Network Isolation, VPN Auth, Firewall, TLS Encryption, App Security</div>
+                                <div class="option" data-correct="false">Perimeter, DMZ, Internal, Database, Logging</div>
+                                <div class="option" data-correct="false">Prevention, Detection, Response, Recovery, Education</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="checkQuiz(2)">Submit Quiz 2</button>
+                        <button class="btn btn-secondary" onclick="resetQuiz(2)">Reset</button>
+                        <div id="score-2" class="score-display" style="display: none;"></div>
+                    </div>
+
+                    <!-- Quiz 3: VPN & DevOps -->
+                    <div class="quiz-container">
+                        <h3 style="color: #667eea; margin-bottom: 20px;">Quiz 3: VPN Technologies & DevOps Practices</h3>
+                        
+                        <div class="question" data-quiz="3" data-question="1">
+                            <div class="question-text">1. What protocol does Firezone use for VPN connections?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">OpenVPN</div>
+                                <div class="option" data-correct="false">IPsec</div>
+                                <div class="option" data-correct="true">WireGuard</div>
+                                <div class="option" data-correct="false">L2TP</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="2">
+                            <div class="question-text">2. What is a key advantage of WireGuard over traditional VPN protocols?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It uses more encryption layers</div>
+                                <div class="option" data-correct="true">Simpler codebase (~4,000 lines) makes it easier to audit for security</div>
+                                <div class="option" data-correct="false">It works without any configuration</div>
+                                <div class="option" data-correct="false">It doesn't require user authentication</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="3">
+                            <div class="question-text">3. In Firezone, what is the purpose of "Resources"?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To monitor CPU and memory usage</div>
+                                <div class="option" data-correct="true">To define which internal services users can access through the VPN</div>
+                                <div class="option" data-correct="false">To allocate IP addresses</div>
+                                <div class="option" data-correct="false">To manage billing and quotas</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="4">
+                            <div class="question-text">4. What port does Jenkins use by default?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">80</div>
+                                <div class="option" data-correct="false">443</div>
+                                <div class="option" data-correct="true">8080</div>
+                                <div class="option" data-correct="false">22</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="5">
+                            <div class="question-text">5. Why use Nginx as a reverse proxy in front of Jenkins?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Jenkins doesn't support HTTP</div>
+                                <div class="option" data-correct="true">For TLS termination, better performance, and security hardening</div>
+                                <div class="option" data-correct="false">To reduce server costs</div>
+                                <div class="option" data-correct="false">It's required by GCP</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="6">
+                            <div class="question-text">6. What is the benefit of "double encryption" in this architecture?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It doubles the encryption speed</div>
+                                <div class="option" data-correct="true">VPN encryption + TLS encryption provides defense in depth</div>
+                                <div class="option" data-correct="false">It's required for compliance</div>
+                                <div class="option" data-correct="false">It reduces certificate management complexity</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="7">
+                            <div class="question-text">7. What is Infrastructure as Code (IaC)?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Writing application code that runs on infrastructure</div>
+                                <div class="option" data-correct="true">Managing infrastructure through machine-readable definition files</div>
+                                <div class="option" data-correct="false">Encrypting infrastructure configurations</div>
+                                <div class="option" data-correct="false">Converting infrastructure diagrams to code</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="8">
+                            <div class="question-text">8. What is the main advantage of using Terraform over manual GCP Console configuration?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It's faster to deploy</div>
+                                <div class="option" data-correct="true">Version control, repeatability, and automation</div>
+                                <div class="option" data-correct="false">It's required for production environments</div>
+                                <div class="option" data-correct="false">It reduces cloud costs</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="9">
+                            <div class="question-text">9. In a CI/CD pipeline, what is the primary role of Jenkins?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To host the production application</div>
+                                <div class="option" data-correct="true">To automate building, testing, and deploying code</div>
+                                <div class="option" data-correct="false">To store source code</div>
+                                <div class="option" data-correct="false">To manage user authentication</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="10">
+                            <div class="question-text">10. What is the estimated monthly cost of running the complete infrastructure?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">$30-40</div>
+                                <div class="option" data-correct="false">$50-60</div>
+                                <div class="option" data-correct="true">$90-100</div>
+                                <div class="option" data-correct="false">$150-160</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="11">
+                            <div class="question-text">11. What happens when you lose the Root CA private key?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">You can regenerate it from the certificate</div>
+                                <div class="option" data-correct="false">Only new certificates will be affected</div>
+                                <div class="option" data-correct="true">You must create a new PKI infrastructure from scratch</div>
+                                <div class="option" data-correct="false">You can request a replacement from a public CA</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="12">
+                            <div class="question-text">12. Why is logging and monitoring important in production infrastructure?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">It's required by cloud providers</div>
+                                <div class="option" data-correct="false">To increase infrastructure costs</div>
+                                <div class="option" data-correct="true">For troubleshooting, security auditing, and compliance</div>
+                                <div class="option" data-correct="false">To improve application performance</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="13">
+                            <div class="question-text">13. What is the purpose of resource tagging in cloud infrastructure?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">To improve network performance</div>
+                                <div class="option" data-correct="true">For cost tracking, organization, and automation</div>
+                                <div class="option" data-correct="false">To enable encryption</div>
+                                <div class="option" data-correct="false">To satisfy GCP requirements</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="14">
+                            <div class="question-text">14. In a zero-trust architecture, what principle is most important?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Trust all internal network traffic</div>
+                                <div class="option" data-correct="true">Never trust, always verify - even internal traffic</div>
+                                <div class="option" data-correct="false">Use the strongest encryption available</div>
+                                <div class="option" data-correct="false">Minimize the number of firewalls</div>
+                            </div>
+                        </div>
+
+                        <div class="question" data-quiz="3" data-question="15">
+                            <div class="question-text">15. What is the recommended practice for managing secrets in Terraform?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">Store them in terraform.tfvars and commit to Git</div>
+                                <div class="option" data-correct="false">Hardcode them in the Terraform files</div>
+                                <div class="option" data-correct="true">Use environment variables or secret management services (Vault, GCP Secret Manager)</div>
+                                <div class="option" data-correct="false">Share them via email with the team</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="checkQuiz(3)">Submit Quiz 3</button>
+                        <button class="btn btn-secondary" onclick="resetQuiz(3)">Reset</button>
+                        <div id="score-3" class="score-display" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Concepts Tab -->
+            <div id="concepts" class="tab-content">
+                <div class="section">
+                    <h2>Visual Concept Maps</h2>
+                    <p>Interactive visual guides to understand complex topics and their relationships.</p>
+
+                    <!-- Concept Map 1: Architecture Overview -->
+                    <div class="concept-map">
+                        <h3 style="color: #667eea; text-align: center; margin-bottom: 30px;">Architecture Components & Flow</h3>
+                        
+                        <div style="text-align: center; margin: 20px 0;">
+                            <div class="concept-node">👤 Remote User</div>
+                            <div class="concept-connection">↓ Connects via WireGuard protocol</div>
+                            <div class="concept-node">🔐 Firezone VPN Gateway (10.0.0.0/16)</div>
+                            <div class="concept-connection">↓ VPC Peering (Private Network)</div>
+                            <div class="concept-node">⚖️ Internal Load Balancer (10.10.0.0/16)</div>
+                            <div class="concept-connection">↓ Health checks on port 8080</div>
+                            <div class="concept-node">🔒 Nginx Reverse Proxy (Port 443)</div>
+                            <div class="concept-connection">↓ TLS termination, proxies to localhost:8080</div>
+                            <div class="concept-node">⚙️ Jenkins CI/CD (Port 8080)</div>
+                        </div>
+
+                        <h4 style="color: #764ba2; margin-top: 40px;">Key Relationships:</h4>
+                        <ul>
+                            <li><strong>VPN Gateway ↔ Jenkins Network:</strong> Connected via VPC peering for private communication</li>
+                            <li><strong>Load Balancer:</strong> Provides stable IP, health monitoring, and future scalability</li>
+                            <li><strong>Nginx:</strong> Handles TLS/SSL, security headers, and acts as reverse proxy</li>
+                            <li><strong>No Internet Access:</strong> Jenkins VM has no public IP and no Cloud NAT</li>
+                        </ul>
+                    </div>
+
+                    <!-- Concept Map 2: Security Layers -->
+                    <div class="concept-map">
+                        <h3 style="color: #667eea; text-align: center; margin-bottom: 30px;">Defense in Depth - 5 Security Layers</h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                                <h4>Layer 1: Network Isolation</h4>
+                                <p style="margin-top: 10px; line-height: 1.6;">
+                                    • No public IPs<br>
+                                    • No Cloud NAT<br>
+                                    • Private VPC networks<br>
+                                    • Separate projects
+                                </p>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                                <h4>Layer 2: VPN Authentication</h4>
+                                <p style="margin-top: 10px; line-height: 1.6;">
+                                    • WireGuard encryption<br>
+                                    • User authentication<br>
+                                    • Resource-based access<br>
+                                    • Modern cryptography
+                                </p>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                                <h4>Layer 3: Firewall Rules</h4>
+                                <p style="margin-top: 10px; line-height: 1.6;">
+                                    • GCP firewall rules<br>
+                                    • Least privilege access<br>
+                                    • Specific port/CIDR rules<br>
+                                    • Deny-all default
+                                </p>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                                <h4>Layer 4: TLS Encryption</h4>
+                                <p style="margin-top: 10px; line-height: 1.6;">
+                                    • HTTPS with PKI certs<br>
+                                    • 3-tier certificate chain<br>
+                                    • TLS 1.2/1.3 only<br>
+                                    • Security headers
+                                </p>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                                <h4>Layer 5: Application Security</h4>
+                                <p style="margin-top: 10px; line-height: 1.6;">
+                                    • Jenkins authentication<br>
+                                    • Role-based access (RBAC)<br>
+                                    • Security plugins<br>
+                                    • Audit logging
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-success" style="margin-top: 20px;">
+                            <strong>🛡️ Defense in Depth:</strong> Even if one layer is breached, multiple additional layers protect the infrastructure. This is why the architecture is so secure.
+                        </div>
+                    </div>
+
+                    <!-- Concept Map 3: PKI Certificate Chain -->
+                    <div class="concept-map">
+                        <h3 style="color: #667eea; text-align: center; margin-bottom: 30px;">PKI Certificate Chain & Trust Model</h3>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <div style="display: inline-block; text-align: left;">
+                                <div style="background: #721c24; color: white; padding: 20px; border-radius: 8px; margin: 10px;">
+                                    <strong>🔐 Root CA (Self-Signed)</strong><br>
+                                    <small>
+                                        • 4096-bit RSA<br>
+                                        • 10-year validity<br>
+                                        • Kept offline in production<br>
+                                        • Foundation of trust
+                                    </small>
+                                </div>
+                                <div style="text-align: center; color: #666; font-size: 2em;">↓ Signs</div>
+                                <div style="background: #856404; color: white; padding: 20px; border-radius: 8px; margin: 10px;">
+                                    <strong>🔒 Intermediate CA</strong><br>
+                                    <small>
+                                        • 4096-bit RSA<br>
+                                        • 5-year validity<br>
+                                        • Used for day-to-day signing<br>
+                                        • Can be rotated if compromised
+                                    </small>
+                                </div>
+                                <div style="text-align: center; color: #666; font-size: 2em;">↓ Signs</div>
+                                <div style="background: #155724; color: white; padding: 20px; border-radius: 8px; margin: 10px;">
+                                    <strong>🌐 Server Certificate</strong><br>
+                                    <small>
+                                        • 2048-bit RSA<br>
+                                        • 1-year validity<br>
+                                        • Contains SAN entries<br>
+                                        • Installed on Nginx
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 style="color: #764ba2; margin-top: 30px;">Trust Validation Flow:</h4>
+                        <ol style="line-height: 2;">
+                            <li>Browser receives server certificate from Nginx</li>
+                            <li>Verifies server cert was signed by Intermediate CA</li>
+                            <li>Verifies Intermediate CA was signed by Root CA</li>
+                            <li>Checks if Root CA is in trusted store (manually installed)</li>
+                            <li>If chain validates: 🔒 Connection trusted, HTTPS lock shown</li>
+                        </ol>
+
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Critical:</strong> If any certificate in the chain expires or is revoked, the entire chain becomes invalid!
+                        </div>
+                    </div>
+
+                    <!-- Concept Map 4: Cost Breakdown -->
+                    <div class="concept-map">
+                        <h3 style="color: #667eea; text-align: center; margin-bottom: 30px;">Infrastructure Cost Analysis</h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #667eea;">
+                                <h4 style="color: #667eea;">Firezone Gateway</h4>
+                                <div style="font-size: 2em; font-weight: bold; color: #333;">$24/mo</div>
+                                <small>e2-medium instance</small>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #667eea;">
+                                <h4 style="color: #667eea;">Jenkins VM</h4>
+                                <div style="font-size: 2em; font-weight: bold; color: #333;">$49/mo</div>
+                                <small>n1-standard-2 instance</small>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #667eea;">
+                                <h4 style="color: #667eea;">Load Balancer</h4>
+                                <div style="font-size: 2em; font-weight: bold; color: #333;">$18/mo</div>
+                                <small>Internal LB</small>
+                            </div>
+                            
+                            <div style="background: #d4edda; padding: 20px; border-radius: 8px; border-left: 5px solid #28a745;">
+                                <h4 style="color: #155724;">Total Monthly</h4>
+                                <div style="font-size: 2em; font-weight: bold; color: #155724;">$91/mo</div>
+                                <small>~$1,092/year</small>
+                            </div>
+                        </div>
+
+                        <h4 style="color: #764ba2; margin-top: 30px;">Cost Optimization Strategies:</h4>
+                        <ul>
+                            <li><strong>No Cloud NAT:</strong> Saves $45/month ($540/year)</li>
+                            <li><strong>Use terraform destroy:</strong> Delete when not needed</li>
+                            <li><strong>Scheduled shutdown:</strong> Stop VMs during off-hours</li>
+                            <li><strong>Committed use discounts:</strong> Save 37% with 1-year commitment</li>
+                            <li><strong>Right-sizing:</strong> Adjust instance sizes based on actual usage</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <strong>💡 Pro Tip:</strong> For learning/testing, run infrastructure only when needed. A full deploy/test/destroy cycle takes about 30 minutes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Tab -->
+            <div id="projects" class="tab-content">
+                <div class="section">
+                    <h2>Project-Based Learning Activities</h2>
+                    <p>Real-world scenarios to apply your knowledge and build practical skills.</p>
+
+                    <!-- Project 1 -->
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-title">Project 1: Deploy the Complete Infrastructure</div>
+                            <span class="duration">⏱️ 6-8 hours</span>
+                        </div>
+                        
+                        <div class="project-section">
+                            <h4>Objective</h4>
+                            <p>Deploy the complete GCP VPN infrastructure from scratch, documenting every step and decision.</p>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Tasks</h4>
+                            <ul class="checklist">
+                                <li>Set up two GCP projects with appropriate permissions</li>
+                                <li>Configure Terraform and deploy VPC networks</li>
+                                <li>Implement VPC peering between projects</li>
+                                <li>Deploy Firezone VPN gateway</li>
+                                <li>Deploy Jenkins VM (air-gapped)</li>
+                                <li>Configure Internal Load Balancer</li>
+                                <li>Create complete PKI certificate chain</li>
+                                <li>Configure Nginx with TLS</li>
+                                <li>Set up firewall rules</li>
+                                <li>Test and verify complete system</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Deliverables</h4>
+                            <ol>
+                                <li><strong>Infrastructure Documentation:</strong> Complete architecture diagram with all components labeled</li>
+                                <li><strong>Configuration Files:</strong> All Terraform files, Nginx configs, and PKI certificates</li>
+                                <li><strong>Test Results:</strong> Screenshots and logs proving system functionality</li>
+                                <li><strong>Cost Analysis:</strong> Breakdown of actual costs incurred during project</li>
+                                <li><strong>Lessons Learned:</strong> Document challenges faced and how you solved them</li>
+                            </ol>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Success Criteria</h4>
+                            <ul>
+                                <li>✅ All infrastructure deployed without errors</li>
+                                <li>✅ Jenkins accessible only via VPN with HTTPS</li>
+                                <li>✅ Certificate chain validates correctly</li>
+                                <li>✅ No internet access from Jenkins VM verified</li>
+                                <li>✅ Complete documentation provided</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Remember:</strong> Use terraform destroy after testing to avoid ongoing costs. Take screenshots before destroying!
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-title">Project 2: Security Hardening & Penetration Testing</div>
+                            <span class="duration">⏱️ 4-6 hours</span>
+                        </div>
+                        
+                        <div class="project-section">
+                            <h4>Objective</h4>
+                            <p>Analyze the infrastructure for security vulnerabilities and implement additional hardening measures.</p>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Tasks</h4>
+                            <ol>
+                                <li>Conduct security audit of firewall rules</li>
+                                <li>Test for unauthorized access paths</li>
+                                <li>Analyze TLS configuration for weaknesses</li>
+                                <li>Review Jenkins security plugins and settings</li>
+                                <li>Implement additional security headers</li>
+                                <li>Set up intrusion detection (optional)</li>
+                                <li>Configure comprehensive logging</li>
+                                <li>Create incident response playbook</li>
+                            </ol>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Testing Scenarios</h4>
+                            <ul>
+                                <li>Attempt to access Jenkins without VPN connection</li>
+                                <li>Try to bypass Nginx and access Jenkins directly</li>
+                                <li>Test certificate validation with various clients</li>
+                                <li>Analyze firewall logs for blocked attempts</li>
+                                <li>Verify egress filtering (no outbound internet)</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Deliverables</h4>
+                            <ul>
+                                <li><strong>Security Audit Report:</strong> Comprehensive analysis of current security posture</li>
+                                <li><strong>Penetration Test Results:</strong> Document all attack vectors tested</li>
+                                <li><strong>Hardening Recommendations:</strong> Prioritized list of improvements</li>
+                                <li><strong>Implementation Guide:</strong> Step-by-step guide for recommended changes</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 -->
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-title">Project 3: Multi-Environment Setup with Terraform Workspaces</div>
+                            <span class="duration">⏱️ 5-7 hours</span>
+                        </div>
+                        
+                        <div class="project-section">
+                            <h4>Objective</h4>
+                            <p>Extend the infrastructure to support multiple environments (dev, staging, prod) using Terraform workspaces and modules.</p>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Requirements</h4>
+                            <ul>
+                                <li>Create three environments: development, staging, production</li>
+                                <li>Each environment has separate VPCs and resources</li>
+                                <li>Development uses smaller/cheaper instances</li>
+                                <li>Production has additional redundancy and monitoring</li>
+                                <li>Separate PKI infrastructure for each environment</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Tasks</h4>
+                            <ol>
+                                <li>Refactor Terraform code into reusable modules</li>
+                                <li>Create workspace-specific variable files</li>
+                                <li>Implement environment-specific naming conventions</li>
+                                <li>Deploy dev environment and verify</li>
+                                <li>Deploy staging environment</li>
+                                <li>Deploy production with enhanced features</li>
+                                <li>Create promotion pipeline (dev → staging → prod)</li>
+                                <li>Document environment differences and use cases</li>
+                            </ol>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Advanced Features</h4>
+                            <ul>
+                                <li>Implement remote state backend with locking</li>
+                                <li>Add automated backup strategies</li>
+                                <li>Configure environment-specific monitoring</li>
+                                <li>Set up automated testing for infrastructure changes</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Project 4 -->
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-title">Project 4: Build a Complete CI/CD Pipeline</div>
+                            <span class="duration">⏱️ 8-10 hours</span>
+                        </div>
+                        
+                        <div class="project-section">
+                            <h4>Objective</h4>
+                            <p>Create a functional CI/CD pipeline in Jenkins that builds, tests, and deploys a sample application.</p>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Pipeline Stages</h4>
+                            <ol>
+                                <li><strong>Source:</strong> Pull code from Git repository</li>
+                                <li><strong>Build:</strong> Compile application (choose your language)</li>
+                                <li><strong>Test:</strong> Run automated unit and integration tests</li>
+                                <li><strong>Security Scan:</strong> Static code analysis and vulnerability scanning</li>
+                                <li><strong>Package:</strong> Create container image or deployment package</li>
+                                <li><strong>Deploy:</strong> Deploy to test environment (within VPN)</li>
+                                <li><strong>Verify:</strong> Automated smoke tests</li>
+                                <li><strong>Notify:</strong> Send notifications on success/failure</li>
+                            </ol>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Sample Application Ideas</h4>
+                            <ul>
+                                <li>Simple REST API (Node.js, Python Flask, or Java Spring Boot)</li>
+                                <li>Static website generator (Hugo, Jekyll)</li>
+                                <li>Microservice with database</li>
+                                <li>Infrastructure as Code validation pipeline</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Deliverables</h4>
+                            <ul>
+                                <li><strong>Jenkinsfile:</strong> Complete pipeline as code</li>
+                                <li><strong>Application Code:</strong> Sample app with tests</li>
+                                <li><strong>Pipeline Documentation:</strong> Explain each stage and decisions</li>
+                                <li><strong>Demo Video:</strong> Screen recording of pipeline execution</li>
+                                <li><strong>Metrics Report:</strong> Build times, test coverage, success rates</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Project 5 -->
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-title">Project 5: Disaster Recovery & High Availability</div>
+                            <span class="duration">⏱️ 6-8 hours</span>
+                        </div>
+                        
+                        <div class="project-section">
+                            <h4>Objective</h4>
+                            <p>Design and implement disaster recovery procedures and high availability enhancements.</p>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Tasks</h4>
+                            <ul class="checklist">
+                                <li>Create automated backup scripts for Jenkins configuration</li>
+                                <li>Implement PKI certificate backup and rotation procedures</li>
+                                <li>Design multi-region failover architecture</li>
+                                <li>Create infrastructure recovery runbooks</li>
+                                <li>Set up monitoring and alerting</li>
+                                <li>Implement automated health checks</li>
+                                <li>Test disaster recovery procedures</li>
+                                <li>Document RTO and RPO objectives</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>DR Scenarios to Test</h4>
+                            <ol>
+                                <li><strong>VM Failure:</strong> Simulate Jenkins VM crash and recover</li>
+                                <li><strong>Network Failure:</strong> Simulate VPN gateway failure</li>
+                                <li><strong>Certificate Expiry:</strong> Certificate rotation procedures</li>
+                                <li><strong>Data Loss:</strong> Restore Jenkins jobs and configurations</li>
+                                <li><strong>Region Outage:</strong> Failover to secondary region</li>
+                            </ol>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>HA Enhancements</h4>
+                            <ul>
+                                <li>Deploy multiple Jenkins agents for load distribution</li>
+                                <li>Implement Jenkins configuration as code (JCasC)</li>
+                                <li>Add redundant VPN gateways</li>
+                                <li>Configure automatic backups to GCS</li>
+                                <li>Set up comprehensive monitoring dashboards</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Capstone Project -->
+                    <div class="project-card" style="border-top-color: #dc3545;">
+                        <div class="project-header">
+                            <div class="project-title">🏆 Capstone Project: Enterprise-Grade Infrastructure</div>
+                            <span class="duration">⏱️ 20-30 hours</span>
+                        </div>
+                        
+                        <div class="project-section">
+                            <h4>Objective</h4>
+                            <p>Design and implement an enterprise-grade infrastructure combining all learned concepts with additional production requirements.</p>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Requirements</h4>
+                            <ul>
+                                <li>Multi-environment setup (dev, staging, prod)</li>
+                                <li>High availability and disaster recovery</li>
+                                <li>Complete CI/CD pipeline with automated testing</li>
+                                <li>Comprehensive security hardening</li>
+                                <li>Monitoring, logging, and alerting</li>
+                                <li>Documentation and runbooks</li>
+                                <li>Cost optimization analysis</li>
+                                <li>Compliance and audit trails</li>
+                            </ul>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Additional Challenges</h4>
+                            <ol>
+                                <li>Implement infrastructure drift detection</li>
+                                <li>Create automated security scanning in CI/CD</li>
+                                <li>Set up centralized log aggregation</li>
+                                <li>Implement secrets rotation automation</li>
+                                <li>Create self-service infrastructure provisioning</li>
+                                <li>Add compliance reporting (SOC2, HIPAA, etc.)</li>
+                            </ol>
+                        </div>
+
+                        <div class="project-section">
+                            <h4>Final Deliverables</h4>
+                            <ol>
+                                <li><strong>Complete Infrastructure:</strong> Fully functional, production-ready system</li>
+                                <li><strong>Architecture Documentation:</strong> Detailed diagrams and explanations</li>
+                                <li><strong>Operations Runbooks:</strong> Procedures for common tasks and incidents</li>
+                                <li><strong>Security Assessment:</strong> Comprehensive security audit and compliance report</li>
+                                <li><strong>Cost Analysis:</strong> Detailed breakdown with optimization recommendations</li>
+                                <li><strong>Presentation:</strong> 30-minute presentation to stakeholders</li>
+                                <li><strong>Demo:</strong> Live demonstration of key capabilities</li>
+                            </ol>
+                        </div>
+
+                        <div class="alert alert-success">
+                            <strong>🎓 Certificate Ready:</strong> Completing this capstone project demonstrates enterprise-level DevOps and cloud infrastructure skills.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Tab -->
+            <div id="resources" class="tab-content">
+                <div class="section">
+                    <h2>Learning Resources & References</h2>
+                    
+                    <h3 style="color: #667eea;">Official Documentation</h3>
+                    <a href="https://github.com/suraj-learning3427/GCP-VPN-Project" class="resource-link" target="_blank">
+                        <strong>📁 GitHub Repository</strong><br>
+                        Complete source code and documentation
+                    </a>
+                    <a href="https://cloud.google.com/docs" class="resource-link" target="_blank">
+                        <strong>☁️ Google Cloud Documentation</strong><br>
+                        Official GCP documentation and guides
+                    </a>
+                    <a href="https://www.terraform.io/docs" class="resource-link" target="_blank">
+                        <strong>🏗️ Terraform Documentation</strong><br>
+                        Learn Infrastructure as Code with Terraform
+                    </a>
+                    <a href="https://www.firezone.dev/docs" class="resource-link" target="_blank">
+                        <strong>🔐 Firezone Documentation</strong><br>
+                        VPN configuration and best practices
+                    </a>
+
+                    <h3 style="color: #667eea; margin-top: 40px;">Key Project Documents</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                        <div class="resource-link">
+                            <strong>📊 Architecture Diagrams</strong><br>
+                            <small>architecture-diagrams.html</small>
+                        </div>
+                        <div class="resource-link">
+                            <strong>📖 Complete Documentation</strong><br>
+                            <small>documentation.html</small>
+                        </div>
+                        <div class="resource-link">
+                            <strong>🔒 PKI Certificate Guide</strong><br>
+                            <small>PKI-CERTIFICATE-CHAIN-GUIDE.md</small>
+                        </div>
+                        <div class="resource-link">
+                            <strong>🔐 HTTPS Setup Guide</strong><br>
+                            <small>HTTPS-SETUP-GUIDE.md</small>
+                        </div>
+                        <div class="resource-link">
+                            <strong>📝 Quick Reference Card</strong><br>
+                            <small>QUICK-REFERENCE-CARD.md</small>
+                        </div>
+                        <div class="resource-link">
+                            <strong>✅ Deployment Checklist</strong><br>
+                            <small>CHECKLIST.md</small>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #667eea; margin-top: 40px;">Additional Learning</h3>
+                    <a href="https://www.wireguard.com/" class="resource-link" target="_blank">
+                        <strong>🔐 WireGuard</strong><br>
+                        Learn about modern VPN technology
+                    </a>
+                    <a href="https://nginx.org/en/docs/" class="resource-link" target="_blank">
+                        <strong>🌐 Nginx Documentation</strong><br>
+                        Web server and reverse proxy configuration
+                    </a>
+                    <a href="https://www.jenkins.io/doc/" class="resource-link" target="_blank">
+                        <strong>⚙️ Jenkins Documentation</strong><br>
+                        CI/CD automation and best practices
+                    </a>
+                    <a href="https://www.openssl.org/docs/" class="resource-link" target="_blank">
+                        <strong>🔒 OpenSSL Documentation</strong><br>
+                        PKI and certificate management
+                    </a>
+
+                    <h3 style="color: #667eea; margin-top: 40px;">Books & Courses (Recommended)</h3>
+                    <div class="lab-content">
+                        <ul>
+                            <li><strong>"Terraform: Up & Running" by Yevgeniy Brikman</strong> - Comprehensive guide to Infrastructure as Code</li>
+                            <li><strong>"Site Reliability Engineering" by Google</strong> - Production-grade infrastructure practices</li>
+                            <li><strong>"The Phoenix Project"</strong> - DevOps principles in practice</li>
+                            <li><strong>Google Cloud Certified Professional Cloud Architect</strong> - Official certification path</li>
+                            <li><strong>HashiCorp Certified: Terraform Associate</strong> - Terraform certification</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="color: #667eea; margin-top: 40px;">Community & Support</h3>
+                    <div class="alert alert-info">
+                        <strong>💬 Questions or Issues?</strong><br>
+                        Open an issue on the GitHub repository or join relevant DevOps/GCP communities for assistance.
+                    </div>
+
+                    <h3 style="color: #667eea; margin-top: 40px;">Tags & Topics</h3>
+                    <div>
+                        <span class="tag">GCP</span>
+                        <span class="tag">Terraform</span>
+                        <span class="tag">VPN</span>
+                        <span class="tag">WireGuard</span>
+                        <span class="tag">Jenkins</span>
+                        <span class="tag">CI/CD</span>
+                        <span class="tag">PKI</span>
+                        <span class="tag">TLS/SSL</span>
+                        <span class="tag">Security</span>
+                        <span class="tag">Infrastructure as Code</span>
+                        <span class="tag">DevOps</span>
+                        <span class="tag">Cloud Architecture</span>
+                        <span class="tag">Air-Gapped</span>
+                        <span class="tag">Nginx</span>
+                        <span class="tag">Networking</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab navigation
+        function showTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Quiz functionality
+        function checkQuiz(quizNumber) {
+            const questions = document.querySelectorAll(`[data-quiz="${quizNumber}"]`);
+            let correct = 0;
+            let total = questions.length;
+            
+            questions.forEach(question => {
+                const options = question.querySelectorAll('.option');
+                let answered = false;
+                let isCorrect = false;
+                
+                options.forEach(option => {
+                    if (option.classList.contains('selected')) {
+                        answered = true;
+                        if (option.dataset.correct === 'true') {
+                            option.classList.add('correct');
+                            isCorrect = true;
+                        } else {
+                            option.classList.add('incorrect');
+                        }
+                    } else if (option.dataset.correct === 'true') {
+                        option.style.border = '2px solid #28a745';
+                    }
+                });
+                
+                if (isCorrect) correct++;
+            });
+            
+            const score = Math.round((correct / total) * 100);
+            const scoreDisplay = document.getElementById(`score-${quizNumber}`);
+            scoreDisplay.style.display = 'block';
+            scoreDisplay.innerHTML = `Score: ${correct}/${total} (${score}%)`;
+            
+            if (score >= 80) {
+                scoreDisplay.style.background = '#d4edda';
+                scoreDisplay.style.color = '#155724';
+            } else if (score >= 60) {
+                scoreDisplay.style.background = '#fff3cd';
+                scoreDisplay.style.color = '#856404';
+            } else {
+                scoreDisplay.style.background = '#f8d7da';
+                scoreDisplay.style.color = '#721c24';
+            }
+        }
+
+        function resetQuiz(quizNumber) {
+            const questions = document.querySelectorAll(`[data-quiz="${quizNumber}"]`);
+            questions.forEach(question => {
+                const options = question.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.classList.remove('selected', 'correct', 'incorrect');
+                    option.style.border = '2px solid #dee2e6';
+                });
+            });
+            
+            const scoreDisplay = document.getElementById(`score-${quizNumber}`);
+            scoreDisplay.style.display = 'none';
+        }
+
+        // Option selection
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option')) {
+                const question = e.target.closest('.question');
+                const options = question.querySelectorAll('.option');
+                
+                // Remove previous selection
+                options.forEach(opt => opt.classList.remove('selected'));
+                
+                // Add selection to clicked option
+                e.target.classList.add('selected');
+            }
+        });
+
+        // Smooth scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

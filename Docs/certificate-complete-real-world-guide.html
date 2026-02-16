@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSL/TLS Certificates - Complete Real-World Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@400;600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-elevated: #1c2128;
+            --accent-green: #2ea043;
+            --accent-blue: #1f6feb;
+            --accent-orange: #fb8500;
+            --accent-purple: #8957e5;
+            --accent-red: #f85149;
+            --text-primary: #e6edf3;
+            --text-secondary: #8d96a0;
+            --border: #30363d;
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(46, 160, 67, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(31, 111, 235, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(251, 133, 0, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: bgPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 5%;
+            z-index: 1000;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-green);
+        }
+
+        .hero {
+            padding: 6rem 5% 4rem;
+            text-align: center;
+            animation: fadeIn 1s ease 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .difficulty-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 2px solid;
+        }
+
+        .badge-beginner { border-color: var(--success); color: var(--success); background: rgba(63, 185, 80, 0.1); }
+        .badge-intermediate { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(31, 111, 235, 0.1); }
+        .badge-advanced { border-color: var(--accent-orange); color: var(--accent-orange); background: rgba(251, 133, 0, 0.1); }
+        .badge-expert { border-color: var(--accent-purple); color: var(--accent-purple); background: rgba(137, 87, 229, 0.1); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .section {
+            margin-bottom: 5rem;
+            animation: fadeIn 1s ease both;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            flex: 1;
+        }
+
+        .section-level {
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(46, 160, 67, 0.15);
+        }
+
+        .content-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-green);
+        }
+
+        .content-card h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem;
+            color: var(--accent-blue);
+        }
+
+        .content-card p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .content-card strong {
+            color: var(--text-primary);
+        }
+
+        .content-card ol, .content-card ul {
+            margin-left: 2rem;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+
+        .flowchart {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .flow-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--accent-blue);
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            min-width: 600px;
+        }
+
+        .flow-box {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            min-width: 250px;
+            text-align: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            animation: flowPulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .flow-box small {
+            display: block;
+            margin-top: 0.5rem;
+            font-family: 'Lora', serif;
+            font-weight: 400;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        @keyframes flowPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(46, 160, 67, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(46, 160, 67, 0.6); }
+        }
+
+        .flow-box.blue { border-color: var(--accent-blue); }
+        .flow-box.orange { border-color: var(--accent-orange); }
+        .flow-box.purple { border-color: var(--accent-purple); }
+        .flow-box.red { border-color: var(--accent-red); }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--accent-green);
+            animation: arrowBounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes arrowBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .key-points {
+            background: linear-gradient(135deg, rgba(46, 160, 67, 0.1), rgba(31, 111, 235, 0.1));
+            border-left: 4px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .key-points h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-green);
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            padding: 0.8rem 0 0.8rem 2rem;
+            position: relative;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        .key-points li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .warning-box {
+            background: rgba(251, 133, 0, 0.1);
+            border: 2px solid var(--accent-orange);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .info-box {
+            background: rgba(31, 111, 235, 0.1);
+            border: 2px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .success-box {
+            background: rgba(46, 160, 67, 0.1);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .warning-icon, .info-icon, .success-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .warning-box p, .info-box p, .success-box p {
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .code-block {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-label {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+
+        pre {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        code {
+            font-family: 'IBM Plex Mono', monospace;
+            background: rgba(46, 160, 67, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--accent-green);
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .comparison-table {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: var(--bg-elevated);
+            padding: 1.2rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .visual-diagram {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .diagram-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--accent-purple);
+        }
+
+        .diagram-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .diagram-item {
+            flex: 1;
+            min-width: 150px;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .diagram-item:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-green);
+        }
+
+        .diagram-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .diagram-label {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .diagram-arrow {
+            font-size: 2rem;
+            color: var(--accent-green);
+        }
+
+        .interactive-question {
+            background: linear-gradient(135deg, rgba(31, 111, 235, 0.1), rgba(137, 87, 229, 0.1));
+            border: 2px dashed var(--accent-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .question-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-blue);
+        }
+
+        .answer-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .answer-box.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .reveal-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .reveal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(31, 111, 235, 0.4);
+        }
+
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-card);
+            z-index: 9999;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .cert-chain-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 2rem;
+            background: var(--bg-elevated);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .cert-level {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: transform 0.3s;
+        }
+
+        .cert-level:hover {
+            transform: translateX(10px);
+        }
+
+        .cert-level.root { border-color: var(--accent-red); }
+        .cert-level.intermediate { border-color: var(--accent-orange); }
+        .cert-level.leaf { border-color: var(--accent-green); }
+
+        .cert-icon {
+            font-size: 2.5rem;
+        }
+
+        .cert-info h5 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .cert-info p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .real-world-example {
+            background: linear-gradient(135deg, rgba(46, 160, 67, 0.15), rgba(31, 111, 235, 0.15));
+            border: 2px solid var(--accent-green);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+        }
+
+        .real-world-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .split-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .flow-container {
+                min-width: auto;
+            }
+
+            .diagram-content {
+                flex-direction: column;
+            }
+
+            .content-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .highlight-box {
+            background: var(--bg-elevated);
+            border-left: 4px solid var(--accent-purple);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-indicator">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <nav>
+        <div class="nav-content">
+            <a href="#" class="logo">🔐 CertLearn</a>
+            <ul class="nav-links">
+                <li><a href="#leaf-cert">Leaf Certificates</a></li>
+                <li><a href="#chain">Certificate Chain</a></li>
+                <li><a href="#real-world">Real World</a></li>
+                <li><a href="#practical">Practical Examples</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Understanding <span class="gradient-text">SSL/TLS Certificates</span></h1>
+        <p class="hero-subtitle">Complete guide with REAL examples from learningmyway.space - See how certificates actually work in production!</p>
+        <div class="difficulty-badges">
+            <span class="badge badge-beginner">🌱 Beginner</span>
+            <span class="badge badge-intermediate">📚 Intermediate</span>
+            <span class="badge badge-advanced">🎓 Advanced</span>
+            <span class="badge badge-expert">🚀 Expert</span>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- NEW: Leaf Certificate Section -->
+        <section class="section reveal" id="leaf-cert">
+            <div class="section-header">
+                <span class="section-icon">🍃</span>
+                <h2 class="section-title">Understanding Leaf Certificates</h2>
+                <span class="section-level badge-intermediate">Critical Concept</span>
+            </div>
+
+            <div class="content-card">
+                <h3>What is a Leaf Certificate? (End-Entity Certificate)</h3>
+                <p>A <strong>leaf certificate</strong> is the certificate that represents the actual website or server you're connecting to. It's called a "leaf" because it sits at the end of the certificate chain, like leaves on a tree branch.</p>
+
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <div>
+                        <p><strong>Analogy:</strong> Think of certificates like a family tree:</p>
+                        <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                            <li><strong>Root Certificate</strong> = Grandparent (oldest, most trusted)</li>
+                            <li><strong>Intermediate Certificate</strong> = Parent</li>
+                            <li><strong>Leaf Certificate</strong> = You (the actual website)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>Key Characteristics of Leaf Certificates:</h4>
+                <div class="key-points">
+                    <ul>
+                        <li><strong>Subject:</strong> Contains the domain name (e.g., learningmyway.space)</li>
+                        <li><strong>Cannot sign other certificates:</strong> It's at the end of the chain</li>
+                        <li><strong>Has the shortest validity period:</strong> Usually 90 days (Let's Encrypt) to 1 year</li>
+                        <li><strong>Contains your public key:</strong> Used for encryption</li>
+                        <li><strong>Signed by an Intermediate CA:</strong> Not directly by the Root CA</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flowchart">
+                <div class="flow-title">Complete Certificate Chain Hierarchy</div>
+                <div class="cert-chain-visual">
+                    <div class="cert-level root">
+                        <div class="cert-icon">👑</div>
+                        <div class="cert-info">
+                            <h5>Root CA Certificate</h5>
+                            <p><strong>Example:</strong> ISRG Root X1 (Let's Encrypt)</p>
+                            <p><strong>Trust:</strong> Pre-installed in browsers/OS</p>
+                            <p><strong>Validity:</strong> 20+ years</p>
+                            <p><strong>Purpose:</strong> Top-level trust anchor</p>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓ signs</div>
+                    <div class="cert-level intermediate">
+                        <div class="cert-icon">🔗</div>
+                        <div class="cert-info">
+                            <h5>Intermediate CA Certificate</h5>
+                            <p><strong>Example:</strong> R3 (Let's Encrypt)</p>
+                            <p><strong>Signed by:</strong> Root CA</p>
+                            <p><strong>Validity:</strong> 3-5 years</p>
+                            <p><strong>Purpose:</strong> Signs end-entity certificates, isolates root CA</p>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓ signs</div>
+                    <div class="cert-level leaf">
+                        <div class="cert-icon">🍃</div>
+                        <div class="cert-info">
+                            <h5>Leaf Certificate (End-Entity)</h5>
+                            <p><strong>Example:</strong> learningmyway.space</p>
+                            <p><strong>Signed by:</strong> Intermediate CA (R3)</p>
+                            <p><strong>Validity:</strong> 90 days</p>
+                            <p><strong>Purpose:</strong> Proves your website's identity</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Why Not Sign Directly with Root CA?</h3>
+                <p>You might wonder: why have intermediate certificates at all? Why not just have Root → Leaf?</p>
+
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reason</th>
+                                <th>Explanation</th>
+                                <th>Benefit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Security</strong></td>
+                                <td>Root CA private key stays offline in secure vault</td>
+                                <td>If intermediate is compromised, root is still safe</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Flexibility</strong></td>
+                                <td>Can revoke intermediate without touching root</td>
+                                <td>Easier to manage and rotate</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Distribution</strong></td>
+                                <td>Can have multiple intermediates for different purposes</td>
+                                <td>Better organizational structure</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Browser Trust</strong></td>
+                                <td>Updating root trust store is hard and slow</td>
+                                <td>Intermediates can be changed quickly</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="warning-box">
+                    <span class="warning-icon">🔴</span>
+                    <p><strong>Real-World Impact:</strong> If a Root CA's private key is compromised, ALL certificates issued by it become untrustworthy. Browser vendors would need to remove it from trust stores, affecting millions of websites. With intermediates, only certificates from that intermediate need to be revoked.</p>
+                </div>
+            </div>
+
+            <div class="interactive-question">
+                <div class="question-title">💡 Question: Can a leaf certificate sign another certificate?</div>
+                <button class="reveal-btn" onclick="toggleAnswer('leaf-answer')">Reveal Answer</button>
+                <div class="answer-box" id="leaf-answer">
+                    <p><strong>No!</strong> Leaf certificates cannot sign other certificates. Here's why:</p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem;">
+                        <li>The certificate's <strong>Basic Constraints</strong> extension has <code>CA:FALSE</code></li>
+                        <li>It lacks the <strong>Key Usage</strong> extension for certificate signing</li>
+                        <li>It's specifically designed as an <strong>end-entity</strong> certificate</li>
+                        <li>Attempting to use it to sign another cert would be rejected by browsers</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><strong>Think of it like:</strong> A passport (leaf cert) proves YOUR identity, but you can't use your passport to issue passports to others. Only the government (CA) can do that!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certificate Chain Deep Dive -->
+        <section class="section reveal" id="chain">
+            <div class="section-header">
+                <span class="section-icon">⛓️</span>
+                <h2 class="section-title">Certificate Chain & Trust Path</h2>
+                <span class="section-level badge-advanced">Advanced</span>
+            </div>
+
+            <div class="content-card">
+                <h3>How Certificate Validation Works</h3>
+                <p>When you visit <code>https://learningmyway.space</code>, your browser performs a complex validation:</p>
+
+                <div class="flowchart">
+                    <div class="flow-title">Certificate Chain Validation Process</div>
+                    <div class="flow-container">
+                        <div class="flow-box">
+                            🌐 Browser Receives Leaf Certificate<br>
+                            <small>Subject: learningmyway.space<br>Issued by: R3 (Intermediate CA)</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box blue">
+                            🔍 Check #1: Is it for the right domain?<br>
+                            <small>Does CN or SAN match "learningmyway.space"? ✓</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box orange">
+                            🔍 Check #2: Is it expired?<br>
+                            <small>Is current date between Valid From and Valid To? ✓</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            🔍 Check #3: Who signed this?<br>
+                            <small>Issuer: R3 (Intermediate CA)<br>Get R3's certificate...</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box blue">
+                            🔐 Verify Signature with R3's Public Key<br>
+                            <small>Decrypt signature → does hash match? ✓</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box orange">
+                            🔍 Check #4: Is R3 trusted?<br>
+                            <small>R3 is signed by ISRG Root X1<br>Get root certificate...</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            🔐 Verify R3's Signature with Root's Public Key<br>
+                            <small>Decrypt signature → does hash match? ✓</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            👑 Check #5: Is Root in Trust Store?<br>
+                            <small>ISRG Root X1 found in browser/OS trust store ✓</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box blue">
+                            🔍 Check #6: Not Revoked?<br>
+                            <small>Check OCSP or CRL → Certificate valid ✓</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            ✅ TRUST ESTABLISHED<br>
+                            <small>Show padlock 🔒 - Secure connection!</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <span class="success-icon">✓</span>
+                    <p><strong>All checks passed!</strong> This is what happens in milliseconds every time you visit a secure website. If ANY check fails, you'll see a security warning.</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>What's in Each Certificate Type?</h3>
+
+                <h4>📄 Leaf Certificate Fields:</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Example: learningmyway.space Certificate</span>
+                    </div>
+                    <pre><code>Certificate:
+    Version: 3 (0x2)
+    Serial Number: 04:7a:3f:...:b2:e9
+    
+    Signature Algorithm: sha256WithRSAEncryption
+    
+    Issuer: C=US, O=Let's Encrypt, CN=R3
+    
+    Validity:
+        Not Before: Jan 15 00:00:00 2024 GMT
+        Not After : Apr 15 23:59:59 2024 GMT
+    
+    Subject: CN=learningmyway.space
+    
+    Subject Public Key Info:
+        Public Key Algorithm: rsaEncryption
+        RSA Public-Key: (2048 bit)
+        Modulus: (2048 bit hexadecimal key)
+    
+    X509v3 Extensions:
+        X509v3 Basic Constraints: critical
+            CA:FALSE
+        X509v3 Key Usage: critical
+            Digital Signature, Key Encipherment
+        X509v3 Extended Key Usage:
+            TLS Web Server Authentication
+        X509v3 Subject Alternative Names:
+            DNS:learningmyway.space
+            DNS:www.learningmyway.space</code></pre>
+                </div>
+
+                <div class="key-points">
+                    <h4>Important Fields Explained:</h4>
+                    <ul>
+                        <li><strong>CA:FALSE</strong> - This is a leaf certificate, cannot sign others</li>
+                        <li><strong>Key Usage</strong> - What this key can be used for (encryption, signing)</li>
+                        <li><strong>Extended Key Usage</strong> - Specifically for TLS/SSL server authentication</li>
+                        <li><strong>Subject Alternative Names (SANs)</strong> - All domains covered (www and non-www)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Certificate Revocation: What if a Certificate is Compromised?</h3>
+                <p>Two main methods to check if a certificate has been revoked:</p>
+
+                <div class="split-layout">
+                    <div class="visual-diagram">
+                        <div class="diagram-icon">📋</div>
+                        <div class="diagram-label"><strong>CRL</strong><br>Certificate Revocation List</div>
+                        <p style="margin-top: 1rem; text-align: left; font-size: 0.95rem;">
+                            <strong>How it works:</strong><br>
+                            • CA publishes a list of revoked cert serial numbers<br>
+                            • Browser downloads and checks the list<br>
+                            <br>
+                            <strong>Problems:</strong><br>
+                            ❌ List can be huge (slow to download)<br>
+                            ❌ Privacy concern (reveals which sites you visit)<br>
+                            ❌ Not real-time
+                        </p>
+                    </div>
+                    <div class="visual-diagram">
+                        <div class="diagram-icon">⚡</div>
+                        <div class="diagram-label"><strong>OCSP</strong><br>Online Certificate Status Protocol</div>
+                        <p style="margin-top: 1rem; text-align: left; font-size: 0.95rem;">
+                            <strong>How it works:</strong><br>
+                            • Browser asks CA: "Is cert #12345 valid?"<br>
+                            • CA responds: "Yes" or "Revoked"<br>
+                            <br>
+                            <strong>Benefits:</strong><br>
+                            ✅ Real-time status<br>
+                            ✅ Smaller response<br>
+                            <br>
+                            <strong>Problem:</strong><br>
+                            ❌ Privacy leak (CA knows which sites you visit)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <span class="info-icon">🔒</span>
+                    <div>
+                        <p><strong>OCSP Stapling:</strong> Modern solution!</p>
+                        <p>Instead of the browser checking with the CA, the <strong>web server</strong> gets a signed OCSP response from the CA and "staples" it to the certificate during the handshake. This is:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>✅ Faster (no extra lookup)</li>
+                            <li>✅ More private (CA doesn't see your browsing)</li>
+                            <li>✅ More reliable (server caches the response)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real World Inspection -->
+        <section class="section reveal" id="real-world">
+            <div class="section-header">
+                <span class="section-icon">🌍</span>
+                <h2 class="section-title">Real-World: Inspecting Certificates</h2>
+                <span class="section-level badge-advanced">Practical</span>
+            </div>
+
+            <div class="real-world-example">
+                <div class="real-world-title">
+                    <span>🔍</span>
+                    How to Inspect learningmyway.space Certificate
+                </div>
+
+                <h4>Method 1: Using Your Browser (Easiest)</h4>
+                <ol>
+                    <li>Visit <code>https://learningmyway.space</code></li>
+                    <li>Click the <strong>🔒 padlock</strong> in the address bar</li>
+                    <li>Click <strong>"Connection is secure"</strong> or <strong>"Certificate"</strong></li>
+                    <li>Click <strong>"Certificate is valid"</strong> or <strong>"More information"</strong></li>
+                </ol>
+
+                <div class="highlight-box">
+                    <strong>What you'll see:</strong>
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                        <li>Certificate issued to: <code>learningmyway.space</code></li>
+                        <li>Issued by: Let's Encrypt (R3)</li>
+                        <li>Valid from: [Start date]</li>
+                        <li>Valid until: [End date - typically 90 days from start]</li>
+                        <li>Public key: RSA 2048 bits or ECDSA</li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 2rem;">Method 2: Using OpenSSL (Command Line)</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Terminal Command</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># View certificate details
+openssl s_client -connect learningmyway.space:443 -servername learningmyway.space &lt; /dev/null 2&gt;/dev/null | openssl x509 -noout -text
+
+# Show certificate chain
+openssl s_client -connect learningmyway.space:443 -servername learningmyway.space -showcerts &lt; /dev/null 2&gt;/dev/null
+
+# Check expiration date
+echo | openssl s_client -connect learningmyway.space:443 -servername learningmyway.space 2&gt;/dev/null | openssl x509 -noout -dates
+
+# Verify certificate chain
+openssl s_client -connect learningmyway.space:443 -servername learningmyway.space &lt; /dev/null 2&gt;/dev/null | openssl verify</code></pre>
+                </div>
+
+                <h4 style="margin-top: 2rem;">Method 3: Online Tools</h4>
+                <div class="key-points">
+                    <ul>
+                        <li><strong>SSL Labs:</strong> <code>ssllabs.com/ssltest/analyze.html?d=learningmyway.space</code></li>
+                        <li><strong>SSL Checker:</strong> Various online tools show certificate details</li>
+                        <li><strong>Certificate Transparency Logs:</strong> <code>crt.sh/?q=learningmyway.space</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Understanding Your Certificate Chain</h3>
+                <p>For <code>learningmyway.space</code>, here's the typical certificate chain:</p>
+
+                <div class="flowchart">
+                    <div class="flow-container">
+                        <div class="flow-box red">
+                            👑 <strong>Root CA</strong><br>
+                            ISRG Root X1<br>
+                            <small>Validity: 2025-2035 (20 years)<br>
+                            RSA 4096 bits<br>
+                            Pre-installed in all browsers</small>
+                        </div>
+                        <div class="flow-arrow">↓ Signs</div>
+                        <div class="flow-box orange">
+                            🔗 <strong>Intermediate CA</strong><br>
+                            R3 or R10 or R11 (Let's Encrypt)<br>
+                            <small>Validity: ~5 years<br>
+                            RSA 2048 bits or ECDSA<br>
+                            Delivered with leaf certificate</small>
+                        </div>
+                        <div class="flow-arrow">↓ Signs</div>
+                        <div class="flow-box">
+                            🍃 <strong>Leaf Certificate</strong><br>
+                            learningmyway.space<br>
+                            <small>Validity: 90 days<br>
+                            RSA 2048 bits or ECDSA P-256<br>
+                            Your actual website certificate</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <div>
+                        <p><strong>Why 90 days for Let's Encrypt?</strong></p>
+                        <p>Short validity periods are more secure because:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Compromised certificates expire quickly</li>
+                            <li>Encourages automation (less human error)</li>
+                            <li>Forces regular security checks</li>
+                            <li>Reduces impact of forgotten/abandoned sites</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practical Examples -->
+        <section class="section reveal" id="practical">
+            <div class="section-header">
+                <span class="section-icon">⚙️</span>
+                <h2 class="section-title">Practical: Setting Up Certificates</h2>
+                <span class="section-level badge-expert">Expert</span>
+            </div>
+
+            <div class="content-card">
+                <h3>How to Get a Free Certificate for learningmyway.space</h3>
+                <p>Let's walk through getting a Let's Encrypt certificate for your domain:</p>
+
+                <h4>Prerequisites:</h4>
+                <div class="key-points">
+                    <ul>
+                        <li>A server with a public IP address</li>
+                        <li>Domain (learningmyway.space) pointing to your server</li>
+                        <li>Port 80 (HTTP) and 443 (HTTPS) open</li>
+                        <li>Root/sudo access to the server</li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 2rem;">Step-by-Step: Using Certbot</h4>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">1. Install Certbot (Ubuntu/Debian)</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># Update package list
+sudo apt update
+
+# Install certbot
+sudo apt install certbot python3-certbot-nginx -y
+
+# Or for Apache:
+# sudo apt install certbot python3-certbot-apache -y</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">2. Get Certificate (Automated)</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># For Nginx (automatically configures)
+sudo certbot --nginx -d learningmyway.space -d www.learningmyway.space
+
+# For Apache
+# sudo certbot --apache -d learningmyway.space -d www.learningmyway.space
+
+# Manual method (generates files only)
+# sudo certbot certonly --standalone -d learningmyway.space -d www.learningmyway.space</code></pre>
+                </div>
+
+                <div class="info-box">
+                    <span class="info-icon">🤖</span>
+                    <div>
+                        <p><strong>What Certbot does:</strong></p>
+                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Generates a key pair (private key stays on your server)</li>
+                            <li>Creates a Certificate Signing Request (CSR)</li>
+                            <li>Proves domain ownership via HTTP-01 challenge</li>
+                            <li>Receives the certificate from Let's Encrypt</li>
+                            <li>Installs it and configures your web server</li>
+                            <li>Sets up auto-renewal</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 2rem;">Where Certificates Are Stored:</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Certificate File Locations</span>
+                    </div>
+                    <pre><code># Main certificate directory
+/etc/letsencrypt/live/learningmyway.space/
+
+# Files created:
+fullchain.pem    → Leaf cert + Intermediate cert (send to browser)
+cert.pem         → Leaf certificate only
+chain.pem        → Intermediate certificate only
+privkey.pem      → Private key (NEVER share this!)
+
+# Archive (actual files, above are symlinks)
+/etc/letsencrypt/archive/learningmyway.space/</code></pre>
+                </div>
+
+                <h4 style="margin-top: 2rem;">Auto-Renewal Setup:</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Check & Test Renewal</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># Test renewal (dry run)
+sudo certbot renew --dry-run
+
+# Certbot automatically creates a systemd timer
+# Check renewal timer status
+sudo systemctl status certbot.timer
+
+# Manual renewal (if needed)
+sudo certbot renew
+
+# Renewal happens automatically when cert is <30 days from expiry</code></pre>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Common Certificate Issues & Solutions</h3>
+
+                <h4>❌ Issue 1: "Your connection is not private" / NET::ERR_CERT_AUTHORITY_INVALID</h4>
+                <div class="highlight-box">
+                    <p><strong>Cause:</strong> Certificate chain is incomplete or not trusted</p>
+                    <p><strong>Solution:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                        <li>Make sure you're using <code>fullchain.pem</code> not <code>cert.pem</code></li>
+                        <li>Verify intermediate certificate is included</li>
+                        <li>Check: <code>openssl s_client -connect learningmyway.space:443 -showcerts</code></li>
+                    </ul>
+                </div>
+
+                <h4>❌ Issue 2: Certificate Expired</h4>
+                <div class="highlight-box">
+                    <p><strong>Cause:</strong> Certificate passed its "Valid To" date (90 days for Let's Encrypt)</p>
+                    <p><strong>Solution:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                        <li>Run: <code>sudo certbot renew</code></li>
+                        <li>Check auto-renewal timer: <code>sudo systemctl status certbot.timer</code></li>
+                        <li>Verify renewal cron job exists</li>
+                    </ul>
+                </div>
+
+                <h4>❌ Issue 3: Mixed Content (Some resources not secure)</h4>
+                <div class="highlight-box">
+                    <p><strong>Cause:</strong> HTTPS page loading HTTP resources (images, scripts, CSS)</p>
+                    <p><strong>Solution:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                        <li>Change all <code>http://</code> URLs to <code>https://</code></li>
+                        <li>Or use protocol-relative URLs: <code>//example.com/image.jpg</code></li>
+                        <li>Add CSP header: <code>Content-Security-Policy: upgrade-insecure-requests</code></li>
+                    </ul>
+                </div>
+
+                <h4>❌ Issue 4: "Subject Alternative Name Missing"</h4>
+                <div class="highlight-box">
+                    <p><strong>Cause:</strong> Certificate issued for www.learningmyway.space but accessing learningmyway.space (or vice versa)</p>
+                    <p><strong>Solution:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                        <li>Request cert for both: <code>-d learningmyway.space -d www.learningmyway.space</code></li>
+                        <li>Or use wildcard: <code>*.learningmyway.space</code> (requires DNS validation)</li>
+                    </ul>
+                </div>
+
+                <h4>❌ Issue 5: "ERR_SSL_VERSION_OR_CIPHER_MISMATCH"</h4>
+                <div class="highlight-box">
+                    <p><strong>Cause:</strong> Server and browser can't agree on encryption method</p>
+                    <p><strong>Solution:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                        <li>Update web server SSL configuration</li>
+                        <li>Enable modern cipher suites (TLS 1.2+)</li>
+                        <li>Disable old protocols (SSLv3, TLS 1.0, TLS 1.1)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Advanced: Wildcard Certificates</h3>
+                <p>If you have multiple subdomains (mail.learningmyway.space, api.learningmyway.space, blog.learningmyway.space), you can use a wildcard certificate:</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Get Wildcard Certificate</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># Wildcard requires DNS validation (not HTTP)
+sudo certbot certonly --manual --preferred-challenges dns -d "*.learningmyway.space" -d learningmyway.space
+
+# You'll be asked to add a TXT record to DNS:
+# _acme-challenge.learningmyway.space → random-string-from-certbot
+
+# After adding DNS record and verifying it propagated:
+# dig _acme-challenge.learningmyway.space TXT
+
+# Press Enter to continue validation</code></pre>
+                </div>
+
+                <div class="warning-box">
+                    <span class="warning-icon">⚠️</span>
+                    <p><strong>Important:</strong> Wildcard certs (<code>*.learningmyway.space</code>) cover subdomains but NOT the root domain. You need to request both: <code>-d "*.learningmyway.space" -d learningmyway.space</code></p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Monitoring & Best Practices</h3>
+
+                <h4>1. Certificate Expiration Monitoring</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Script to Check Expiration</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>#!/bin/bash
+# Check days until expiration
+DOMAIN="learningmyway.space"
+EXPIRY=$(echo | openssl s_client -connect $DOMAIN:443 -servername $DOMAIN 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)
+EXPIRY_EPOCH=$(date -d "$EXPIRY" +%s)
+NOW_EPOCH=$(date +%s)
+DAYS_LEFT=$(( ($EXPIRY_EPOCH - $NOW_EPOCH) / 86400 ))
+
+echo "Certificate for $DOMAIN expires in $DAYS_LEFT days"
+
+if [ $DAYS_LEFT -lt 30 ]; then
+    echo "⚠️  WARNING: Certificate expires soon!"
+fi</code></pre>
+                </div>
+
+                <h4 style="margin-top: 2rem;">2. Security Headers (Nginx)</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">/etc/nginx/sites-available/learningmyway.space</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>server {
+    listen 443 ssl http2;
+    server_name learningmyway.space www.learningmyway.space;
+
+    # Certificate files
+    ssl_certificate /etc/letsencrypt/live/learningmyway.space/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/learningmyway.space/privkey.pem;
+
+    # Modern SSL configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';
+    ssl_prefer_server_ciphers off;
+
+    # HSTS - Force HTTPS for 1 year
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+    # OCSP Stapling
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    ssl_trusted_certificate /etc/letsencrypt/live/learningmyway.space/chain.pem;
+
+    # Your website content
+    root /var/www/learningmyway.space;
+    index index.html;
+}
+
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    server_name learningmyway.space www.learningmyway.space;
+    return 301 https://$server_name$request_uri;
+}</code></pre>
+                </div>
+
+                <h4 style="margin-top: 2rem;">3. Best Practices Checklist</h4>
+                <div class="key-points">
+                    <ul>
+                        <li>✅ Use strong cipher suites (TLS 1.2+)</li>
+                        <li>✅ Enable HSTS to force HTTPS</li>
+                        <li>✅ Enable OCSP stapling for privacy</li>
+                        <li>✅ Set up auto-renewal (certbot timer)</li>
+                        <li>✅ Monitor expiration (30 days before)</li>
+                        <li>✅ Use fullchain.pem (not just cert.pem)</li>
+                        <li>✅ Protect private key (chmod 600)</li>
+                        <li>✅ Test configuration (SSL Labs)</li>
+                        <li>✅ Redirect HTTP → HTTPS</li>
+                        <li>✅ Add CAA DNS record (optional)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section reveal">
+            <div class="content-card" style="background: linear-gradient(135deg, rgba(46, 160, 67, 0.15), rgba(31, 111, 235, 0.15)); border: 2px solid var(--accent-green);">
+                <h3>🎯 Complete Certificate Knowledge Summary</h3>
+                
+                <h4>What You Now Know:</h4>
+                <div class="key-points">
+                    <ul>
+                        <li><strong>Leaf Certificates:</strong> The end-entity cert that represents your website</li>
+                        <li><strong>Certificate Chain:</strong> Root → Intermediate → Leaf hierarchy</li>
+                        <li><strong>Validation Process:</strong> How browsers verify certificates in 6 steps</li>
+                        <li><strong>Real-World Inspection:</strong> How to check learningmyway.space certificate</li>
+                        <li><strong>Practical Setup:</strong> Getting free Let's Encrypt certificates</li>
+                        <li><strong>Troubleshooting:</strong> Common issues and solutions</li>
+                        <li><strong>Best Practices:</strong> Security headers, monitoring, auto-renewal</li>
+                    </ul>
+                </div>
+
+                <div class="success-box" style="margin-top: 2rem;">
+                    <span class="success-icon">🎓</span>
+                    <div>
+                        <p><strong>You're now an expert!</strong> You understand certificates from basic concepts to production implementation. You can:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Explain how certificate chains work</li>
+                            <li>Set up HTTPS for any domain</li>
+                            <li>Troubleshoot certificate issues</li>
+                            <li>Implement security best practices</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Smooth scroll reveal
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(reveal => {
+                const windowHeight = window.innerHeight;
+                const revealTop = reveal.getBoundingClientRect().top;
+                const revealPoint = 150;
+                if (revealTop < windowHeight - revealPoint) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress-bar').style.width = scrolled + '%';
+        });
+
+        // Toggle answer
+        function toggleAnswer(id) {
+            const answerBox = document.getElementById(id);
+            answerBox.classList.toggle('show');
+            const button = event.target;
+            if (answerBox.classList.contains('show')) {
+                button.textContent = 'Hide Answer';
+                button.style.background = 'var(--accent-green)';
+            } else {
+                button.textContent = 'Reveal Answer';
+                button.style.background = 'var(--accent-blue)';
+            }
+        }
+
+        // Copy code
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Smooth scroll for anchors
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

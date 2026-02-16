@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Mastery - Complete Guide with Real-World Examples</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Courier+Prime:wght@400;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #050a1e;
+            --bg-card: #0a1128;
+            --bg-elevated: #0f1738;
+            --accent-cyan: #00d9ff;
+            --accent-electric: #7b2cbf;
+            --accent-neon: #39ff14;
+            --accent-orange: #ff6d00;
+            --accent-pink: #ff006e;
+            --text-bright: #f0f8ff;
+            --text-dim: #8892b0;
+            --border-glow: #1a2744;
+            --glow-cyan: rgba(0, 217, 255, 0.3);
+            --glow-purple: rgba(123, 44, 191, 0.3);
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-bright);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated Grid Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, var(--bg-elevated) 1px, transparent 1px) 0 0,
+                linear-gradient(180deg, var(--bg-elevated) 1px, transparent 1px) 0 0;
+            background-size: 50px 50px;
+            opacity: 0.3;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Floating particles */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, var(--glow-cyan) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, var(--glow-purple) 0%, transparent 30%),
+                radial-gradient(circle at 50% 50%, rgba(57, 255, 20, 0.1) 0%, transparent 40%);
+            z-index: -1;
+            animation: particleFloat 15s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(5, 10, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--border-glow);
+            padding: 1.2rem 5%;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 217, 255, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-electric));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px var(--glow-cyan);
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px var(--glow-cyan)); }
+            50% { filter: drop-shadow(0 0 20px var(--accent-electric)); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-cyan);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            padding: 8rem 5% 5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 7vw, 6rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-electric), var(--accent-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(30deg); }
+        }
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: var(--text-dim);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            font-family: 'Courier Prime', monospace;
+        }
+
+        .hero-domain {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: rgba(0, 217, 255, 0.1);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 10px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            box-shadow: 0 0 30px var(--glow-cyan);
+            animation: domainPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes domainPulse {
+            0%, 100% { box-shadow: 0 0 20px var(--glow-cyan); }
+            50% { box-shadow: 0 0 40px var(--glow-cyan); }
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .section {
+            margin-bottom: 6rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 3px solid var(--border-glow);
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), transparent);
+            animation: lineGrow 2s ease-in-out infinite;
+        }
+
+        @keyframes lineGrow {
+            0%, 100% { width: 200px; }
+            50% { width: 300px; }
+        }
+
+        .section-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 0 20px currentColor);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            flex: 1;
+        }
+
+        .level-badge {
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 2px solid;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-beginner { 
+            border-color: var(--accent-neon); 
+            color: var(--accent-neon); 
+            background: rgba(57, 255, 20, 0.1);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+        }
+
+        .badge-intermediate { 
+            border-color: var(--accent-cyan); 
+            color: var(--accent-cyan); 
+            background: rgba(0, 217, 255, 0.1);
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .badge-advanced { 
+            border-color: var(--accent-orange); 
+            color: var(--accent-orange); 
+            background: rgba(255, 109, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 109, 0, 0.3);
+        }
+
+        .badge-expert { 
+            border-color: var(--accent-electric); 
+            color: var(--accent-electric); 
+            background: rgba(123, 44, 191, 0.1);
+            box-shadow: 0 0 20px var(--glow-purple);
+        }
+
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.05), transparent);
+            transition: left 0.6s;
+        }
+
+        .content-card:hover::before {
+            left: 100%;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 50px rgba(0, 217, 255, 0.2);
+            border-color: var(--accent-cyan);
+        }
+
+        .content-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .content-card h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem;
+            color: var(--accent-electric);
+        }
+
+        .content-card p {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+            color: var(--text-dim);
+        }
+
+        .content-card strong {
+            color: var(--text-bright);
+            font-weight: 600;
+        }
+
+        .flowchart {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-glow);
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 2.5rem 0;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0, 217, 255, 0.05);
+        }
+
+        .flow-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .flow-box {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 15px;
+            padding: 2rem 2.5rem;
+            min-width: 300px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            position: relative;
+            box-shadow: 0 0 30px var(--glow-cyan);
+            transition: all 0.3s;
+        }
+
+        .flow-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px var(--glow-cyan);
+        }
+
+        .flow-box.purple { 
+            border-color: var(--accent-electric); 
+            box-shadow: 0 0 30px var(--glow-purple);
+        }
+
+        .flow-box.neon { 
+            border-color: var(--accent-neon); 
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.4);
+        }
+
+        .flow-box.orange { 
+            border-color: var(--accent-orange); 
+            box-shadow: 0 0 30px rgba(255, 109, 0, 0.4);
+        }
+
+        .flow-box small {
+            display: block;
+            margin-top: 1rem;
+            font-family: 'Courier Prime', monospace;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .flow-arrow {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 20px var(--glow-cyan);
+            animation: arrowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes arrowPulse {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(10px); opacity: 0.7; }
+        }
+
+        .dns-record-card {
+            background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
+            border: 2px solid var(--accent-cyan);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dns-record-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--accent-cyan);
+        }
+
+        .record-type {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .record-example {
+            background: var(--bg-deep);
+            border-left: 3px solid var(--accent-neon);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.95rem;
+        }
+
+        .code-block {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-glow);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .code-label {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-electric));
+            color: var(--text-bright);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px var(--glow-cyan);
+        }
+
+        pre {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-bright);
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier Prime', monospace;
+            background: rgba(0, 217, 255, 0.1);
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            color: var(--accent-cyan);
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(123, 44, 191, 0.1));
+            border: 2px solid var(--accent-cyan);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            box-shadow: 0 0 30px var(--glow-cyan);
+        }
+
+        .info-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(255, 109, 0, 0.1), rgba(255, 0, 110, 0.1));
+            border: 2px solid var(--accent-orange);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            box-shadow: 0 0 30px rgba(255, 109, 0, 0.3);
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), rgba(0, 217, 255, 0.1));
+            border: 2px solid var(--accent-neon);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+            border-left: 3px solid var(--accent-cyan);
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            border-radius: 15px;
+            border: 1px solid var(--border-glow);
+            transition: all 0.3s;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3.7rem;
+            top: 2rem;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            border: 4px solid var(--bg-deep);
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .timeline-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 30px var(--glow-cyan);
+        }
+
+        .timeline-time {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-glow);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .comparison-item:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 40px var(--glow-cyan);
+        }
+
+        .comparison-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 15px currentColor);
+        }
+
+        .comparison-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
+            border: 2px dashed var(--accent-electric);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2.5rem 0;
+            text-align: center;
+        }
+
+        .demo-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--accent-electric);
+        }
+
+        .demo-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 1.2rem;
+            background: var(--bg-deep);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 10px;
+            color: var(--text-bright);
+            font-family: 'Courier Prime', monospace;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .demo-input:focus {
+            outline: none;
+            box-shadow: 0 0 30px var(--glow-cyan);
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, var(--accent-electric), var(--accent-pink));
+            color: var(--text-bright);
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .demo-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px var(--glow-purple);
+        }
+
+        .demo-result {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: var(--bg-deep);
+            border-radius: 15px;
+            border: 1px solid var(--border-glow);
+            text-align: left;
+            display: none;
+        }
+
+        .demo-result.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--bg-card);
+            z-index: 9999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-electric), var(--accent-neon));
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--bg-elevated);
+        }
+
+        th {
+            padding: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-align: left;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--border-glow);
+        }
+
+        td {
+            padding: 1.5rem;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        tbody tr {
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-elevated);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .flow-box {
+                min-width: 250px;
+            }
+
+            .content-card {
+                padding: 2rem;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline {
+                padding-left: 2rem;
+            }
+        }
+
+        .key-points {
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.05), rgba(0, 217, 255, 0.05));
+            border-left: 5px solid var(--accent-neon);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 10px;
+        }
+
+        .key-points h4 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-neon);
+            margin-bottom: 1.5rem;
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            padding: 0.8rem 0 0.8rem 2.5rem;
+            position: relative;
+            color: var(--text-dim);
+        }
+
+        .key-points li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: var(--accent-neon);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <nav>
+        <div class="nav-content">
+            <a href="#" class="logo">🌐 DNS·MASTER</a>
+            <ul class="nav-links">
+                <li><a href="#basics">Basics</a></li>
+                <li><a href="#workflow">Workflow</a></li>
+                <li><a href="#records">Records</a></li>
+                <li><a href="#practical">Practical</a></li>
+                <li><a href="#expert">Expert</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1><span class="hero-gradient">DNS MASTERY</span></h1>
+        <p class="hero-subtitle">Complete real-time workflow from domain purchase to expert-level DNS management</p>
+        <div class="hero-domain">🎯 learningmyway.space</div>
+    </section>
+
+    <div class="container">
+
+        <!-- LEVEL 1: BASICS -->
+        <section class="section" id="basics">
+            <div class="section-header">
+                <span class="section-icon">🌱</span>
+                <h2 class="section-title">WHAT IS DNS?</h2>
+                <span class="level-badge badge-beginner">Beginner</span>
+            </div>
+
+            <div class="content-card">
+                <h3>DNS = The Internet's Phone Book</h3>
+                <p>Imagine you want to call your friend, but you don't remember their phone number. What do you do? You look it up in your phone's contacts!</p>
+                
+                <p><strong>DNS (Domain Name System)</strong> works exactly like that for the internet:</p>
+
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <div>
+                        <p><strong>The Problem:</strong> Computers communicate using IP addresses (like <code>192.0.2.1</code>), but humans can't remember these numbers!</p>
+                        <p style="margin-top: 1rem;"><strong>The Solution:</strong> DNS translates easy-to-remember domain names like <code>learningmyway.space</code> into IP addresses that computers understand.</p>
+                    </div>
+                </div>
+
+                <h4>Real-World Example:</h4>
+                <div class="flowchart">
+                    <div class="flow-container">
+                        <div class="flow-box neon">
+                            👤 You type: learningmyway.space
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            🔍 DNS Magic Happens<br>
+                            <small>(We'll learn the details next!)</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            🎯 DNS Returns: 192.0.2.123
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box neon">
+                            🌐 Your browser connects to 192.0.2.123<br>
+                            <small>Website loads!</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="key-points">
+                    <h4>🔑 KEY CONCEPTS:</h4>
+                    <ul>
+                        <li><strong>Domain Name:</strong> Human-friendly address (learningmyway.space)</li>
+                        <li><strong>IP Address:</strong> Computer-friendly numbers (192.0.2.123)</li>
+                        <li><strong>DNS Server:</strong> The "phone book" that does the translation</li>
+                        <li><strong>Resolution:</strong> The process of converting domain → IP</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Understanding Domain Names</h3>
+                <p>Let's break down: <code>www.learningmyway.space</code></p>
+
+                <div class="flowchart">
+                    <div class="flow-title">DOMAIN HIERARCHY</div>
+                    <div class="flow-container">
+                        <div class="flow-box orange">
+                            <strong>. (root)</strong><br>
+                            <small>The very top - usually invisible<br>
+                            Managed by: IANA (Internet Assigned Numbers Authority)</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            <strong>.space</strong> (TLD - Top Level Domain)<br>
+                            <small>Like .com, .org, .net, .space<br>
+                            Managed by: Registry operators (e.g., Radix for .space)</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            <strong>learningmyway</strong> (Second Level Domain)<br>
+                            <small>This is what you register and own!<br>
+                            Managed by: YOU (via registrar)</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box neon">
+                            <strong>www</strong> (Subdomain)<br>
+                            <small>Optional prefix you can create<br>
+                            Examples: mail, blog, api, ftp<br>
+                            Managed by: YOU (in your DNS settings)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <span class="info-icon">⚠️</span>
+                    <div>
+                        <p><strong>Important:</strong> You don't "own" a domain forever. You <strong>lease</strong> it for a period (usually 1-10 years) and must renew it. If you don't renew, someone else can register it!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: COMPLETE WORKFLOW -->
+        <section class="section" id="workflow">
+            <div class="section-header">
+                <span class="section-icon">⚡</span>
+                <h2 class="section-title">COMPLETE DNS WORKFLOW</h2>
+                <span class="level-badge badge-intermediate">Intermediate</span>
+            </div>
+
+            <div class="content-card">
+                <h3>PART 1: Buying a Domain (learningmyway.space)</h3>
+                <p>Let's walk through buying your domain step-by-step:</p>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">Step 1</div>
+                        <h4>Choose a Domain Registrar</h4>
+                        <p>Popular options:</p>
+                        <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                            <li><strong>Namecheap</strong> - Great prices, easy interface</li>
+                            <li><strong>GoDaddy</strong> - Most well-known, lots of features</li>
+                            <li><strong>Google Domains</strong> - Simple, no upsells</li>
+                            <li><strong>Cloudflare</strong> - At-cost pricing, great DNS</li>
+                            <li><strong>Name.com, Porkbun</strong> - Alternative options</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">Step 2</div>
+                        <h4>Search for Your Domain</h4>
+                        <div class="code-block">
+                            <pre><code>Search: learningmyway.space
+
+Results:
+✅ learningmyway.space - Available! $9.99/year
+❌ learningmyway.com - Taken
+✅ learningmyway.tech - Available! $12.99/year</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">Step 3</div>
+                        <h4>Add to Cart & Configure</h4>
+                        <p><strong>During checkout, you'll see options:</strong></p>
+                        <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                            <li>✅ <strong>Domain Privacy (WHOIS Protection):</strong> YES! Hides your personal info</li>
+                            <li>⚠️ <strong>Auto-renew:</strong> Recommended (prevents losing domain)</li>
+                            <li>❌ <strong>Email hosting:</strong> Optional (usually not needed initially)</li>
+                            <li>❌ <strong>Website builder:</strong> Optional (you can host elsewhere)</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">Step 4</div>
+                        <h4>What Happens Behind the Scenes</h4>
+                        <p>When you complete purchase:</p>
+                        <ol style="margin-left: 2rem; margin-top: 0.5rem;">
+                            <li>Registrar contacts the <strong>.space registry</strong></li>
+                            <li>Registry checks if domain is available</li>
+                            <li>Registry creates a database entry for your domain</li>
+                            <li>Your contact info is added to WHOIS database</li>
+                            <li>Default nameservers are assigned</li>
+                            <li>Domain is now registered to you for 1 year!</li>
+                        </ol>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">Step 5</div>
+                        <h4>You Now Have Control</h4>
+                        <p>In your registrar dashboard, you can:</p>
+                        <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                            <li>✏️ Change nameservers</li>
+                            <li>🔒 Manage domain lock (prevents unauthorized transfers)</li>
+                            <li>📧 Update contact information</li>
+                            <li>🔄 Renew or transfer domain</li>
+                            <li>⚙️ Manage DNS records (if using registrar's DNS)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>PART 2: What Happens When Someone Visits Your Site</h3>
+                <p>Complete real-time DNS resolution workflow:</p>
+
+                <div class="flowchart">
+                    <div class="flow-title">COMPLETE DNS RESOLUTION (Real-Time)</div>
+                    <div class="flow-container">
+                        <div class="flow-box neon">
+                            👤 USER TYPES: learningmyway.space<br>
+                            <small>Browser: "I need the IP address for this!"</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            💾 CHECK LOCAL CACHE<br>
+                            <small>Browser checks: "Have I visited this recently?"<br>
+                            If YES → Use cached IP (instant!)<br>
+                            If NO → Continue to next step</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            🖥️ CHECK OS CACHE<br>
+                            <small>Operating System (Windows/Mac/Linux) checks its cache<br>
+                            Location: /etc/hosts or system resolver<br>
+                            If found → Return IP<br>
+                            If not → Continue</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box orange">
+                            🔍 QUERY RECURSIVE RESOLVER<br>
+                            <small>Usually your ISP's DNS server<br>
+                            Examples: 8.8.8.8 (Google), 1.1.1.1 (Cloudflare)<br>
+                            "Hey, do you know learningmyway.space?"</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            🌍 QUERY ROOT NAMESERVER<br>
+                            <small>Recursive resolver: "Where can I find .space domains?"<br>
+                            Root server: "Ask the .space TLD nameservers!"<br>
+                            Returns: IP addresses of .space nameservers<br>
+                            There are 13 root server clusters worldwide</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box purple">
+                            🏢 QUERY TLD NAMESERVER (.space)<br>
+                            <small>Recursive resolver: "Where is learningmyway.space?"<br>
+                            TLD server: "Ask these authoritative nameservers!"<br>
+                            Returns: Your domain's nameserver addresses<br>
+                            (e.g., ns1.cloudflare.com, ns2.cloudflare.com)</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box neon">
+                            📡 QUERY AUTHORITATIVE NAMESERVER<br>
+                            <small>Recursive resolver: "What's the IP for learningmyway.space?"<br>
+                            Your nameserver: "Here it is: 192.0.2.123"<br>
+                            This is YOUR DNS server with YOUR records!</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box orange">
+                            💾 CACHE THE RESULT<br>
+                            <small>Recursive resolver saves this for future queries<br>
+                            TTL (Time To Live): Usually 300-3600 seconds<br>
+                            Next query will be instant (from cache)!</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box">
+                            📨 RETURN TO BROWSER<br>
+                            <small>Recursive resolver → OS → Browser<br>
+                            "Here's the IP: 192.0.2.123"</small>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-box neon">
+                            🌐 BROWSER CONNECTS<br>
+                            <small>HTTP/HTTPS request to 192.0.2.123<br>
+                            Website loads!<br>
+                            Total time: 20-300ms (first visit)<br>
+                            Cached: <1ms (subsequent visits)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <span class="info-icon">⚡</span>
+                    <div>
+                        <p><strong>Speed Optimization:</strong> This entire process happens in milliseconds! Caching at multiple levels ensures most DNS lookups are nearly instant. That's why your second visit to a website is always faster!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>PART 3: Nameservers Explained</h3>
+                <p><strong>Nameservers</strong> are the DNS servers that hold your domain's DNS records.</p>
+
+                <h4>Two Main Options:</h4>
+
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <div class="comparison-icon">🏢</div>
+                        <div class="comparison-title">REGISTRAR'S NAMESERVERS</div>
+                        <p style="margin-top: 1rem; color: var(--text-dim);">
+                            <strong>Example:</strong><br>
+                            ns1.namecheap.com<br>
+                            ns2.namecheap.com
+                        </p>
+                        <div class="key-points" style="margin-top: 1.5rem; text-align: left;">
+                            <ul>
+                                <li>Default option</li>
+                                <li>Manage DNS in registrar dashboard</li>
+                                <li>Good for beginners</li>
+                                <li>Basic features</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="comparison-item">
+                        <div class="comparison-icon">☁️</div>
+                        <div class="comparison-title">THIRD-PARTY NAMESERVERS</div>
+                        <p style="margin-top: 1rem; color: var(--text-dim);">
+                            <strong>Example:</strong><br>
+                            ns1.cloudflare.com<br>
+                            ns2.cloudflare.com
+                        </p>
+                        <div class="key-points" style="margin-top: 1.5rem; text-align: left;">
+                            <ul>
+                                <li>More features (CDN, DDoS protection)</li>
+                                <li>Faster global performance</li>
+                                <li>Better analytics</li>
+                                <li>Requires changing nameservers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 2rem;">How to Change Nameservers (learningmyway.space):</h4>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Example: Switching to Cloudflare</span>
+                    </div>
+                    <pre><code>1. Sign up at Cloudflare.com
+2. Add your domain: learningmyway.space
+3. Cloudflare scans your existing DNS records
+4. Cloudflare gives you new nameservers:
+   - ns1.cloudflare.com
+   - ns2.cloudflare.com
+
+5. Go to your registrar (e.g., Namecheap)
+6. Find "Nameservers" or "DNS" settings
+7. Change from "Default" to "Custom"
+8. Enter Cloudflare's nameservers
+9. Save changes
+
+10. Wait for propagation (0-48 hours, usually <4 hours)
+11. Cloudflare will notify you when active
+12. Now manage DNS in Cloudflare dashboard!</code></pre>
+                </div>
+
+                <div class="warning-box">
+                    <span class="info-icon">⚠️</span>
+                    <div>
+                        <p><strong>DNS Propagation:</strong> When you change nameservers, it takes time for the change to spread worldwide. This is because:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>DNS servers cache old information</li>
+                            <li>Changes must propagate through global DNS hierarchy</li>
+                            <li>ISPs update at different rates</li>
+                            <li>Your TTL settings affect speed</li>
+                        </ul>
+                        <p style="margin-top: 1rem;"><strong>Tip:</strong> Lower your TTL to 300 seconds a day before making changes!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: DNS RECORDS -->
+        <section class="section" id="records">
+            <div class="section-header">
+                <span class="section-icon">📝</span>
+                <h2 class="section-title">ALL DNS RECORD TYPES</h2>
+                <span class="level-badge badge-advanced">Advanced</span>
+            </div>
+
+            <div class="content-card">
+                <h3>Complete DNS Records Guide</h3>
+                <p>Let's explore EVERY DNS record type with real examples for <code>learningmyway.space</code></p>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">A RECORD</div>
+                <p><strong>Purpose:</strong> Maps domain name to IPv4 address (32-bit)</p>
+                <p><strong>Most Common Use:</strong> Pointing your domain to a web server</p>
+                
+                <div class="record-example">
+                    <strong>Example for learningmyway.space:</strong><br><br>
+                    Type: A<br>
+                    Name: @<br>
+                    Value: 192.0.2.123<br>
+                    TTL: 3600<br><br>
+                    Result: learningmyway.space → 192.0.2.123
+                </div>
+
+                <div class="record-example">
+                    <strong>Subdomain Example:</strong><br><br>
+                    Type: A<br>
+                    Name: www<br>
+                    Value: 192.0.2.123<br>
+                    TTL: 3600<br><br>
+                    Result: www.learningmyway.space → 192.0.2.123
+                </div>
+
+                <div class="key-points">
+                    <ul>
+                        <li>@ means "root domain" (learningmyway.space)</li>
+                        <li>Can have multiple A records for same name (load balancing)</li>
+                        <li>Most websites need at least 2 A records (@ and www)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">AAAA RECORD</div>
+                <p><strong>Purpose:</strong> Maps domain name to IPv6 address (128-bit)</p>
+                <p><strong>Use Case:</strong> Support for modern IPv6 protocol</p>
+                
+                <div class="record-example">
+                    <strong>Example:</strong><br><br>
+                    Type: AAAA<br>
+                    Name: @<br>
+                    Value: 2001:0db8:85a3:0000:0000:8a2e:0370:7334<br>
+                    TTL: 3600<br><br>
+                    Result: learningmyway.space → 2001:0db8:85a3::8a2e:0370:7334
+                </div>
+
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <div>
+                        <p><strong>Why IPv6?</strong> We're running out of IPv4 addresses (only 4.3 billion). IPv6 has 340 undecillion addresses! Always add AAAA records alongside A records for future-proofing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">CNAME RECORD</div>
+                <p><strong>Purpose:</strong> Creates an alias from one domain to another (Canonical Name)</p>
+                <p><strong>Use Case:</strong> Point multiple names to the same destination</p>
+                
+                <div class="record-example">
+                    <strong>Example - Pointing www to root:</strong><br><br>
+                    Type: CNAME<br>
+                    Name: www<br>
+                    Value: learningmyway.space<br>
+                    TTL: 3600<br><br>
+                    Result: www.learningmyway.space → points to learningmyway.space
+                </div>
+
+                <div class="record-example">
+                    <strong>Example - Subdomain to external service:</strong><br><br>
+                    Type: CNAME<br>
+                    Name: blog<br>
+                    Value: myblog.ghost.io<br>
+                    TTL: 3600<br><br>
+                    Result: blog.learningmyway.space → points to Ghost hosting
+                </div>
+
+                <div class="warning-box">
+                    <span class="info-icon">⚠️</span>
+                    <div>
+                        <p><strong>CRITICAL RULE:</strong> You CANNOT create a CNAME for the root domain (@). This is a DNS protocol limitation. Use A/AAAA records or ALIAS/ANAME records instead (if your provider supports them).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">MX RECORD</div>
+                <p><strong>Purpose:</strong> Specifies mail servers for your domain (Mail Exchange)</p>
+                <p><strong>Use Case:</strong> Receiving email at your domain (e.g., rksuraj@learningmyway.space)</p>
+                
+                <div class="record-example">
+                    <strong>Example - Google Workspace:</strong><br><br>
+                    Type: MX<br>
+                    Name: @<br>
+                    Priority: 1<br>
+                    Value: aspmx.l.google.com<br><br>
+                    Type: MX<br>
+                    Name: @<br>
+                    Priority: 5<br>
+                    Value: alt1.aspmx.l.google.com<br><br>
+                    Type: MX<br>
+                    Name: @<br>
+                    Priority: 10<br>
+                    Value: alt2.aspmx.l.google.com
+                </div>
+
+                <div class="key-points">
+                    <ul>
+                        <li><strong>Priority:</strong> Lower number = higher priority (try this server first)</li>
+                        <li>Multiple MX records provide redundancy</li>
+                        <li>If priority 1 fails, mail server tries priority 5, then 10</li>
+                        <li>Required if you want to receive email at your domain</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">TXT RECORD</div>
+                <p><strong>Purpose:</strong> Store arbitrary text data - most versatile record type!</p>
+                <p><strong>Common Uses:</strong> Verification, email security, site ownership proof</p>
+                
+                <div class="record-example">
+                    <strong>Example 1 - Domain Verification (Google):</strong><br><br>
+                    Type: TXT<br>
+                    Name: @<br>
+                    Value: "google-site-verification=abc123xyz789"<br>
+                    TTL: 3600
+                </div>
+
+                <div class="record-example">
+                    <strong>Example 2 - SPF (Email Authentication):</strong><br><br>
+                    Type: TXT<br>
+                    Name: @<br>
+                    Value: "v=spf1 include:_spf.google.com ~all"<br>
+                    TTL: 3600<br><br>
+                    Meaning: Only Google's servers can send email from @learningmyway.space
+                </div>
+
+                <div class="record-example">
+                    <strong>Example 3 - DKIM (Email Signature):</strong><br><br>
+                    Type: TXT<br>
+                    Name: default._domainkey<br>
+                    Value: "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBA..."<br>
+                    TTL: 3600
+                </div>
+
+                <div class="record-example">
+                    <strong>Example 4 - DMARC (Email Policy):</strong><br><br>
+                    Type: TXT<br>
+                    Name: _dmarc<br>
+                    Value: "v=DMARC1; p=quarantine; rua=mailto:dmarc@learningmyway.space"<br>
+                    TTL: 3600
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">NS RECORD</div>
+                <p><strong>Purpose:</strong> Specifies authoritative nameservers for your domain</p>
+                <p><strong>Use Case:</strong> Delegates DNS control to specific nameservers</p>
+                
+                <div class="record-example">
+                    <strong>Example - Cloudflare Nameservers:</strong><br><br>
+                    Type: NS<br>
+                    Name: @<br>
+                    Value: ns1.cloudflare.com<br><br>
+                    Type: NS<br>
+                    Name: @<br>
+                    Value: ns2.cloudflare.com
+                </div>
+
+                <div class="record-example">
+                    <strong>Example - Subdomain Delegation:</strong><br><br>
+                    Type: NS<br>
+                    Name: api<br>
+                    Value: ns1.aws.com<br><br>
+                    Result: api.learningmyway.space DNS is managed by AWS
+                </div>
+
+                <div class="warning-box">
+                    <span class="info-icon">⚠️</span>
+                    <div>
+                        <p><strong>Important:</strong> NS records at the root (@) are usually set by your registrar and shouldn't be changed directly. You change nameservers in your registrar's dashboard, which updates these records automatically.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">SRV RECORD</div>
+                <p><strong>Purpose:</strong> Specifies location of specific services (Service Record)</p>
+                <p><strong>Use Case:</strong> VoIP, gaming servers, instant messaging, XMPP</p>
+                
+                <div class="record-example">
+                    <strong>Example - Minecraft Server:</strong><br><br>
+                    Type: SRV<br>
+                    Name: _minecraft._tcp<br>
+                    Priority: 0<br>
+                    Weight: 5<br>
+                    Port: 25565<br>
+                    Target: mc.learningmyway.space<br><br>
+                    Result: Players can connect via learningmyway.space instead of IP
+                </div>
+
+                <div class="record-example">
+                    <strong>Example - XMPP Chat:</strong><br><br>
+                    Type: SRV<br>
+                    Name: _xmpp-client._tcp<br>
+                    Priority: 10<br>
+                    Weight: 0<br>
+                    Port: 5222<br>
+                    Target: chat.learningmyway.space
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">CAA RECORD</div>
+                <p><strong>Purpose:</strong> Specifies which Certificate Authorities can issue SSL certificates</p>
+                <p><strong>Use Case:</strong> Security - prevent unauthorized certificate issuance</p>
+                
+                <div class="record-example">
+                    <strong>Example - Allow Only Let's Encrypt:</strong><br><br>
+                    Type: CAA<br>
+                    Name: @<br>
+                    Flags: 0<br>
+                    Tag: issue<br>
+                    Value: "letsencrypt.org"<br><br>
+                    Result: Only Let's Encrypt can issue certs for learningmyway.space
+                </div>
+
+                <div class="record-example">
+                    <strong>Example - Wildcard Certificate:</strong><br><br>
+                    Type: CAA<br>
+                    Name: @<br>
+                    Flags: 0<br>
+                    Tag: issuewild<br>
+                    Value: "letsencrypt.org"
+                </div>
+
+                <div class="record-example">
+                    <strong>Example - Report Violations:</strong><br><br>
+                    Type: CAA<br>
+                    Name: @<br>
+                    Flags: 0<br>
+                    Tag: iodef<br>
+                    Value: "mailto:security@learningmyway.space"
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">PTR RECORD</div>
+                <p><strong>Purpose:</strong> Reverse DNS - Maps IP address back to domain name</p>
+                <p><strong>Use Case:</strong> Email server reputation, network diagnostics</p>
+                
+                <div class="record-example">
+                    <strong>Example:</strong><br><br>
+                    Forward DNS: learningmyway.space → 192.0.2.123<br>
+                    Reverse DNS (PTR): 192.0.2.123 → mail.learningmyway.space<br><br>
+                    Note: Usually managed by your hosting provider, not in your DNS
+                </div>
+
+                <div class="info-box">
+                    <span class="info-icon">💡</span>
+                    <div>
+                        <p><strong>Why it matters for email:</strong> Mail servers check PTR records to verify the sender's identity. No PTR = your emails might go to spam!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dns-record-card">
+                <div class="record-type">SOA RECORD</div>
+                <p><strong>Purpose:</strong> Start of Authority - Contains zone metadata and admin info</p>
+                <p><strong>Note:</strong> Automatically created, rarely needs manual editing</p>
+                
+                <div class="record-example">
+                    <strong>Example:</strong><br><br>
+                    Type: SOA<br>
+                    Primary NS: ns1.cloudflare.com<br>
+                    Admin Email: dns.cloudflare.com<br>
+                    Serial: 2024021501<br>
+                    Refresh: 7200<br>
+                    Retry: 3600<br>
+                    Expire: 1209600<br>
+                    Minimum TTL: 3600
+                </div>
+
+                <div class="key-points">
+                    <ul>
+                        <li><strong>Serial:</strong> Increment when zone changes (format: YYYYMMDDNN)</li>
+                        <li><strong>Refresh:</strong> How often secondary NS checks for updates</li>
+                        <li><strong>Retry:</strong> Wait time if refresh fails</li>
+                        <li><strong>Expire:</strong> How long secondary NS serves stale data</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Quick Reference: DNS Records Summary</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Record</th>
+                                <th>Purpose</th>
+                                <th>Example Use</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>A</strong></td>
+                                <td>IPv4 address</td>
+                                <td>Point domain to server</td>
+                                <td>🔥 Essential</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AAAA</strong></td>
+                                <td>IPv6 address</td>
+                                <td>IPv6 support</td>
+                                <td>✅ Recommended</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CNAME</strong></td>
+                                <td>Alias to another domain</td>
+                                <td>www → root domain</td>
+                                <td>🔥 Essential</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MX</strong></td>
+                                <td>Mail servers</td>
+                                <td>Receive email</td>
+                                <td>🔥 If using email</td>
+                            </tr>
+                            <tr>
+                                <td><strong>TXT</strong></td>
+                                <td>Text data</td>
+                                <td>Verification, SPF, DKIM</td>
+                                <td>✅ Recommended</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NS</strong></td>
+                                <td>Nameservers</td>
+                                <td>DNS delegation</td>
+                                <td>⚙️ Auto-managed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CAA</strong></td>
+                                <td>SSL/TLS authority</td>
+                                <td>Certificate security</td>
+                                <td>🔒 Security</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SRV</strong></td>
+                                <td>Service location</td>
+                                <td>Gaming, VoIP</td>
+                                <td>⚡ Special use</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PTR</strong></td>
+                                <td>Reverse DNS</td>
+                                <td>Email reputation</td>
+                                <td>📧 Email servers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SOA</strong></td>
+                                <td>Zone metadata</td>
+                                <td>DNS zone info</td>
+                                <td>⚙️ Auto-created</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 4: PRACTICAL -->
+        <section class="section" id="practical">
+            <div class="section-header">
+                <span class="section-icon">🛠️</span>
+                <h2 class="section-title">PRACTICAL SETUP</h2>
+                <span class="level-badge badge-expert">Expert</span>
+            </div>
+
+            <div class="content-card">
+                <h3>Complete DNS Setup for learningmyway.space</h3>
+                <p>Let's set up a production-ready DNS configuration:</p>
+
+                <h4>Scenario: Website + Email + Subdomains</h4>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Complete DNS Records Setup</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># 1. MAIN WEBSITE (hosted on server 192.0.2.123)
+Type: A
+Name: @
+Value: 192.0.2.123
+TTL: 3600
+
+Type: AAAA
+Name: @
+Value: 2001:0db8:85a3::8a2e:0370:7334
+TTL: 3600
+
+Type: A
+Name: www
+Value: 192.0.2.123
+TTL: 3600
+
+# 2. EMAIL SETUP (Google Workspace)
+Type: MX
+Name: @
+Priority: 1
+Value: aspmx.l.google.com
+
+Type: MX
+Name: @
+Priority: 5
+Value: alt1.aspmx.l.google.com
+
+Type: MX
+Name: @
+Priority: 10
+Value: alt2.aspmx.l.google.com
+
+# 3. EMAIL AUTHENTICATION
+# SPF - Authorize Google to send email
+Type: TXT
+Name: @
+Value: "v=spf1 include:_spf.google.com ~all"
+
+# DKIM - Email signature
+Type: TXT
+Name: google._domainkey
+Value: "v=DKIM1; k=rsa; p=YOUR_PUBLIC_KEY_HERE"
+
+# DMARC - Email policy
+Type: TXT
+Name: _dmarc
+Value: "v=DMARC1; p=quarantine; rua=mailto:dmarc-reports@learningmyway.space"
+
+# 4. SUBDOMAINS
+# Blog (hosted on Ghost)
+Type: CNAME
+Name: blog
+Value: myblog.ghost.io
+TTL: 3600
+
+# API (different server)
+Type: A
+Name: api
+Value: 192.0.2.200
+TTL: 3600
+
+# Mail interface
+Type: CNAME
+Name: mail
+Value: ghs.googlehosted.com
+TTL: 3600
+
+# Development environment
+Type: A
+Name: dev
+Value: 192.0.2.250
+TTL: 300  # Lower TTL for testing
+
+# 5. SECURITY
+# CAA - Only Let's Encrypt can issue certificates
+Type: CAA
+Name: @
+Flags: 0
+Tag: issue
+Value: "letsencrypt.org"
+
+Type: CAA
+Name: @
+Flags: 0
+Tag: issuewild
+Value: "letsencrypt.org"
+
+# 6. VERIFICATION
+# Google Search Console
+Type: TXT
+Name: @
+Value: "google-site-verification=abc123xyz789"
+
+# Domain ownership for various services
+Type: TXT
+Name: @
+Value: "facebook-domain-verification=abc123xyz"</code></pre>
+                </div>
+
+                <div class="success-box">
+                    <span class="info-icon">✅</span>
+                    <div>
+                        <p><strong>Result:</strong> With these records, you have:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>✅ Main website accessible at learningmyway.space and www.learningmyway.space</li>
+                            <li>✅ Email working at rksuraj@learningmyway.space</li>
+                            <li>✅ Blog at blog.learningmyway.space</li>
+                            <li>✅ API at api.learningmyway.space</li>
+                            <li>✅ Protected against email spoofing</li>
+                            <li>✅ Secured SSL certificate issuance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>DNS Tools & Commands</h3>
+
+                <h4>Check DNS Records (Command Line):</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Essential DNS Commands</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># Check A records
+dig learningmyway.space A
+dig +short learningmyway.space A
+
+# Check all DNS records
+dig learningmyway.space ANY
+
+# Check MX records
+dig learningmyway.space MX
+
+# Check TXT records
+dig learningmyway.space TXT
+
+# Check nameservers
+dig learningmyway.space NS
+
+# Trace full DNS resolution path
+dig +trace learningmyway.space
+
+# Query specific DNS server
+dig @8.8.8.8 learningmyway.space
+
+# Check TTL
+dig learningmyway.space | grep TTL
+
+# Windows equivalent
+nslookup learningmyway.space
+nslookup -type=MX learningmyway.space
+nslookup -type=TXT learningmyway.space</code></pre>
+                </div>
+
+                <h4>Online DNS Tools:</h4>
+                <div class="key-points">
+                    <ul>
+                        <li><strong>DNSChecker.org</strong> - Check DNS propagation worldwide</li>
+                        <li><strong>MXToolbox.com</strong> - Comprehensive DNS and email testing</li>
+                        <li><strong>IntoDNS.com</strong> - DNS health check</li>
+                        <li><strong>WhatsMyDNS.net</strong> - Global DNS propagation checker</li>
+                        <li><strong>DNS Propagation Checker</strong> - Multiple location testing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Common DNS Issues & Solutions</h3>
+
+                <h4>❌ Issue 1: Website Not Loading</h4>
+                <div class="warning-box">
+                    <span class="info-icon">🔍</span>
+                    <div>
+                        <p><strong>Symptoms:</strong> Domain doesn't resolve, "server not found" error</p>
+                        <p><strong>Check:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>A record exists and points to correct IP</li>
+                            <li>Nameservers are correctly set at registrar</li>
+                            <li>DNS propagation complete (use dnschecker.org)</li>
+                            <li>Server is actually running and accessible</li>
+                        </ul>
+                        <p><strong>Command:</strong> <code>dig +short learningmyway.space A</code></p>
+                    </div>
+                </div>
+
+                <h4>❌ Issue 2: Email Not Working</h4>
+                <div class="warning-box">
+                    <span class="info-icon">📧</span>
+                    <div>
+                        <p><strong>Symptoms:</strong> Can't receive email, emails bouncing</p>
+                        <p><strong>Check:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>MX records exist with correct priorities</li>
+                            <li>SPF record configured</li>
+                            <li>DKIM records set up</li>
+                            <li>PTR record (reverse DNS) configured</li>
+                        </ul>
+                        <p><strong>Command:</strong> <code>dig learningmyway.space MX</code></p>
+                    </div>
+                </div>
+
+                <h4>❌ Issue 3: Slow DNS Resolution</h4>
+                <div class="warning-box">
+                    <span class="info-icon">⏱️</span>
+                    <div>
+                        <p><strong>Symptoms:</strong> Website takes long to start loading</p>
+                        <p><strong>Solutions:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Reduce number of DNS lookups on page</li>
+                            <li>Use a faster DNS provider (Cloudflare, Google)</li>
+                            <li>Increase TTL values (longer caching)</li>
+                            <li>Enable DNS prefetching in HTML</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>❌ Issue 4: Changes Not Taking Effect</h4>
+                <div class="warning-box">
+                    <span class="info-icon">⏳</span>
+                    <div>
+                        <p><strong>Cause:</strong> DNS caching and propagation</p>
+                        <p><strong>Solutions:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Wait for TTL to expire (check old TTL value)</li>
+                            <li>Clear local DNS cache: <code>ipconfig /flushdns</code> (Windows) or <code>sudo dscacheutil -flushcache</code> (Mac)</li>
+                            <li>Test with: <code>dig @8.8.8.8 learningmyway.space</code></li>
+                            <li>Lower TTL before making changes (plan ahead!)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-title">🔍 Interactive DNS Lookup</div>
+                <p style="margin-bottom: 1.5rem; color: var(--text-dim);">Enter any domain to see its DNS records:</p>
+                <input type="text" class="demo-input" id="domainInput" placeholder="Enter domain (e.g., google.com)" value="learningmyway.space">
+                <br>
+                <button class="demo-btn" onclick="lookupDNS()">Lookup DNS Records</button>
+                <div class="demo-result" id="dnsResult">
+                    <h4 style="margin-bottom: 1rem; color: var(--accent-cyan);">DNS Results:</h4>
+                    <pre id="resultContent"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPERT LEVEL -->
+        <section class="section" id="expert">
+            <div class="section-header">
+                <span class="section-icon">🚀</span>
+                <h2 class="section-title">EXPERT LEVEL</h2>
+                <span class="level-badge badge-expert">Expert</span>
+            </div>
+
+            <div class="content-card">
+                <h3>Advanced DNS Concepts</h3>
+
+                <h4>1. DNSSEC (DNS Security Extensions)</h4>
+                <p><strong>Problem:</strong> Standard DNS has no authentication - responses can be spoofed</p>
+                <p><strong>Solution:</strong> DNSSEC adds cryptographic signatures to DNS records</p>
+
+                <div class="key-points">
+                    <h4>How DNSSEC Works:</h4>
+                    <ul>
+                        <li>Each DNS zone has a public/private key pair</li>
+                        <li>DNS records are signed with private key</li>
+                        <li>Resolvers verify signatures with public key</li>
+                        <li>Creates "chain of trust" from root to your domain</li>
+                        <li>Prevents cache poisoning and man-in-the-middle attacks</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">Check DNSSEC Status</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code># Check if domain has DNSSEC
+dig learningmyway.space +dnssec
+
+# Verify DNSSEC validation
+dig @8.8.8.8 learningmyway.space +dnssec +multi
+
+# Check DS records (at parent zone)
+dig learningmyway.space DS</code></pre>
+                </div>
+
+                <h4>2. GeoDNS (Geographic DNS)</h4>
+                <p>Return different IP addresses based on user's location for:</p>
+                <ul style="margin-left: 2rem;">
+                    <li>Lower latency (closer server)</li>
+                    <li>Compliance (data residency laws)</li>
+                    <li>Load distribution</li>
+                </ul>
+
+                <div class="record-example">
+                    <strong>Example GeoDNS Setup:</strong><br><br>
+                    Asia users → 192.0.2.100 (Tokyo server)<br>
+                    Europe users → 192.0.2.200 (Frankfurt server)<br>
+                    US users → 192.0.2.300 (Virginia server)
+                </div>
+
+                <h4>3. Anycast DNS</h4>
+                <p>Multiple servers share the same IP address. Router sends request to nearest server.</p>
+                <p><strong>Used by:</strong> Cloudflare (1.1.1.1), Google (8.8.8.8), Root DNS servers</p>
+
+                <h4>4. DNS Load Balancing</h4>
+                <p>Return multiple A records in rotating order:</p>
+
+                <div class="code-block">
+                    <pre><code>Type: A
+Name: @
+Value: 192.0.2.10
+
+Type: A
+Name: @
+Value: 192.0.2.20
+
+Type: A
+Name: @
+Value: 192.0.2.30
+
+Result: Traffic distributed across 3 servers</code></pre>
+                </div>
+
+                <h4>5. DNS over HTTPS (DoH) / DNS over TLS (DoT)</h4>
+                <p><strong>Problem:</strong> Standard DNS queries are unencrypted</p>
+                <p><strong>Solution:</strong> Encrypt DNS queries using HTTPS or TLS</p>
+
+                <div class="key-points">
+                    <h4>Benefits:</h4>
+                    <ul>
+                        <li>ISP can't see which websites you're visiting</li>
+                        <li>Prevents DNS hijacking</li>
+                        <li>Protects privacy on public WiFi</li>
+                    </ul>
+                </div>
+
+                <p><strong>Popular DoH Providers:</strong></p>
+                <ul style="margin-left: 2rem;">
+                    <li>Cloudflare: https://1.1.1.1/dns-query</li>
+                    <li>Google: https://dns.google/dns-query</li>
+                    <li>Quad9: https://dns.quad9.net/dns-query</li>
+                </ul>
+            </div>
+
+            <div class="content-card">
+                <h3>Performance Optimization</h3>
+
+                <h4>TTL Strategy:</h4>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <div class="comparison-title">LOW TTL (300s)</div>
+                        <div class="key-points" style="text-align: left; margin-top: 1rem;">
+                            <ul>
+                                <li>Changes propagate fast</li>
+                                <li>More DNS queries</li>
+                                <li>Slight performance hit</li>
+                            </ul>
+                        </div>
+                        <p style="margin-top: 1rem;"><strong>Use when:</strong> Testing, frequent changes</p>
+                    </div>
+
+                    <div class="comparison-item">
+                        <div class="comparison-title">HIGH TTL (86400s)</div>
+                        <div class="key-points" style="text-align: left; margin-top: 1rem;">
+                            <ul>
+                                <li>Fewer DNS queries</li>
+                                <li>Better performance</li>
+                                <li>Slower to change</li>
+                            </ul>
+                        </div>
+                        <p style="margin-top: 1rem;"><strong>Use when:</strong> Stable, production</p>
+                    </div>
+                </div>
+
+                <h4>DNS Prefetching:</h4>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-label">HTML DNS Prefetch</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;!-- Prefetch DNS for external resources --&gt;
+    &lt;link rel="dns-prefetch" href="//fonts.googleapis.com"&gt;
+    &lt;link rel="dns-prefetch" href="//cdn.example.com"&gt;
+    &lt;link rel="dns-prefetch" href="//api.learningmyway.space"&gt;
+    
+    &lt;!-- Browser resolves these BEFORE they're needed! --&gt;
+&lt;/head&gt;</code></pre>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>🎓 DNS Mastery Checklist</h3>
+                
+                <div class="success-box">
+                    <span class="info-icon">🏆</span>
+                    <div>
+                        <h4 style="margin-bottom: 1rem;">You now understand:</h4>
+                        <ul style="margin-left: 1.5rem;">
+                            <li>✅ What DNS is and why we need it</li>
+                            <li>✅ Complete DNS resolution workflow (10+ steps)</li>
+                            <li>✅ How to buy and configure a domain</li>
+                            <li>✅ All 10+ DNS record types with examples</li>
+                            <li>✅ Nameservers and how to change them</li>
+                            <li>✅ DNS propagation and caching</li>
+                            <li>✅ Email authentication (SPF, DKIM, DMARC)</li>
+                            <li>✅ SSL certificate authorization (CAA)</li>
+                            <li>✅ Troubleshooting DNS issues</li>
+                            <li>✅ Advanced concepts (DNSSEC, GeoDNS, DoH)</li>
+                            <li>✅ Performance optimization strategies</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Scroll reveal
+        function checkScroll() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight * 0.75;
+                if (isVisible) {
+                    section.classList.add('visible');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('load', checkScroll);
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress').style.width = scrolled + '%';
+        });
+
+        // Copy code
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'COPIED!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // DNS Lookup (educational - shows what to check)
+        function lookupDNS() {
+            const domain = document.getElementById('domainInput').value;
+            const result = document.getElementById('dnsResult');
+            const content = document.getElementById('resultContent');
+
+            if (!domain) {
+                alert('Please enter a domain name!');
+                return;
+            }
+
+            result.classList.add('show');
+            
+            // Educational example of what DNS lookup shows
+            content.textContent = `DNS Records for: ${domain}
+
+To check these records yourself, use these commands:
+
+1. A Records (IPv4):
+   dig ${domain} A
+   dig +short ${domain} A
+
+2. AAAA Records (IPv6):
+   dig ${domain} AAAA
+
+3. MX Records (Email):
+   dig ${domain} MX
+
+4. TXT Records (Verification, SPF, DKIM):
+   dig ${domain} TXT
+
+5. NS Records (Nameservers):
+   dig ${domain} NS
+
+6. Full DNS Trace:
+   dig +trace ${domain}
+
+Online Tools:
+• https://dnschecker.org
+• https://mxtoolbox.com/SuperTool.aspx?action=a:${domain}
+• https://whatsmydns.net/#A/${domain}
+
+Try these commands in your terminal to see real DNS data!`;
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
